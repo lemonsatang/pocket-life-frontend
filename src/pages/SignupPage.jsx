@@ -15,9 +15,9 @@ export default function SignupPage({ onGoLogin }) {
     sms: false,
     mail: false,
   });
-  const [showPw, setShowPw] = useState(false);
+  const [showPw, setShowPw] = useState(false); // 비밀번호 보기 공개여부
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // 로딩 여부
   const [idMsg, setIdMsg] = useState({ text: "", isError: false }); // 아이디 중복 체크 여부
 
   const [m, setM] = useState({
@@ -192,18 +192,6 @@ export default function SignupPage({ onGoLogin }) {
       <div className="fieldErr">{msg}</div>
     );
 
-  const fakeRegister = () =>
-    new Promise((resolve, reject) => {
-      setTimeout(() => {
-        Math.random() < 0.2
-          ? reject({
-              message: "아이디가 이미 사용 중입니다.",
-              errors: { username: "중복된 아이디" },
-            })
-          : resolve({ ok: true });
-      }, 600);
-    });
-
   const buildReason = (data, fallback) => {
     const lines = [];
     if (data?.message) lines.push(String(data.message));
@@ -212,22 +200,6 @@ export default function SignupPage({ onGoLogin }) {
         if (v) lines.push(`${k}: ${String(v)}`);
     }
     return lines.length ? lines.join("\n") : fallback;
-  };
-
-  const saveLocal = () => {
-    localStorage.setItem(
-      "mock_user",
-      JSON.stringify({
-        id: f.id,
-        pw: f.pw,
-        email: f.email,
-        name: f.name,
-        phone: f.phone,
-        birth: f.birth,
-        agree: { mkt: f.mkt, sms: f.sms, mail: f.mail },
-        createdAt: Date.now(),
-      })
-    );
   };
 
   // 회원가입
