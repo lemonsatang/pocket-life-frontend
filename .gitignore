@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 Self_Practice/
+
+.vscode/
+.settings/
+.project
+.classpath
