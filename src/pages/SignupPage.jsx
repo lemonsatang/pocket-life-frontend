@@ -144,8 +144,8 @@ export default function SignupPage({ onGoLogin }) {
     }
 
     // 글자수 확인
-    if (val.length <= 6) {
-      setIdMsg({ text: "아이디는 6자 이상이어야 합니다.", isError: true });
+    if (val.length < 4) {
+      setIdMsg({ text: "아이디는 4자 이상이어야 합니다.", isError: true });
       return;
     }
 
@@ -154,7 +154,7 @@ export default function SignupPage({ onGoLogin }) {
         usrid: e.target.value,
       });
 
-      if (idk) {
+      if (idk.data) {
         setIdMsg({ text: "이미 사용 중인 아이디입니다.", isError: true });
       } else {
         setIdMsg({ text: "사용 가능한 아이디입니다.", isError: false });
