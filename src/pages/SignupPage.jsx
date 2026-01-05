@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
-// 경로에 맞춰 수정해주세요 (같은 폴더면 "./Modal", components 폴더면 "../components/Modal")
 import Modal from "../components/Modal";
+import axios from "axios";
 
 export default function SignupPage({ onGoLogin }) {
   const [f, set] = useState({
@@ -18,6 +18,7 @@ export default function SignupPage({ onGoLogin }) {
   const [showPw, setShowPw] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [idMsg, setIdMsg] = useState({ text: "", isError: false }); // 아이디 중복 체크 여부
 
   const [m, setM] = useState({
     open: false,
@@ -133,6 +134,36 @@ export default function SignupPage({ onGoLogin }) {
     set((s) => ({ ...s, [name]: v }));
   };
 
+  // 아이디 중복 확인
+  const idChk = async (e) => {
+    const val = e.target.value;
+
+    // 빈값 여부 확인
+    if (!val) {
+      return;
+    }
+
+    // 글자수 확인
+    if (val.length <= 6) {
+      setIdMsg({ text: "아이디는 6자 이상이어야 합니다.", isError: true });
+      return;
+    }
+
+    try {
+      const idk = await axios.post("http://localhost:8080/idChk", {
+        usrid: e.target.value,
+      });
+
+      if (idk) {
+        setIdMsg({ text: "이미 사용 중인 아이디입니다.", isError: true });
+      } else {
+        setIdMsg({ text: "사용 가능한 아이디입니다.", isError: false });
+      }
+    } catch (e) {
+      console.error("중복 체크 중 에러 발생:", e.response?.data || e.message);
+    }
+  };
+
   const err = useMemo(
     () => ({
       id: !f.id ? "필수 입력" : f.id.length < 4 ? "아이디 4자 이상" : "",
@@ -199,15 +230,31 @@ export default function SignupPage({ onGoLogin }) {
     );
   };
 
+  // 회원가입
   const submit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
+
     if (Object.values(err).some(Boolean)) return;
 
     setLoading(true);
     try {
-      await fakeRegister();
-      saveLocal();
+      // await fakeRegister();
+      // saveLocal();
+
+      const joinData = {
+        usrid: f.id,
+        usrnm: f.name,
+        passwd: f.pw,
+        email: f.email,
+        tel: f.phone,
+        birth: f.birth,
+        mkConsent: f.mkt ? "Y" : "N",
+        mailConsent: f.mail ? "Y" : "N",
+      };
+
+      const response = await axios.post("http://localhost:8080/join", joinData);
+
       setLoading(false);
       openAskGoLogin();
     } catch (data) {
@@ -227,7 +274,19 @@ export default function SignupPage({ onGoLogin }) {
           name="id"
           value={f.id}
           onChange={on}
+          onBlur={idChk}
         />
+        {idMsg.text && (
+          <div
+            style={{
+              color: idMsg.isError ? "red" : "green",
+              fontSize: "12px",
+              textAlign: "-webkit-left",
+            }}
+          >
+            {idMsg.text}
+          </div>
+        )}
         <InlineErr msg={err.id} />
 
         <Field
@@ -367,6 +426,7 @@ function Field({
   name,
   value,
   onChange,
+  onBlur,
   suffix,
 }) {
   return (
@@ -378,6 +438,7 @@ function Field({
         type={type}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         placeholder={placeholder}
         style={{ flex: 1 }}
       />
