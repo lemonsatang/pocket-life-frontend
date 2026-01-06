@@ -17,16 +17,8 @@ import "./styles/DatePicker.css";
 
 // [Logic] 메인 App 컴포넌트
 export default function App() {
-  // [임시] 개발용 - 로그인 우회 (배포 시 제거 필요)
-  const [authed, setAuthed] = useState(true);
+  const [authed, setAuthed] = useState(false);
   const [view, setView] = useState("login");
-
-  // [임시] 개발용 - 자동 로그인 토큰 설정
-  useEffect(() => {
-    if (!localStorage.getItem("mock_token")) {
-      localStorage.setItem("mock_token", "dev-temp-token");
-    }
-  }, []);
 
   // [Logic] 로그아웃 처리
   const logout = () => {

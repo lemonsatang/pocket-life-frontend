@@ -1,6 +1,8 @@
 // [Layout] 로그인 페이지 - 사용자 인증
 import React, { useState } from "react";
+// 경로에 맞춰 수정 (같은 폴더면 "./Modal", components 폴더면 "../components/Modal")
 import Modal from "../../components/Modal/Modal";
+import axios from "axios";
 import "./LoginPage.css";
 
 export default function LoginPage({ onGoSignup, onLoginSuccess }) {
@@ -56,23 +58,39 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
     });
   };
 
-  // [Logic] 로그인 처리
-  const login = (e) => {
+  const login = async (e) => {
     e.preventDefault();
-    if (!id || !pw) return openAskSignup();
 
-    const raw = localStorage.getItem("mock_user");
-    if (!raw) return openAskSignup();
+    // 로그인에 사용할 formData 생성
+    const formData = new FormData();
+    formData.append("username", id);
+    formData.append("password", pw);
 
-    const user = JSON.parse(raw);
-    if (user.id !== id || user.pw !== pw) return openAskSignup();
+    try {
+      // 서버에 로그인 요청
+      const response = await axios.post(
+        "http://localhost:8080/login",
+        formData
+      );
+      console.log(response);
 
-    localStorage.setItem("mock_token", "mock-" + Date.now());
-    openOk("로그인 성공", () => {
-      setId("");
-      setPw("");
-      onLoginSuccess?.();
-    });
+      // 토큰 추출
+      const token = response.headers["authorization"];
+
+      // 토큰 있을시 로컬스토리지에 저장
+      if (token) {
+        localStorage.setItem("token", token);
+
+        openOk("로그인 성공", () => {
+          setId("");
+          setPw("");
+          onLoginSuccess?.();
+        });
+      }
+    } catch (e) {
+      console.error("로그인 에러: ", e);
+      openOk("로그인 정보를 확인해주세요.");
+    }
   };
 
   // [Logic] 소셜 로그인 처리
