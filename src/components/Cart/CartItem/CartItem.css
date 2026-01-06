@@ -1,0 +1,97 @@
+/* =================================================================
+   [CartItem.css] 장바구니 아이템 컴포넌트 스타일
+   ================================================================= */
+
+/* 1. 아이템 행 */
+.cart-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  margin-bottom: 5px;
+  border-radius: 10px;
+}
+
+.cart-item-row.highlight {
+  animation: highlightBlink 0.8s infinite;
+}
+
+/* 2. 아이템 내용 */
+.cart-item-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cart-item-favorite {
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.cart-item-favorite.active {
+  color: #fbc02d;
+}
+
+.cart-item-favorite.inactive {
+  color: #cbd5e0;
+}
+
+.cart-item-text {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.cart-item-text.bought {
+  text-decoration: line-through;
+  color: #cbd5e0;
+}
+
+.cart-item-text.not-bought {
+  color: #4a5568;
+}
+
+.cart-item-count {
+  color: #5e72e4;
+  margin-left: 5px;
+  font-weight: bold;
+}
+
+/* 3. 아이템 액션 */
+.cart-item-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.cart-item-complete-badge {
+  color: #48bb78;
+  font-weight: bold;
+  padding: 5px 10px;
+}
+
+.cart-item-complete-btn {
+  background: #48bb78;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.cart-item-delete-btn {
+  padding: 6px 15px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* 4. 애니메이션 */
+@keyframes highlightBlink {
+  0%, 100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: #fff9c4;
+    transform: scale(1.01);
+  }
+}

@@ -1,88 +1,21 @@
-import React, { useState } from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Link,
-  useLocation,
-} from "react-router-dom";
-import Home from "./pages/Home";
-import Meal from "./pages/Meal";
+// [Layout] 메인 앱 컴포넌트 - 라우팅 및 인증 상태 관리
+import React, { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home/Home";
+import MealPage from "./pages/MealPage/MealPage";
 import Cart from "./pages/Cart";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
+import SchedulePage from "./pages/SchedulePage/SchedulePage";
+import LedgerPage from "./pages/LedgerPage/LedgerPage";
+import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
+import Header from "./components/Layout/Header";
+import Footer from "./components/Layout/Footer";
+import AuthLayout from "./components/Layout/AuthLayout/AuthLayout";
 
-// [CSS] 두 파일 모두 import
-import "./Retro.css";
-import "./Auth.css";
+// [Style] 전역 스타일 import
+import "./styles/Common.css";
+import "./styles/DatePicker.css";
 
-function Nav({ onLogout }) {
-  const location = useLocation();
-  const path = location.pathname;
-
-  return (
-    <nav className="pixel-nav-container">
-      <div className="pixel-nav-bar">
-        {/* 로고 */}
-        <Link
-          to="/"
-          className="nav-logo-small"
-          style={{ textDecoration: "none" }}
-        >
-          <span className="logo-text">Pocket Life</span>
-        </Link>
-
-        {/* 메뉴 구성: 대시보드 / 식단 관리 / 장바구니 / 일정 / 가계부 */}
-        <div className="nav-tabs">
-          <Link to="/" className={`nav-tab ${path === "/" ? "active" : ""}`}>
-            대시보드
-          </Link>
-          <div className="nav-divider"></div>
-
-          <Link
-            to="/meal"
-            className={`nav-tab ${path === "/meal" ? "active" : ""}`}
-          >
-            식단 관리
-          </Link>
-          <div className="nav-divider"></div>
-
-          <Link
-            to="/cart"
-            className={`nav-tab ${path === "/cart" ? "active" : ""}`}
-          >
-            장바구니
-          </Link>
-          <div className="nav-divider"></div>
-
-          <Link
-            to="/schedule"
-            className={`nav-tab ${path === "/schedule" ? "active" : ""}`}
-          >
-            일정
-          </Link>
-          <div className="nav-divider"></div>
-
-          <Link
-            to="/ledger"
-            className={`nav-tab ${path === "/ledger" ? "active" : ""}`}
-          >
-            가계부
-          </Link>
-        </div>
-
-        {/* 우측 유저 정보 및 로그아웃 */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div className="nav-user-info">효민님 반갑습니다.</div>
-          <button className="logoutBtn" onClick={onLogout}>
-            로그아웃
-          </button>
-        </div>
-      </div>
-    </nav>
-  );
-}
-
+// [Logic] 메인 App 컴포넌트
 export default function App() {
   const [authed, setAuthed] = useState(false);
   const [view, setView] = useState("login");
@@ -92,107 +25,44 @@ export default function App() {
     localStorage.removeItem("mock_token");
     setAuthed(false);
     setView("login");
-    // [핵심] 로그아웃 시에도 URL을 / (대시보드)로 초기화
     window.history.pushState(null, "", "/");
   };
 
-  // 1. 로그인이 안 된 경우 -> 로그인/회원가입 화면 (Auth.css 적용)
+  // [Logic] 로그인 성공 핸들러
+  const handleLoginSuccess = () => {
+    setAuthed(true);
+    window.history.pushState(null, "", "/");
+  };
+
+  // [Layout] 미인증 상태 - 인증 레이아웃 표시
   if (!authed) {
     return (
-      <div className="authBg">
-        <div className="authWrap">
-          <div className="brand">Pocket Life</div>
-
-          <div className="topBar"></div>
-
-          {/* [중요] auth-card 클래스 유지 (로그인 UI 깨짐 방지) */}
-          <div className="auth-card">
-            <div className="banner">
-              <svg className="drop" viewBox="0 0 64 64" aria-hidden="true">
-                <path d="M32 6C24 18 16 26 16 38a16 16 0 0 0 32 0C48 26 40 18 32 6z" />
-              </svg>
-            </div>
-
-            <div className="panel">
-              {view === "signup" ? (
-                <SignupPage onGoLogin={() => setView("login")} />
-              ) : (
-                <LoginPage
-                  onGoSignup={() => setView("signup")}
-                  onLoginSuccess={() => {
-                    setAuthed(true);
-                    // [핵심] 로그인 성공 시 무조건 URL을 / (대시보드)로 변경
-                    window.history.pushState(null, "", "/");
-                  }}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <AuthLayout
+        view={view}
+        onGoLogin={() => setView("login")}
+        onGoSignup={() => setView("signup")}
+        onLoginSuccess={handleLoginSuccess}
+      />
     );
   }
 
-  // 2. 로그인이 된 경우 -> 대시보드 (Retro.css 적용)
+  // [Layout] 인증 상태 - 메인 애플리케이션
   return (
     <BrowserRouter>
-      <Nav onLogout={logout} />
-      <main className="main-content">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/meal" element={<Meal />} />
-          <Route path="/cart" element={<Cart />} />
-
-          {/* 일정, 가계부 라우트 - 글자색(color) 추가됨 */}
-          <Route
-            path="/schedule"
-            element={
-              <div
-                style={{
-                  padding: "40px",
-                  textAlign: "center",
-                  fontFamily: "Jua",
-                  color: "#6f76a1",
-                }}
-              >
-                <h2>📅 일정 페이지</h2>
-                <p>아직 준비 중입니다.</p>
-              </div>
-            }
-          />
-          <Route
-            path="/ledger"
-            element={
-              <div
-                style={{
-                  padding: "40px",
-                  textAlign: "center",
-                  fontFamily: "Jua",
-                  color: "#6f76a1",
-                }}
-              >
-                <h2>💰 가계부 페이지</h2>
-                <p>아직 준비 중입니다.</p>
-              </div>
-            }
-          />
-
-          <Route
-            path="*"
-            element={
-              <div
-                style={{
-                  padding: "50px",
-                  textAlign: "center",
-                  color: "#6f76a1",
-                }}
-              >
-                <h2>페이지를 찾을 수 없습니다.</h2>
-              </div>
-            }
-          />
-        </Routes>
-      </main>
+      <div className="app-layout">
+        <Header onLogout={logout} />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/meal" element={<MealPage />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/schedule" element={<SchedulePage />} />
+            <Route path="/ledger" element={<LedgerPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
     </BrowserRouter>
   );
 }

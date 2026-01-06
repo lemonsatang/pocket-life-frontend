@@ -1,0 +1,26 @@
+.signup-id-msg {
+  font-size: 12px;
+  text-align: -webkit-left;
+}
+
+.signup-id-msg.error {
+  color: red;
+}
+
+.signup-id-msg.success {
+  color: green;
+}
+
+.signup-password-toggle-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  color: #a0aec0;
+}
+
+.signup-field-input {
+  flex: 1;
+}

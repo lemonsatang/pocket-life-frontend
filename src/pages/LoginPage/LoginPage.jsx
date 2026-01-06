@@ -1,12 +1,14 @@
+// [Layout] 로그인 페이지 - 사용자 인증
 import React, { useState } from "react";
 // 경로에 맞춰 수정 (같은 폴더면 "./Modal", components 폴더면 "../components/Modal")
 import Modal from "../../components/Modal/Modal";
 import axios from "axios";
+import "./LoginPage.css";
 
 export default function LoginPage({ onGoSignup, onLoginSuccess }) {
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
-  const [showPw, setShowPw] = useState(false); // 비밀번호 보이기 상태
+  const [showPw, setShowPw] = useState(false);
 
   const [m, setM] = useState({
     open: false,
@@ -19,8 +21,10 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
     onCancel: null,
   });
 
+  // [Logic] 모달 닫기
   const close = () => setM((s) => ({ ...s, open: false }));
 
+  // [Logic] 회원가입 안내 모달
   const openAskSignup = () => {
     setM({
       open: true,
@@ -37,6 +41,7 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
     });
   };
 
+  // [Logic] 확인 모달
   const openOk = (msg, after) => {
     setM({
       open: true,
@@ -88,9 +93,8 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
     }
   };
 
-  // [추가] 소셜 로그인 시뮬레이션 (가짜 로그인)
+  // [Logic] 소셜 로그인 처리
   const handleSocialLogin = (provider) => {
-    // 실제로는 여기서 구글/네이버 API를 호출하지만, 과제용으로 바로 성공 처리
     localStorage.setItem(
       "mock_token",
       "mock-social-" + provider + "-" + Date.now()
@@ -112,11 +116,10 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
             </svg>
           </span>
           <input
-            className="input"
+            className="input login-input"
             value={id}
             onChange={(e) => setId(e.target.value)}
             placeholder="아이디"
-            style={{ flex: 1 }}
           />
         </div>
 
@@ -127,25 +130,16 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
             </svg>
           </span>
           <input
-            className="input"
+            className="input login-input"
             type={showPw ? "text" : "password"}
             value={pw}
             onChange={(e) => setPw(e.target.value)}
             placeholder="비밀번호"
-            style={{ flex: 1 }}
           />
           <button
             type="button"
             onClick={() => setShowPw(!showPw)}
-            style={{
-              border: "none",
-              background: "transparent",
-              cursor: "pointer",
-              padding: "0 5px",
-              display: "flex",
-              alignItems: "center",
-              color: "#a0aec0",
-            }}
+            className="login-password-toggle-btn"
           >
             {showPw ? (
               <svg width="18" height="18" viewBox="0 0 24 24">
@@ -184,7 +178,6 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
         </div>
 
         <div className="socialRow">
-          {/* [수정] 구글 버튼에 클릭 이벤트 추가 */}
           <button
             type="button"
             className="social google"
@@ -194,11 +187,9 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
               alt="Google"
-              style={{ width: "30px", cursor: "pointer" }}
+              className="login-social-img"
             />
           </button>
-
-          {/* [수정] 네이버 버튼에 클릭 이벤트 추가 */}
           <button
             type="button"
             className="social naver"

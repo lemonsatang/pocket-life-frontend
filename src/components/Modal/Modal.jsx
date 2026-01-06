@@ -1,4 +1,6 @@
+// [Layout] 모달 컴포넌트 - 확인/취소 다이얼로그
 import React from "react";
+import "./Modal.css";
 
 export default function Modal({
   open,
@@ -17,7 +19,6 @@ export default function Modal({
       <div className="modalCard">
         {title && <div className="modalTitle">{title}</div>}
         <div className="modalMsg">{message}</div>
-
         <div className="modalBtns">
           {showCancel && (
             <button type="button" className="modalBtn ghost" onClick={onCancel}>

@@ -1,0 +1,180 @@
+/* =================================================================
+   [Common.css] 공통 컴포넌트 스타일
+   카드, 버튼, 입력 필드, 리스트 등 재사용 가능한 컴포넌트
+   ================================================================= */
+
+/* 1. 앱 레이아웃 */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 2. 메인 콘텐츠 영역 */
+.main-content {
+  margin-top: 100px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 60px;
+  flex: 1;
+}
+
+/* 2. 카드 컴포넌트 */
+.pixel-card {
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 40px;
+  width: 650px;
+  box-shadow: 0 20px 50px rgba(170, 183, 236, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pixel-card h2,
+.pixel-card h3 {
+  color: #2d3748;
+  margin-bottom: 30px;
+  font-weight: 400;
+}
+
+/* 3. 입력 그룹 */
+.input-group {
+  display: flex;
+  width: 100%;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+/* 4. 입력 필드 */
+.pixel-input {
+  flex: 1;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 15px 25px;
+  font-family: "Jua", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #2d3748 !important;
+  outline: none;
+  transition: 0.3s;
+}
+
+.pixel-input:focus {
+  border-color: #aab7ec;
+  box-shadow: 0 0 0 3px rgba(170, 183, 236, 0.2);
+}
+
+/* 5. 버튼 컴포넌트 */
+.pixel-btn {
+  background: #aab7ec !important;
+  color: #fff !important;
+  border: none;
+  border-radius: 17.5px;
+  padding: 0 40px;
+  cursor: pointer;
+  font-family: "Jua", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  height: 55px;
+  box-shadow: 0 8px 20px rgba(170, 183, 236, 0.4);
+  white-space: nowrap;
+  transition: transform 0.2s;
+  min-width: 0px;
+}
+
+.pixel-btn:active {
+  transform: scale(0.95);
+}
+
+.pixel-btn.delete {
+  margin-left: auto !important;
+  height: 40px;
+  padding: 0 25px;
+  font-size: 16px;
+  font-weight: 400;
+  border-radius: 15px;
+  background: #9fa8da !important;
+  box-shadow: none;
+  min-width: auto;
+}
+
+.pixel-btn.edit {
+  background: #48bb78 !important;
+  height: 40px;
+  padding: 0 25px;
+  font-size: 16px;
+  border-radius: 15px;
+  box-shadow: none !important;
+}
+
+.mini-btn {
+  border: none !important;
+  outline: none !important;
+  background: #edf2f7;
+  color: #718096;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  margin-top: auto;
+}
+
+/* 6. 리스트 아이템 */
+.item-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 18px 5px;
+  border-bottom: 1px solid #f1f5f9;
+  box-sizing: border-box;
+}
+
+.item-row span {
+  font-size: 18px;
+  color: #4a5568;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
+
+.item-row span::before {
+  content: "•";
+  margin-right: 10px;
+  color: #aab7ec;
+  display: inline-block;
+}
+
+/* 칼로리 내부의 추가 기호 발생 방지 */
+.item-row span span::before {
+  content: none !important;
+}
+
+/* 7. 대시보드 카드 (Home 전용) - DashboardCard.css로 이동됨 */
+/* .card, .card h3, .count-box, .sub-text 스타일은 DashboardCard.css로 분리되었습니다. */
+
+/* 8. Placeholder 및 404 페이지 */
+.placeholder-page {
+  padding: 40px;
+  text-align: center;
+  font-family: "Jua", sans-serif;
+  color: #6f76a1;
+}
+
+.placeholder-page h2 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.not-found-page {
+  padding: 50px;
+  text-align: center;
+  color: #6f76a1;
+  font-family: "Jua", sans-serif;
+}
+
+.not-found-page h2 {
+  font-size: 1.5rem;
+}

@@ -1,6 +1,7 @@
 import React from "react";
 import DatePicker from "react-datepicker";
-import CartItem from "./CartItem";
+import CartItem from "../CartItem/CartItem";
+import "./CartMainSection.css";
 
 const CartMainSection = (props) => {
   const {
@@ -36,32 +37,13 @@ const CartMainSection = (props) => {
   ).sort((a, b) => new Date(b) - new Date(a));
 
   return (
-    <div
-      className="pixel-card"
-      style={{
-        flex: 1.2,
-        padding: "25px",
-        minWidth: "500px",
-        boxSizing: "border-box",
-        transition: "opacity 0.2s",
-      }}
-    >
-      <h3 style={{ fontSize: "1.5rem", marginBottom: "20px" }}>
-        오늘의 장바구니🛍️
-      </h3>
+    <div className="pixel-card cart-main-card">
+      <h3 className="cart-main-title">오늘의 장바구니🛍️</h3>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "15px",
-          marginBottom: "20px",
-        }}
-      >
+      <div className="cart-main-date-picker">
         <button
+          className="cart-main-date-btn"
           onClick={() => onDateChange(-1)}
-          style={{ background: "none", color: "#5e72e4", fontSize: "1.2rem" }}
         >
           ◀
         </button>
@@ -70,26 +52,20 @@ const CartMainSection = (props) => {
           onChange={onDatePickerChange}
           dateFormat="yyyy년 MM월 dd일 eeee"
           customInput={
-            <span
-              style={{
-                fontWeight: "bold",
-                cursor: "pointer",
-                color: "#4a5568",
-              }}
-            >
+            <span className="cart-main-date-input">
               {getDateStr(currentDate)} 📅
             </span>
           }
         />
         <button
+          className="cart-main-date-btn"
           onClick={() => onDateChange(1)}
-          style={{ background: "none", color: "#5e72e4", fontSize: "1.2rem" }}
         >
           ▶
         </button>
       </div>
 
-      <div className="input-group" style={{ marginBottom: "20px" }}>
+      <div className="input-group cart-main-input-group">
         <input
           className="pixel-input"
           type="text"
@@ -99,9 +75,8 @@ const CartMainSection = (props) => {
           placeholder="구매할 물건 입력..."
         />
         <button
-          className="pixel-btn"
+          className="pixel-btn cart-main-search-btn"
           onClick={onSearch}
-          style={{ background: "#5e72e4" }}
         >
           검색
         </button>
@@ -111,29 +86,15 @@ const CartMainSection = (props) => {
       </div>
 
       {uniqueDates.length >= 2 && (
-        <div
-          style={{
-            marginBottom: "15px",
-            padding: "10px",
-            background: "#f8f9fa",
-            borderRadius: "10px",
-            fontSize: "0.85rem",
-          }}
-        >
-          <span style={{ color: "#718096", marginRight: "10px" }}>
+        <div className="cart-main-date-selector">
+          <span className="cart-main-date-selector-label">
             여러 번 구매했네요! 날짜 선택:
           </span>
           {uniqueDates.map((date, idx) => (
             <button
               key={idx}
+              className="cart-main-date-selector-btn"
               onClick={() => onMoveDate(date, inputValue)}
-              style={{
-                color: "#5e72e4",
-                cursor: "pointer",
-                marginRight: "8px",
-                background: "none",
-                textDecoration: "underline",
-              }}
             >
               {date}
             </button>
@@ -145,23 +106,12 @@ const CartMainSection = (props) => {
         (inputValue &&
           searchResults.length > 0 &&
           uniqueDates.length === 0)) && (
-        <div
-          style={{ color: "#f56565", marginBottom: "15px", fontWeight: "bold" }}
-        >
+        <div className="cart-main-error">
           ⚠️ {searchError || "검색 결과가 없습니다."}
         </div>
       )}
 
-      <div
-        style={{
-          width: "100%",
-          maxHeight: "400px",
-          overflowY: "auto",
-          overflowX: "hidden",
-          padding: "0 5px",
-          boxSizing: "border-box",
-        }}
-      >
+      <div className="cart-main-item-list">
         {displayedItems.map((item) => (
           <CartItem
             key={item.id}

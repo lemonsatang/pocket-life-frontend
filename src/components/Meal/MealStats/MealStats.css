@@ -1,0 +1,134 @@
+/* =================================================================
+   [MealStats.css] 식단 통계 컴포넌트 스타일
+   ================================================================= */
+
+/* 1. 컨테이너 */
+.meal-stats-container {
+  flex: 0 0 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 115px;
+}
+
+/* 2. 영양 요약 카드 */
+.meal-stats-card {
+  padding: 20px;
+  margin: 0;
+  width: auto !important; /* 추가: 고정 너비 해제 */
+  min-width: 0 !important; /* 추가: 최소 너비 해제 */
+}
+
+.meal-stats-title {
+  margin-bottom: 20px;
+}
+
+.meal-stats-label {
+  font-size: 0.85rem;
+  color: #718096;
+  text-align: center;
+}
+
+.meal-stats-calories {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.meal-stats-calories.over {
+  color: #f56565;
+}
+
+.meal-stats-calories.normal {
+  color: #48bb78;
+}
+
+.meal-stats-goal {
+  font-size: 0.9rem;
+  color: #a0aec0;
+}
+
+/* 3. 진행 바 */
+.meal-stats-progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #edf2f7;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.meal-stats-progress-fill {
+  height: 100%;
+  transition: width 0.5s;
+}
+
+.meal-stats-progress-fill.over {
+  background-color: #f56565;
+}
+
+.meal-stats-progress-fill.normal {
+  background-color: #48bb78;
+}
+
+/* 4. 상태 메시지 */
+.meal-stats-status {
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.meal-stats-status.over {
+  background-color: #fff5f5;
+  border: 1px solid #feb2b2;
+}
+
+.meal-stats-status.normal {
+  background-color: #f0fff4;
+  border: 1px solid #9ae6b4;
+}
+
+.meal-stats-status-text {
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.meal-stats-status-text.over {
+  color: #c53030;
+}
+
+.meal-stats-status-text.normal {
+  color: #2f855a;
+}
+
+/* 5. 추천 식단 카드 */
+.meal-stats-recommend-card {
+  padding: 15px;
+  margin: 0;
+  width: auto !important; /* 추가: 고정 너비 해제 */
+  min-width: 0 !important; /* 추가: 최소 너비 해제 */
+  text-align: center;
+}
+
+.meal-stats-recommend-title {
+  font-size: 1.3rem;
+  margin-bottom: -15px;
+}
+
+.meal-stats-recommend-desc {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-bottom: 30px;
+}
+
+.meal-stats-recommend-list {
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.meal-stats-recommend-item {
+  padding: 8px 0;
+  font-size: 0.95rem;
+  color: #4a5568;
+}
