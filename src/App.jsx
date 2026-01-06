@@ -84,10 +84,10 @@ function Nav({ onLogout }) {
 }
 
 export default function App() {
-  // 로그인 상태 관리 (테스트를 위해 기본값을 true로 설정하거나, localStorage 확인)
-  const [authed, setAuthed] = useState(!!localStorage.getItem("mock_token"));
-  const [view, setView] = useState("login"); // login or signup
+  const [authed, setAuthed] = useState(false);
+  const [view, setView] = useState("login");
 
+  // [Logic] 로그아웃 처리
   const logout = () => {
     localStorage.removeItem("mock_token");
     setAuthed(false);

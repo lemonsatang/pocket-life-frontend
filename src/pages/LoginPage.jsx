@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 // 경로에 맞춰 수정 (같은 폴더면 "./Modal", components 폴더면 "../components/Modal")
-import Modal from "../components/Modal";
+import Modal from "../../components/Modal/Modal";
+import axios from "axios";
 
 export default function LoginPage({ onGoSignup, onLoginSuccess }) {
   const [id, setId] = useState("");
