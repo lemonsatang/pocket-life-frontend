@@ -1,11 +1,12 @@
+// [Layout] 식단 관리 페이지 - 식사 기록 및 통계
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
-import { useMealData } from "../hooks/useMealData";
-import MealStats from "../components/MealStats";
-import MealList from "../components/MealList"; // 새로 만든 리스트 컴포넌트
-import "../Retro.css";
+import { useMealData } from "../../hooks/useMealData";
+import MealStats from "../../components/Meal/MealStats/MealStats";
+import MealList from "../../components/Meal/MealList/MealList";
+import "./MealPage.css";
 
-const Meal = () => {
+const MealPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [mealType, setMealType] = useState("아침");
   const [inputValue, setInputValue] = useState("");
@@ -23,11 +24,14 @@ const Meal = () => {
     errorMessage,
     setErrorMessage,
   } = useMealData(currentDate);
+
+  // [Logic] 총 칼로리 계산
   const totalCalories = meals.reduce(
     (sum, m) => sum + (Number(m.calories) || 0),
     0
   );
 
+  // [Logic] 칼로리에 따른 추천 식단 생성
   useEffect(() => {
     const base =
       totalCalories > 2000
@@ -36,54 +40,28 @@ const Meal = () => {
     setDisplayRecs([...base].sort(() => Math.random() - 0.5).slice(0, 3));
   }, [totalCalories]);
 
+  // [Layout] DatePicker 커스텀 입력 컴포넌트
   const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
-    <span
-      onClick={onClick}
-      ref={ref}
-      style={{
-        fontWeight: "bold",
-        color: "#4a5568",
-        cursor: "pointer",
-        fontSize: "1.1rem",
-      }}
-    >
+    <span onClick={onClick} ref={ref} className="meal-date-input">
       {value} 📅
     </span>
   ));
 
+  // [Logic] 날짜 변경 핸들러
+  const handleDateChange = (offset) => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + offset);
+    setCurrentDate(newDate);
+  };
+
   return (
-    <div
-      className="main-content"
-      style={{
-        display: "flex",
-        gap: "30px",
-        alignItems: "flex-start",
-        justifyContent: "center",
-        width: "100%",
-        maxWidth: "1600px",
-        margin: "100px auto 0",
-        padding: "0 40px",
-        boxSizing: "border-box",
-      }}
-    >
-      <div className="pixel-card" style={{ flex: "0 1 700px", minWidth: "0" }}>
+    <div className="main-content meal-container">
+      <div className="pixel-card meal-card">
         <h3>🥗 오늘의 식단 기록</h3>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "20px",
-            marginBottom: "25px",
-          }}
-        >
+        <div className="meal-date-picker-container">
           <button
             className="date-nav-btn"
-            onClick={() =>
-              setCurrentDate(
-                new Date(currentDate.setDate(currentDate.getDate() - 1))
-              )
-            }
+            onClick={() => handleDateChange(-1)}
           >
             ◀
           </button>
@@ -96,23 +74,12 @@ const Meal = () => {
           />
           <button
             className="date-nav-btn"
-            onClick={() =>
-              setCurrentDate(
-                new Date(currentDate.setDate(currentDate.getDate() + 1))
-              )
-            }
+            onClick={() => handleDateChange(1)}
           >
             ▶
           </button>
         </div>
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            marginBottom: "15px",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="meal-type-buttons">
           {["아침", "점심", "저녁", "간식"].map((type) => (
             <button
               key={type}
@@ -120,36 +87,30 @@ const Meal = () => {
                 setMealType(type);
                 setErrorMessage("");
               }}
-              style={{
-                background: mealType === type ? "#5e72e4" : "#edf2f7",
-                color: mealType === type ? "#fff" : "#4a5568",
-                padding: "8px 16px",
-                borderRadius: "15px",
-                border: "none",
-                cursor: "pointer",
-              }}
+              className={`meal-type-btn ${
+                mealType === type ? "active" : "inactive"
+              }`}
             >
               {type}
             </button>
           ))}
         </div>
         <div
-          className="input-group"
-          style={{ marginBottom: errorMessage ? "5px" : "20px" }}
+          className={`input-group meal-input-group ${
+            errorMessage ? "has-error" : ""
+          }`}
         >
           <input
-            className="pixel-input"
+            className="pixel-input meal-food-input"
             placeholder="음식명"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            style={{ flex: 3 }}
           />
           <input
-            className="pixel-input"
+            className="pixel-input meal-calorie-input"
             placeholder="kcal"
             value={calorieInput}
             onChange={(e) => setCalorieInput(e.target.value.replace(/\D/g, ""))}
-            style={{ width: "70px" }}
           />
           <button
             className="pixel-btn"
@@ -168,16 +129,7 @@ const Meal = () => {
           </button>
         </div>
         {errorMessage && (
-          <div
-            style={{
-              color: "#f56565",
-              fontSize: "0.85rem",
-              marginBottom: "15px",
-              fontWeight: "bold",
-            }}
-          >
-            ⚠️ {errorMessage}
-          </div>
+          <div className="meal-error-message">⚠️ {errorMessage}</div>
         )}
         <MealList
           meals={meals}
@@ -199,4 +151,5 @@ const Meal = () => {
     </div>
   );
 };
-export default Meal;
+
+export default MealPage;

@@ -1,12 +1,25 @@
-@import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
+/* =================================================================
+   [Auth.css] 로그인/회원가입 페이지 공통 스타일
+   ================================================================= */
 
-/* 로그인/회원가입 전용 스타일 */
+/* 1. 인증 배경 */
+.authBg {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #eceaf3 0%, #e0e7ff 100%);
+  padding: 20px;
+}
+
+/* 2. 인증 래퍼 */
 .authWrap {
   width: 430px;
   max-width: 92vw;
   text-align: center;
 }
 
+/* 3. 브랜드 로고 */
 .brand {
   font-size: 20px;
   color: #7b84aa;
@@ -19,12 +32,14 @@
   font-family: "Jua", sans-serif !important;
 }
 
+/* 4. 상단 바 */
 .topBar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 0 2px 6px;
 }
+
 .logoutBtn {
   border: 0;
   border-radius: 10px;
@@ -36,6 +51,13 @@
   font-family: "Jua", sans-serif !important;
 }
 
+.logoutBtn:focus,
+.logoutBtn:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 5. 인증 카드 */
 .auth-card {
   background: #ffffff !important;
   border-radius: 16px !important;
@@ -52,6 +74,7 @@
   display: none !important;
 }
 
+/* 6. 배너 */
 .banner {
   height: 50px;
   width: 100%;
@@ -75,21 +98,22 @@
     radial-gradient(circle at 60% 30%, #fff 0 35%, transparent 36%),
     radial-gradient(circle at 90% 70%, #fff 0 28%, transparent 29%);
 }
+
 .drop {
   width: 32px;
   height: 32px;
   filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.08));
 }
+
 .drop path {
   fill: #eef4ff;
 }
 
-/* [핵심 수정 1] 가로 여백 대폭 증가 (20px -> 45px) */
+/* 7. 패널 */
 .panel {
   background: transparent !important;
   box-shadow: none !important;
   margin-top: 0 !important;
-  /* 위쪽, 양옆(45px), 아래쪽 패딩 조정 */
   padding: 24px 45px 30px !important;
   border-radius: 0 !important;
   position: relative;
@@ -105,12 +129,14 @@
   font-family: "Jua", sans-serif !important;
 }
 
+/* 8. 폼 */
 .form {
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
+/* 9. 아이콘 */
 .icon {
   width: 18px;
   height: 18px;
@@ -119,21 +145,23 @@
   justify-content: center;
   flex: 0 0 18px;
 }
+
 .icon svg {
   fill: #1f2a44;
   opacity: 0.8;
 }
 
-/* [핵심 수정 3] 입력창 자체 높이(padding) 살짝 줄여서 슬림하게 만듦 */
+/* 10. 입력 필드 */
 .field {
   display: flex;
   align-items: center;
   gap: 10px;
   border: 1px solid #dfe4ff;
   border-radius: 12px;
-  padding: 8px 12px; /* 세로 패딩 9px -> 8px */
+  padding: 8px 12px;
   background: #fff;
 }
+
 .input {
   border: 0;
   outline: 0;
@@ -143,11 +171,13 @@
   background: transparent;
   font-family: "Jua", sans-serif !important;
 }
+
 .input::placeholder {
   color: #8e95b6;
   font-family: "Jua", sans-serif !important;
 }
 
+/* 11. 에러 메시지 */
 .fieldErr {
   margin: -2px 2px 4px;
   text-align: left;
@@ -155,12 +185,14 @@
   font-size: 12px;
   font-family: "Jua", sans-serif !important;
 }
+
 .errSpace {
-  height: 8px; /* 에러 메시지 공간도 살짝 줄임 */
+  height: 8px;
 }
 
+/* 12. 주요 버튼 */
 .primaryBtn {
-  margin-top: 8px; /* 버튼 위 간격 조정 */
+  margin-top: 8px;
   border: 0;
   border-radius: 12px;
   padding: 11px 12px;
@@ -171,26 +203,37 @@
   font-family: "Jua", sans-serif !important;
   font-size: 16px;
 }
+
 .primaryBtn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
+.primaryBtn:focus,
+.primaryBtn:active {
+  outline: none !important;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 13. 동의 박스 */
 .agreeBox {
   margin-top: 2px;
   text-align: left;
 }
+
 .agreeHead {
   display: flex;
   gap: 10px;
   align-items: flex-start;
 }
+
 .agreeTitle {
   font-weight: 800;
   color: #1f2a44;
   font-size: 13px;
   font-family: "Jua", sans-serif !important;
 }
+
 .agreeDesc {
   color: #737aa0;
   font-size: 12px;
@@ -198,12 +241,14 @@
   line-height: 1.35;
   font-family: "Jua", sans-serif !important;
 }
+
 .agreeSub {
   margin-left: 28px;
   margin-top: 6px;
   display: grid;
   gap: 6px;
 }
+
 .agreeLine {
   display: flex;
   gap: 10px;
@@ -213,15 +258,17 @@
   font-family: "Jua", sans-serif !important;
 }
 
+/* 14. 미니 링크 */
 .miniLinks {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin-top: 10px; /* 링크 위 간격 조정 */
+  margin-top: 10px;
   color: #7c84aa;
   font-size: 12px;
 }
+
 .miniLink {
   border: 0;
   background: transparent;
@@ -230,6 +277,13 @@
   cursor: pointer;
   font-family: "Jua", sans-serif !important;
 }
+
+.miniLink:focus,
+.miniLink:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .dot {
   width: 3px;
   height: 3px;
@@ -237,6 +291,7 @@
   background: #b7bddc;
 }
 
+/* 15. 구분선 */
 .dividerRow {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -244,10 +299,12 @@
   align-items: center;
   margin: 12px 0 8px;
 }
+
 .hr {
   height: 1px;
   background: #e7e9fb;
 }
+
 .or {
   font-size: 12px;
   color: #1f2a44;
@@ -255,12 +312,14 @@
   font-family: "Jua", sans-serif !important;
 }
 
+/* 16. 소셜 로그인 */
 .socialRow {
   display: flex;
   justify-content: center;
   gap: 18px;
   margin-bottom: 6px;
 }
+
 .social {
   width: 52px;
   height: 52px;
@@ -274,10 +333,18 @@
   align-items: center;
 }
 
+.social:hover,
+.social:focus,
+.social:active {
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08) !important;
+  outline: none !important;
+}
+
 .google {
   background: #fff;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
 }
+
 .naver {
   background: #19d35a;
   color: #fff;
@@ -285,12 +352,14 @@
   font-family: "Jua", sans-serif !important;
 }
 
+/* 17. 하단 링크 */
 .bottomLink {
   margin-top: 10px;
   font-size: 12px;
   color: #7c84aa;
   font-family: "Jua", sans-serif !important;
 }
+
 .bottomBtn {
   border: 0;
   background: transparent;
@@ -300,91 +369,8 @@
   font-family: "Jua", sans-serif !important;
 }
 
-/* 모달 */
-.modalDim {
-  position: fixed;
-  inset: 0;
-  background: rgba(20, 24, 40, 0.35);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-  z-index: 2000;
-}
-.modalCard {
-  width: 360px;
-  max-width: 92vw;
-  background: #fff;
-  border-radius: 14px;
-  padding: 16px 16px 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
-}
-.modalTitle {
-  font-weight: 900;
-  color: #1f2a44;
-  margin: 0 0 8px;
-  font-size: 16px;
-  font-family: "Jua", sans-serif !important;
-}
-.modalMsg {
-  white-space: pre-line;
-  color: #2b2f44;
-  font-size: 14px;
-  line-height: 1.35;
-  font-family: "Jua", sans-serif !important;
-}
-.modalBtns {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 14px;
-}
-.modalBtn {
-  border: 0;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-weight: 900;
-  cursor: pointer;
-  font-family: "Jua", sans-serif !important;
-}
-.modalBtn.ghost {
-  background: #f1f3ff;
-  color: #6f76a1;
-}
-.modalBtn.primary {
-  background: #aebaf0;
-  color: #fff;
-}
-/* ============================================================
-   [추가] 버튼 클릭 시 생기는 검은 테두리(Focus Outline) 제거
-   ============================================================ */
-button:focus,
-button:active,
-.primaryBtn:focus,
-.primaryBtn:active,
-.social:focus,
-.social:active,
-.miniLink:focus,
-.miniLink:active,
 .bottomBtn:focus,
-.bottomBtn:active,
-.logoutBtn:focus,
-.logoutBtn:active,
-.modalBtn:focus,
-.modalBtn:active {
-  outline: none !important; /* 검은 테두리 제거 */
-  box-shadow: none !important; /* 혹시 모를 그림자 테두리 제거 */
-}
-
-/* 단, primaryBtn(로그인 버튼)은 원래 그림자가 있어야 예쁘니까 예외 처리 */
-.primaryBtn:focus,
-.primaryBtn:active {
-  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* 소셜 버튼(구글/네이버)도 입체감 그림자는 유지 */
-.social:hover,
-.social:focus,
-.social:active {
-  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08) !important;
+.bottomBtn:active {
+  outline: none !important;
+  box-shadow: none !important;
 }

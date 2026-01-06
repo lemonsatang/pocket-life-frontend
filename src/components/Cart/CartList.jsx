@@ -1,5 +1,6 @@
+// [Logic] 장바구니 리스트 컨테이너 - 상태 관리 및 API 호출
 import React, { useState, useEffect } from "react";
-import CartView from "./CartView";
+import CartView from "./CartView/CartView";
 
 const CartList = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -11,23 +12,24 @@ const CartList = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [searchTarget, setSearchTarget] = useState("");
 
+  // [Logic] 날짜를 YYYY-MM-DD 형식으로 변환
   const getApiDate = (dateObj) =>
     `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(
       2,
       "0"
     )}-${String(dateObj.getDate()).padStart(2, "0")}`;
 
+  // [Logic] 즐겨찾기 목록 로드
   const fetchFavorites = () => {
-    // [변경] api/shopping -> api/cart
     fetch("http://localhost:8080/api/cart/favorites")
       .then((res) => res.json())
       .then((data) => setFavorites(data))
       .catch((e) => console.log("즐겨찾기 로드 실패(혹은 API 없음):", e));
   };
 
+  // [Logic] 장바구니 아이템 로드
   const fetchItems = () => {
     setIsLoading(true);
-    // [변경] api/shopping -> api/cart
     fetch(`http://localhost:8080/api/cart?date=${getApiDate(currentDate)}`)
       .then((res) => res.json())
       .then((data) => {
@@ -43,11 +45,13 @@ const CartList = () => {
       .catch(() => setIsLoading(false));
   };
 
+  // [Logic] 날짜 변경 시 데이터 재로드
   useEffect(() => {
     fetchItems();
     fetchFavorites();
   }, [currentDate]);
 
+  // [Logic] 즐겨찾기 토글
   const handleToggleFav = (item) => {
     const newFavStatus = !item.isFavorite;
 
@@ -67,20 +71,17 @@ const CartList = () => {
     }
 
     const updated = { ...item, isFavorite: newFavStatus };
-    // [변경] api/shopping -> api/cart
     fetch(`http://localhost:8080/api/cart/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updated),
-    }).then(() => {
-      // fetchItems();
     });
   };
 
+  // [Logic] 아이템 삭제
   const handleDelete = (item) => {
     setItems((prev) => prev.filter((i) => i.id !== item.id));
 
-    // [변경] api/shopping -> api/cart
     fetch(`http://localhost:8080/api/cart/${item.id}`, {
       method: "DELETE",
     }).then((res) => {
@@ -88,18 +89,34 @@ const CartList = () => {
     });
   };
 
+  // [Logic] 날짜 문자열 포맷팅
+  const getDateStr = (dateObj) => {
+    const days = [
+      "일요일",
+      "월요일",
+      "화요일",
+      "수요일",
+      "목요일",
+      "금요일",
+      "토요일",
+    ];
+    return `${dateObj.getFullYear()}년 ${String(
+      dateObj.getMonth() + 1
+    ).padStart(2, "0")}월 ${String(dateObj.getDate()).padStart(2, "0")}일 ${
+      days[dateObj.getDay()]
+    }`;
+  };
+
   return (
     <CartView
-      {...{
-        currentDate,
-        items,
-        isLoading,
-        inputValue,
-        setInputValue,
-        searchError,
-        searchResults,
-        searchTarget,
-      }}
+      currentDate={currentDate}
+      items={items}
+      isLoading={isLoading}
+      inputValue={inputValue}
+      setInputValue={setInputValue}
+      searchError={searchError}
+      searchResults={searchResults}
+      searchTarget={searchTarget}
       uniqueFavorites={favorites}
       onDateChange={(n) => {
         const d = new Date(currentDate);
@@ -109,7 +126,6 @@ const CartList = () => {
       onDatePickerChange={setCurrentDate}
       onSearch={() => {
         if (!inputValue.trim()) return;
-        // [변경] api/shopping -> api/cart
         fetch(
           `http://localhost:8080/api/cart/search?text=${encodeURIComponent(
             inputValue
@@ -130,7 +146,6 @@ const CartList = () => {
       }}
       onAdd={(text) => {
         if (!text || !text.trim()) return;
-        // [변경] api/shopping -> api/cart
         fetch("http://localhost:8080/api/cart", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -162,7 +177,6 @@ const CartList = () => {
       }}
       onMark={(item) => {
         const updated = { ...item, isBought: true };
-        // [변경] api/shopping -> api/cart
         fetch(`http://localhost:8080/api/cart/${item.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -173,24 +187,10 @@ const CartList = () => {
       }}
       onDelete={handleDelete}
       onToggleFav={handleToggleFav}
-      getDateStr={(dateObj) => {
-        const days = [
-          "일요일",
-          "월요일",
-          "화요일",
-          "수요일",
-          "목요일",
-          "금요일",
-          "토요일",
-        ];
-        return `${dateObj.getFullYear()}년 ${String(
-          dateObj.getMonth() + 1
-        ).padStart(2, "0")}월 ${String(dateObj.getDate()).padStart(2, "0")}일 ${
-          days[dateObj.getDay()]
-        }`;
-      }}
+      getDateStr={getDateStr}
       getApiDate={getApiDate}
     />
   );
 };
+
 export default CartList;

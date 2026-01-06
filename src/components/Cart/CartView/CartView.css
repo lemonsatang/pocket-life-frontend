@@ -1,0 +1,41 @@
+/* =================================================================
+   [CartView.css] 장바구니 뷰 컨테이너 스타일
+   ================================================================= */
+
+/* 1. 뷰 컨테이너 */
+.cart-view-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+/* 2. 아이템 행 스타일 오버라이드 */
+.item-row::before,
+.item-row span::before,
+.item-row div::before {
+  content: none !important;
+}
+
+.item-row {
+  list-style: none !important;
+}
+
+/* 3. 포커스 스타일 제거 */
+button:focus,
+input:focus,
+.pixel-btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}

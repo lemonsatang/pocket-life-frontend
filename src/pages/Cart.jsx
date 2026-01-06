@@ -1,5 +1,5 @@
+// [Layout] 장바구니 페이지 - 구매 목록 관리
 import React from "react";
-// [수정] ../.. (두칸 위)가 아니라 ../ (한칸 위)가 맞음
 import CartList from "../components/Cart/CartList";
 
 const Cart = () => {
