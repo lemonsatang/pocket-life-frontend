@@ -1,0 +1,124 @@
+/* =================================================================
+   [Header.css] 헤더/네비게이션 영역 스타일
+   ================================================================= */
+
+/* 1. 네비게이션 컨테이너 */
+.pixel-nav-container {
+  position: fixed;
+  top: 15px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* 2. 네비게이션 바 */
+.pixel-nav-bar {
+  width: 94%;
+  max-width: 1100px;
+  height: 50px;
+  background-image: url("/background.png");
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 25px;
+  box-shadow: 0 5px 15px rgba(170, 183, 236, 0.2);
+}
+
+/* 3. 로고 영역 */
+.nav-logo-small {
+  width: auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  text-decoration: none;
+  gap: 8px;
+}
+
+.nav-logo-small img {
+  display: none !important;
+}
+
+.nav-logo-small::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, #ffffff 20%, #bfdbfe 100%);
+  border-radius: 0% 50% 50% 50%;
+  transform: rotate(45deg) translateY(-2px);
+  box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.9),
+    inset -2px -2px 5px rgba(94, 114, 228, 0.15),
+    1px 2px 6px rgba(94, 114, 228, 0.3);
+  border: 0.5px solid rgba(255, 255, 255, 0.6);
+  margin-top: 6px;
+  margin-left: -15px;
+}
+
+.logo-text {
+  font-family: "Jua", sans-serif;
+  font-weight: 400;
+  font-size: 22px;
+  color: #5e72e4;
+  padding-top: 4px;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+}
+
+/* 4. 네비게이션 탭 */
+.nav-tabs {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  backdrop-filter: blur(5px);
+  margin: 0;
+}
+
+.nav-tab {
+  text-decoration: none;
+  color: #5e72e4;
+  font-family: "Jua", sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  padding: 6px 18px;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.nav-tab.active {
+  background: #ffffff;
+  color: #5e72e4;
+  box-shadow: 0 2px 8px rgba(94, 114, 228, 0.15);
+}
+
+.nav-divider {
+  width: 1px;
+  height: 12px;
+  background: rgba(94, 114, 228, 0.2);
+}
+
+/* 5. 사용자 정보 */
+.nav-user-info {
+  color: #5e72e4;
+  font-size: 16px;
+  font-weight: 400;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.nav-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

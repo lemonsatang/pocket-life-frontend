@@ -1,16 +1,15 @@
+// [Layout] 대시보드 홈 페이지 - 전체 데이터 요약 카드 표시
 import React, { useState, useEffect } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import { ko } from "date-fns/locale";
-import DashboardCard from "../components/DashboardCard"; // 경로 확인 필요 (components/Cart/DashboardCard.jsx 인지 확인)
+import DashboardCard from "../../components/DashboardCard/DashboardCard";
 import "react-datepicker/dist/react-datepicker.css";
-import "../Retro.css";
+import "./Home.css";
 
 registerLocale("ko", ko);
 
 const Home = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-
-  // [수정 1] shoppingItems -> cartItems로 이름 통일
   const [dashboardData, setDashboardData] = useState({
     meals: [],
     cartItems: [],
@@ -19,6 +18,7 @@ const Home = () => {
     expense: 0,
   });
 
+  // [Logic] 더미 할 일 데이터
   const dummyTodos = [
     {
       todoid: "d1",
@@ -34,6 +34,7 @@ const Home = () => {
     },
   ];
 
+  // [Logic] 날짜를 YYYY-MM-DD 형식으로 변환
   const getDateStr = (dateObj) => {
     const year = dateObj.getFullYear();
     const month = String(dateObj.getMonth() + 1).padStart(2, "0");
@@ -41,22 +42,14 @@ const Home = () => {
     return `${year}-${month}-${day}`;
   };
 
+  // [Layout] DatePicker 커스텀 입력 컴포넌트
   const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
-    <span
-      onClick={onClick}
-      ref={ref}
-      style={{
-        fontWeight: "bold",
-        color: "#2d3748",
-        cursor: "pointer",
-        fontSize: "1.1rem",
-        outline: "none",
-      }}
-    >
+    <span onClick={onClick} ref={ref} className="home-date-input">
       {value} 📅
     </span>
   ));
 
+  // [Logic] 대시보드 데이터 로드
   useEffect(() => {
     const dateStr = getDateStr(currentDate);
     const userId = "testUser";
@@ -66,7 +59,6 @@ const Home = () => {
       fetch(fetchUrl(`meals?date=${dateStr}`)).then((res) =>
         res.json().catch(() => [])
       ),
-      // [수정 2] shopping -> cart (백엔드 URL 변경 반영)
       fetch(fetchUrl(`cart?date=${dateStr}`)).then((res) =>
         res.json().catch(() => [])
       ),
@@ -85,7 +77,6 @@ const Home = () => {
           .filter((t) => t.txType === "EXPENSE")
           .reduce((sum, t) => sum + (t.amount || 0), 0);
 
-        // [수정 3] 받아온 데이터 변수명도 cartData로 취급
         const todayCartItems = (cartData || []).filter(
           (item) => item.shoppingDate === dateStr
         );
@@ -100,7 +91,7 @@ const Home = () => {
 
         setDashboardData({
           meals: meals || [],
-          cartItems: uniqueCartItems, // [수정] State 키와 일치시킴
+          cartItems: uniqueCartItems,
           todos: combinedTodos,
           income,
           expense,
@@ -109,60 +100,29 @@ const Home = () => {
       .catch((err) => console.error("로딩 실패", err));
   }, [currentDate]);
 
+  // [Logic] 총 칼로리 계산
   const totalCalories = dashboardData.meals.reduce(
     (sum, m) => sum + (Number(m.calories) || 0),
     0
   );
 
-  // [수정] 변수명 일치 (shoppingItems -> cartItems)
+  // [Logic] 미확인 장바구니 아이템 확인
   const hasUnconfirmedItems = dashboardData.cartItems.some(
     (item) => !item.isBought
   );
 
-  const btnStyle = {
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    color: "#AAB7EC",
-    fontSize: "1.5rem",
-    outline: "none",
-    boxShadow: "none",
-    padding: "0 10px",
-  };
-
   return (
-    <div
-      className="home-container"
-      style={{
-        width: "100%",
-        maxWidth: "1400px",
-        margin: "0 auto",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        marginTop: "-40px",
-      }}
-    >
-      <header style={{ marginBottom: "50px", textAlign: "center" }}>
-        <h2
-          style={{ fontSize: "2.5rem", color: "#2d3748", marginBottom: "15px" }}
-        >
-          👛 POCKET DASHBOARD
-        </h2>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+    <div className="home-container">
+      <header className="home-header">
+        <h2 className="home-title">👛 POCKET DASHBOARD</h2>
+        <div className="home-date-picker-container">
           <button
             onClick={() => {
               const d = new Date(currentDate);
               d.setDate(d.getDate() - 1);
               setCurrentDate(d);
             }}
-            style={btnStyle}
+            className="home-date-btn"
           >
             ◀
           </button>
@@ -179,22 +139,14 @@ const Home = () => {
               d.setDate(d.getDate() + 1);
               setCurrentDate(d);
             }}
-            style={btnStyle}
+            className="home-date-btn"
           >
             ▶
           </button>
         </div>
       </header>
 
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "25px",
-          justifyContent: "center",
-          paddingBottom: "40px",
-        }}
-      >
+      <div className="home-cards-container">
         <DashboardCard
           title="일정 📅"
           list={dashboardData.todos}
@@ -214,12 +166,11 @@ const Home = () => {
         />
         <DashboardCard
           title="장바구니 🛍️"
-          // [핵심 수정] 이제 dashboardData.cartItems가 존재하므로 정상 작동
           list={dashboardData.cartItems}
           emptyMsg="구매 목록이 비어있어요!"
           linkTo="/cart"
           btnText="목록 확인"
-          isCart={true} // 아까 수정한 DashboardCard Props와 일치
+          isCart={true}
           hasUnconfirmedItems={hasUnconfirmedItems}
         />
         <DashboardCard

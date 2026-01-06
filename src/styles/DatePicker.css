@@ -1,0 +1,92 @@
+/* =================================================================
+   [DatePicker.css] 달력 컴포넌트 스타일
+   react-datepicker 커스터마이징
+   ================================================================= */
+
+/* 1. 달력 컨테이너 */
+.react-datepicker {
+  font-family: "Jua", sans-serif !important;
+  border: none !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  background-color: #ffffff !important;
+  padding: 15px !important;
+}
+
+/* 2. 달력 헤더 */
+.react-datepicker__header {
+  background-color: #ffffff !important;
+  border-bottom: none !important;
+}
+
+.react-datepicker__current-month {
+  color: #5e72e4 !important;
+  font-size: 1.3rem !important;
+  margin-bottom: 10px !important;
+}
+
+/* 3. 요일 이름 */
+.react-datepicker__day-name {
+  color: #a0aec0 !important;
+  font-weight: bold;
+  width: 2.2rem !important;
+}
+
+/* 4. 날짜 셀 */
+.react-datepicker__day {
+  width: 2.2rem !important;
+  line-height: 2.2rem !important;
+  border-radius: 50% !important;
+  color: #4a5568 !important;
+  font-size: 1rem !important;
+  outline: none !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: #edf2f7 !important;
+  color: #5e72e4 !important;
+}
+
+/* 5. 선택된 날짜 */
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #5e72e4 !important;
+  color: #ffffff !important;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(94, 114, 228, 0.3);
+  outline: none !important;
+  border: none !important;
+}
+
+/* 6. 오늘 날짜 */
+.react-datepicker__day--today {
+  font-weight: bold;
+  color: #5e72e4 !important;
+}
+
+.react-datepicker__day--today.react-datepicker__day--selected {
+  color: #ffffff !important;
+  background-color: #5e72e4 !important;
+  outline: none !important;
+}
+
+/* 7. 이번 달이 아닌 날짜 */
+.react-datepicker__day--outside-month {
+  color: #cbd5e0 !important;
+  pointer-events: none;
+}
+
+/* 8. 삼각형 화살표 제거 */
+.react-datepicker__triangle {
+  display: none !important;
+}
+
+/* 9. 날짜 네비게이션 버튼 */
+.date-nav-btn {
+  background: none;
+  border: none;
+  outline: none !important;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #a0aec0;
+}

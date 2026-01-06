@@ -1,6 +1,8 @@
+// [Layout] 회원가입 페이지 - 신규 사용자 등록
 import React, { useMemo, useState } from "react";
-import Modal from "../components/Modal";
+import Modal from "../../components/Modal/Modal";
 import axios from "axios";
+import "./SignupPage.css";
 
 export default function SignupPage({ onGoLogin }) {
   const [f, set] = useState({
@@ -15,10 +17,10 @@ export default function SignupPage({ onGoLogin }) {
     sms: false,
     mail: false,
   });
-  const [showPw, setShowPw] = useState(false); // 비밀번호 보기 공개여부
+  const [showPw, setShowPw] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false); // 로딩 여부
-  const [idMsg, setIdMsg] = useState({ text: "", isError: false }); // 아이디 중복 체크 여부
+  const [loading, setLoading] = useState(false);
+  const [idMsg, setIdMsg] = useState({ text: "", isError: false });
 
   const [m, setM] = useState({
     open: false,
@@ -30,8 +32,11 @@ export default function SignupPage({ onGoLogin }) {
     onConfirm: null,
     onCancel: null,
   });
+
+  // [Logic] 모달 닫기
   const close = () => setM((s) => ({ ...s, open: false }));
 
+  // [Logic] 확인 모달
   const openOk = (title, msg, after) => {
     setM({
       open: true,
@@ -48,9 +53,8 @@ export default function SignupPage({ onGoLogin }) {
     });
   };
 
-  // [수정] 회원가입 성공 시 마케팅 동의 여부 메시지 추가
+  // [Logic] 회원가입 성공 모달
   const openAskGoLogin = () => {
-    // 마케팅 동의 상태에 따른 메시지 생성
     let mktMsg = "";
     if (f.sms && f.mail) {
       mktMsg = "마케팅 정보 수신: 전체 동의 (SMS, E-Mail)";
@@ -65,7 +69,6 @@ export default function SignupPage({ onGoLogin }) {
     setM({
       open: true,
       title: "회원가입 성공",
-      // 줄바꿈 문자(\n)를 이용해 안내 메시지 구성
       msg: `회원가입이 완료되었습니다.\n[${mktMsg}]\n\n로그인창으로 이동하시겠습니까?`,
       showCancel: true,
       confirmText: "이동",
@@ -78,10 +81,10 @@ export default function SignupPage({ onGoLogin }) {
     });
   };
 
+  // [Logic] 입력 필드 변경 핸들러
   const on = (e) => {
     const { name, value, type, checked } = e.target;
 
-    // 체크박스 (전체 동의 로직)
     if (type === "checkbox") {
       if (name === "mkt") {
         set((s) => ({ ...s, mkt: checked, sms: checked, mail: checked }));
@@ -97,24 +100,20 @@ export default function SignupPage({ onGoLogin }) {
 
     let v = value;
 
-    // [수정] 1. 아이디: 첫 글자는 무조건 영어, 이후 영어+숫자만 허용
+    // [Logic] 아이디: 영문 시작, 영문+숫자만 허용
     if (name === "id") {
-      // 1) 영문, 숫자 외 문자 제거
       v = v.replace(/[^a-zA-Z0-9]/g, "");
-
-      // 2) 첫 글자가 숫자라면 제거 (무조건 영어로 시작하게 강제)
-      //    (빈 문자열이 아닐 때, 첫 글자가 0-9이면 substr(1)로 잘라냄)
       if (v.length > 0 && /^[0-9]/.test(v)) {
         v = v.substring(1);
       }
     }
 
-    // 2. 이름: 한글(자음, 모음 포함) + 영어 허용
+    // [Logic] 이름: 한글+영문 허용
     if (name === "name") {
       v = v.replace(/[^a-zA-Z가-힣ㄱ-ㅎㅏ-ㅣ\s]/g, "");
     }
 
-    // 3. 휴대전화: 숫자만 입력 -> 하이픈(-) 자동 추가
+    // [Logic] 휴대전화: 숫자만, 하이픈 자동 추가
     if (name === "phone") {
       const raw = v.replace(/\D/g, "");
       if (raw.length <= 3) {
@@ -126,7 +125,7 @@ export default function SignupPage({ onGoLogin }) {
       }
     }
 
-    // 4. 생년월일: 숫자만, 6자리 제한 (YYMMDD)
+    // [Logic] 생년월일: 숫자만, 6자리 제한
     if (name === "birth") {
       v = v.replace(/\D/g, "").slice(0, 6);
     }
@@ -134,16 +133,12 @@ export default function SignupPage({ onGoLogin }) {
     set((s) => ({ ...s, [name]: v }));
   };
 
-  // 아이디 중복 확인
+  // [Logic] 아이디 중복 확인
   const idChk = async (e) => {
     const val = e.target.value;
 
-    // 빈값 여부 확인
-    if (!val) {
-      return;
-    }
+    if (!val) return;
 
-    // 글자수 확인
     if (val.length < 4) {
       setIdMsg({ text: "아이디는 4자 이상이어야 합니다.", isError: true });
       return;
@@ -164,6 +159,7 @@ export default function SignupPage({ onGoLogin }) {
     }
   };
 
+  // [Logic] 유효성 검사
   const err = useMemo(
     () => ({
       id: !f.id ? "필수 입력" : f.id.length < 4 ? "아이디 4자 이상" : "",
@@ -185,6 +181,7 @@ export default function SignupPage({ onGoLogin }) {
     [f]
   );
 
+  // [Layout] 인라인 에러 메시지 컴포넌트
   const InlineErr = ({ msg }) =>
     !submitted || !msg ? (
       <div className="errSpace" />
@@ -192,6 +189,7 @@ export default function SignupPage({ onGoLogin }) {
       <div className="fieldErr">{msg}</div>
     );
 
+  // [Logic] 에러 메시지 빌드
   const buildReason = (data, fallback) => {
     const lines = [];
     if (data?.message) lines.push(String(data.message));
@@ -202,7 +200,7 @@ export default function SignupPage({ onGoLogin }) {
     return lines.length ? lines.join("\n") : fallback;
   };
 
-  // 회원가입
+  // [Logic] 회원가입 제출
   const submit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
@@ -211,9 +209,6 @@ export default function SignupPage({ onGoLogin }) {
 
     setLoading(true);
     try {
-      // await fakeRegister();
-      // saveLocal();
-
       const joinData = {
         usrid: f.id,
         usrnm: f.name,
@@ -225,7 +220,7 @@ export default function SignupPage({ onGoLogin }) {
         mailConsent: f.mail ? "Y" : "N",
       };
 
-      const response = await axios.post("http://localhost:8080/join", joinData);
+      await axios.post("http://localhost:8080/join", joinData);
 
       setLoading(false);
       openAskGoLogin();
@@ -250,11 +245,7 @@ export default function SignupPage({ onGoLogin }) {
         />
         {idMsg.text && (
           <div
-            style={{
-              color: idMsg.isError ? "red" : "green",
-              fontSize: "12px",
-              textAlign: "-webkit-left",
-            }}
+            className={`signup-id-msg ${idMsg.isError ? "error" : "success"}`}
           >
             {idMsg.text}
           </div>
@@ -272,15 +263,7 @@ export default function SignupPage({ onGoLogin }) {
             <button
               type="button"
               onClick={() => setShowPw(!showPw)}
-              style={{
-                border: "none",
-                background: "transparent",
-                cursor: "pointer",
-                padding: "0 5px",
-                display: "flex",
-                alignItems: "center",
-                color: "#a0aec0",
-              }}
+              className="signup-password-toggle-btn"
             >
               {showPw ? getIcon("eyeOff") : getIcon("eye")}
             </button>
@@ -391,6 +374,7 @@ export default function SignupPage({ onGoLogin }) {
   );
 }
 
+// [Layout] 입력 필드 컴포넌트
 function Field({
   icon,
   placeholder,
@@ -405,20 +389,20 @@ function Field({
     <div className="field">
       <span className="icon">{getIcon(icon)}</span>
       <input
-        className="input"
+        className="input signup-field-input"
         name={name}
         type={type}
         value={value}
         onChange={onChange}
         onBlur={onBlur}
         placeholder={placeholder}
-        style={{ flex: 1 }}
       />
       {suffix && suffix}
     </div>
   );
 }
 
+// [Layout] 아이콘 렌더링 함수
 function getIcon(k) {
   const common = { width: 18, height: 18, viewBox: "0 0 24 24" };
   const S = (p) => (

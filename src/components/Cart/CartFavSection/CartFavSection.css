@@ -1,0 +1,71 @@
+/* =================================================================
+   [CartFavSection.css] 장바구니 즐겨찾기 섹션 스타일
+   ================================================================= */
+
+/* 1. 즐겨찾기 카드 */
+.cart-fav-card {
+  flex: 0.6;
+  padding: 20px;
+  min-width: 250px;
+  box-sizing: border-box;
+}
+
+.cart-fav-title {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+}
+
+.cart-fav-star {
+  color: #fbc02d;
+}
+
+/* 2. 즐겨찾기 리스트 */
+.cart-fav-list {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  margin: 0;
+}
+
+.cart-fav-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px dashed #edf2f7;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  background-color: #fff;
+}
+
+.cart-fav-item-content {
+  cursor: pointer;
+  flex: 1;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.cart-fav-item-star {
+  color: #fbc02d;
+  margin-right: 5px;
+}
+
+.cart-fav-delete-btn {
+  background: transparent !important;
+  color: #cbd5e0 !important;
+  border: none !important;
+  font-size: 1.1rem;
+  padding: 0 5px;
+}
+
+.cart-fav-delete-btn:hover {
+  color: #f56565 !important;
+}
+
+/* 3. 빈 상태 메시지 */
+.cart-fav-empty {
+  color: #cbd5e0;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 20px;
+}

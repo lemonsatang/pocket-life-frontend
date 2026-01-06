@@ -1,0 +1,199 @@
+/* =================================================================
+   [DashboardCard.css] 대시보드 카드 컴포넌트 스타일
+   ================================================================= */
+
+/* 1. 카드 컨테이너 */
+.dashboard-card {
+  flex: 1;
+  min-width: 300px;
+  max-width: 320px;
+  height: 450px;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  border-radius: 30px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+/* 2. 카드 제목 */
+.dashboard-card-title {
+  font-size: 1.4rem;
+  border-bottom: 1px solid #edf2f7;
+  width: 100%;
+  padding-bottom: 15px;
+  text-align: center;
+}
+
+/* 3. 카드 콘텐츠 영역 */
+.dashboard-card-content {
+  width: 100%;
+  flex: 1;
+  text-align: left;
+  padding: 20px 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 4. 계정 정보 영역 */
+.dashboard-card-account {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+}
+
+.dashboard-card-account-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.dashboard-card-account-label {
+  color: #a0aec0;
+}
+
+.dashboard-card-account-income {
+  color: #5e72e4;
+  font-weight: bold;
+}
+
+.dashboard-card-account-expense {
+  color: #f5365c;
+  font-weight: bold;
+}
+
+.dashboard-card-account-summary {
+  border-top: 2px solid #f8fafc;
+  margin-top: 10px;
+  padding-top: 15px;
+  text-align: center;
+}
+
+.dashboard-card-account-summary-label {
+  margin: 0 0 5px 0;
+  font-size: 0.85rem;
+  color: #a0aec0;
+}
+
+.dashboard-card-account-summary-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.dashboard-card-account-summary-value.positive {
+  color: #2d3748;
+}
+
+.dashboard-card-account-summary-value.negative {
+  color: #f5365c;
+}
+
+/* 5. 빈 상태 메시지 */
+.dashboard-card-empty {
+  color: #cbd5e0;
+  text-align: center;
+  margin: auto;
+}
+
+.dashboard-card-empty-list {
+  color: #cbd5e0;
+  text-align: center;
+  margin-top: 60px;
+}
+
+/* 6. 리스트 아이템 */
+.dashboard-card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-card-list-item {
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-card-list-item.bought {
+  color: #cbd5e0;
+}
+
+.dashboard-card-list-item.not-bought {
+  color: #4a5568;
+}
+
+.dashboard-card-list-item-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-card-list-item-meal-type {
+  color: #5e72e4;
+  margin-right: 6px;
+}
+
+.dashboard-card-list-item-calories {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* 7. 칼로리 요약 (식단 카드) */
+.dashboard-card-calories {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.dashboard-card-calories-label {
+  margin: 0 0 5px 0;
+  font-size: 0.85rem;
+  color: #a0aec0;
+}
+
+.dashboard-card-calories-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.dashboard-card-calories-value.over {
+  color: #f5365c;
+}
+
+.dashboard-card-calories-value.normal {
+  color: #48bb78;
+}
+
+/* 8. 경고 메시지 (장바구니) */
+.dashboard-card-warning {
+  width: 100%;
+  margin-bottom: 15px;
+  text-align: center;
+  color: #f5365c;
+  font-size: 0.85rem;
+  font-weight: bold;
+  background-color: #fff5f5;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* 9. 링크 및 버튼 */
+.dashboard-card-link {
+  width: 100%;
+  outline: none;
+}
+
+.dashboard-card-button {
+  width: 100%;
+  padding: 12px;
+  outline: none;
+  border: none;
+}

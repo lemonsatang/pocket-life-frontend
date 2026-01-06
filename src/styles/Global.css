@@ -1,0 +1,72 @@
+/* =================================================================
+   [Global.css] 전역 공통 설정
+   폰트, Reset, 기본 레이아웃 등 프로젝트 전체에 적용되는 스타일
+   ================================================================= */
+
+/* 1. 폰트 설정 */
+@import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
+
+/* 2. CSS Reset 및 기본 설정 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 3. 전역 변수 및 루트 설정 */
+:root {
+  /* 폰트 설정 */
+  font-family: "Jua", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* 폰트 렌더링 최적화 */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* 색상 스키마 */
+  color-scheme: light;
+}
+
+/* 4. Body 기본 설정 */
+body {
+  margin: 0;
+  font-family: "Jua", sans-serif;
+  font-weight: 400;
+  background-color: #eceaf3;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 5. 링크 기본 스타일 */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 6. 버튼 기본 Reset */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+/* 7. 입력 필드 기본 Reset */
+input,
+textarea {
+  font-family: inherit;
+  outline: none;
+}
+
+/* 8. 리스트 기본 Reset */
+ul,
+ol {
+  list-style: none;
+}

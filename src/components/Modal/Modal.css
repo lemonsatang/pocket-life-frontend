@@ -1,0 +1,78 @@
+/* =================================================================
+   [Modal.css] 모달 컴포넌트 스타일
+   ================================================================= */
+
+/* 1. 모달 배경 */
+.modalDim {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 24, 40, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 2000;
+}
+
+/* 2. 모달 카드 */
+.modalCard {
+  width: 360px;
+  max-width: 92vw;
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px 16px 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+}
+
+/* 3. 모달 제목 */
+.modalTitle {
+  font-weight: 900;
+  color: #1f2a44;
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-family: "Jua", sans-serif !important;
+}
+
+/* 4. 모달 메시지 */
+.modalMsg {
+  white-space: pre-line;
+  color: #2b2f44;
+  font-size: 14px;
+  line-height: 1.35;
+  font-family: "Jua", sans-serif !important;
+}
+
+/* 5. 모달 버튼 영역 */
+.modalBtns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* 6. 모달 버튼 */
+.modalBtn {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 900;
+  cursor: pointer;
+  font-family: "Jua", sans-serif !important;
+}
+
+.modalBtn.ghost {
+  background: #f1f3ff;
+  color: #6f76a1;
+}
+
+.modalBtn.primary {
+  background: #aebaf0;
+  color: #fff;
+}
+
+/* 7. 포커스 스타일 제거 */
+.modalBtn:focus,
+.modalBtn:active {
+  outline: none !important;
+  box-shadow: none !important;
+}

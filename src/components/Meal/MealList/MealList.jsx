@@ -1,4 +1,6 @@
+// [Layout] 식단 리스트 컴포넌트 - 식사 목록 표시 및 편집
 import React from "react";
+import "./MealList.css";
 
 const MealList = ({
   meals,
@@ -12,55 +14,38 @@ const MealList = ({
   deleteMeal,
 }) => {
   return (
-    <div style={{ width: "100%", maxHeight: "500px", overflowY: "auto" }}>
+    <div className="meal-list-container">
       {meals.map((meal) => (
-        <div
-          className="item-row"
-          key={meal.id}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <span style={{ flex: 1 }}>
+        <div className="item-row meal-list-item-row" key={meal.id}>
+          <span className="meal-list-item-content">
             {editingId === meal.id ? (
-              <div style={{ display: "flex", gap: "5px" }}>
+              <div className="meal-list-edit-group">
                 <input
-                  className="pixel-input"
+                  className="pixel-input meal-list-edit-input"
                   value={editingText}
                   onChange={(e) => setEditingText(e.target.value)}
-                  style={{ height: "35px" }}
                 />
                 <input
-                  className="pixel-input"
+                  className="pixel-input meal-list-edit-calorie-input"
                   value={editingCalories}
                   onChange={(e) =>
                     setEditingCalories(e.target.value.replace(/\D/g, ""))
                   }
-                  style={{ width: "60px", height: "35px" }}
                 />
               </div>
             ) : (
-              <div style={{ display: "flex", alignItems: "center" }}>
-                {/* [수정] 식사 종류에 파란색 강조 스타일 추가 */}
-                <strong style={{ color: "#5e72e4", marginRight: "8px" }}>
+              <div className="meal-list-display-group">
+                <strong className="meal-list-meal-type">
                   [{meal.mealType}]
                 </strong>
-                <span style={{ color: "#2d3748" }}>{meal.text}</span>
-                <span
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#a0aec0",
-                    marginLeft: "8px",
-                  }}
-                >
+                <span className="meal-list-meal-text">{meal.text}</span>
+                <span className="meal-list-meal-calories">
                   ({meal.calories || 0} kcal)
                 </span>
               </div>
             )}
           </span>
-          <div style={{ display: "flex", gap: "5px", flexShrink: 0 }}>
+          <div className="meal-list-button-group">
             {editingId === meal.id ? (
               <button
                 className="pixel-btn edit"
