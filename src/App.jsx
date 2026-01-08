@@ -20,9 +20,18 @@ export default function App() {
   const [authed, setAuthed] = useState(false);
   const [view, setView] = useState("login");
 
+  // 로그인 유지
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      setAuthed(true); // 토큰이 있다면 로그인 유지
+    }
+  }, []);
+
   // [Logic] 로그아웃 처리
   const logout = () => {
-    localStorage.removeItem("mock_token");
+    localStorage.removeItem("token");
     setAuthed(false);
     setView("login");
     window.history.pushState(null, "", "/");

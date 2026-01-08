@@ -1,11 +1,28 @@
 // [Layout] 헤더 컴포넌트 - 공통 네비게이션 바
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./Header.css";
+import { jwtDecode } from "jwt-decode";
 
 const Header = ({ onLogout }) => {
   const location = useLocation();
   const path = location.pathname;
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        // Bearer 제외하고 토큰만 추출하여 해석
+        const decoded = jwtDecode(token.replace("Bearer ", ""));
+        setUsername(decoded.username);
+      } catch (err) {
+        console.error("토큰 해석 에러:", err);
+      }
+    } else {
+      console.error("토큰 해석 에러:", err);
+    }
+  });
 
   return (
     <nav className="pixel-nav-container">
@@ -49,7 +66,9 @@ const Header = ({ onLogout }) => {
         </div>
 
         <div className="nav-user-actions">
-          <div className="nav-user-info">효민님 반갑습니다.</div>
+          <div className="nav-user-info">
+            {username ? `${username} 님` : "사용자 님"} 반갑습니다.
+          </div>
           <button className="logoutBtn" onClick={onLogout}>
             로그아웃
           </button>
