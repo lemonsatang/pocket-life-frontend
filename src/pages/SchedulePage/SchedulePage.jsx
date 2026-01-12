@@ -1,15 +1,16 @@
 // [Layout] 일정 페이지 컴포넌트
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PlaceholderPage from "../PlaceholderPage/PlaceholderPage";
 import "./SchedulePage.css";
 import axios from "axios";
 
 const SchedulePage = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date().getDate());
+  const [selectedDate, setSelectedDate] = useState(new Date().getDate()); // 선택 날짜
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
   const [currentDate, setCurrentDate] = useState(new Date()); // 오늘 날짜
-  const [textInput, setTextInput] = useState("");
+  const [textInput, setTextInput] = useState(""); // 일정 입력텍스트
   const token = localStorage.getItem("token"); // 토큰 가져오기
+  const [todoList, setTodoList] = useState([]); // 일정리스트
 
   // 이전달로 이동
   const prevMonth = () =>
@@ -47,10 +48,32 @@ const SchedulePage = () => {
   };
   const days = createCalendar();
 
-  const createTodo = async () => {
-    console.log("추가");
+  // 날짜 변경시 호출
+  const getTodoList = async () => {
+    const formattedDate = `${currentDate.getFullYear()}-${(
+      currentDate.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}-${selectedDate.toString().padStart(2, "0")}`;
 
-    console.log(textInput);
+    try {
+      const list = await axios.get("http://localhost:8080/api/todo/getList", {
+        params: {
+          date: formattedDate, // 3. 백엔드에서 요구하는 파라미터명 (date)
+        },
+
+        headers: {
+          Authorization: token, //헤더에 토큰 포함
+        },
+      });
+      setTodoList(list.data); // 가져온 데이터 저장
+    } catch (e) {
+      console.error("리스트를 불러오던 도중 오류가 발생했습니다.: " + e);
+    }
+  };
+
+  // 일정 추가
+  const createTodo = async () => {
     if (!textInput) {
       openOk("일정을 입력해주세요.");
       return;
@@ -73,12 +96,16 @@ const SchedulePage = () => {
           },
         }
       );
-
-      console.log(response.data);
+      await getTodoList();
     } catch (e) {
       console.error("에러 발생: ", e);
     }
   };
+
+  // 페이지 로딩 or 날짜 변경시 호출
+  useEffect(() => {
+    getTodoList();
+  }, [selectedDate, currentDate]);
 
   return (
     <div className="schedule-container">
@@ -131,12 +158,18 @@ const SchedulePage = () => {
             추가
           </button>
         </div>
-        {/* 임시 할 일 목록 */}
+        {/* 할 일 목록 */}
         <div className="todo-list">
-          <div className="todo-item">
-            <span>콜라 마시기</span>
-            <button>삭제</button>
-          </div>
+          {todoList.length > 0 ? (
+            todoList.map((todo, i) => (
+              <div key={i} className="todo-item">
+                <span>{todo.content}</span>
+                <button className="delete-btn">삭제</button>
+              </div>
+            ))
+          ) : (
+            <div className="no-todo">일정이 없습니다.</div>
+          )}
         </div>
       </div>
     </div>
