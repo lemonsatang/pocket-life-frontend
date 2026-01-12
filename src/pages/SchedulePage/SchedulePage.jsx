@@ -99,7 +99,7 @@ const SchedulePage = () => {
   // 일정 추가
   const createTodo = async () => {
     if (!textInput) {
-      openOk("일정을 입력해주세요.");
+      openAlert("일정을 입력해주세요.");
       return;
     }
 
@@ -121,8 +121,28 @@ const SchedulePage = () => {
         }
       );
       await getTodoList();
+      setTextInput("");
     } catch (e) {
       console.error("에러 발생: ", e);
+    }
+  };
+
+  const deleteTodo = async (id) => {
+    if (confirm("삭제하시겠습니까?")) {
+      try {
+        const result = await axios.delete(
+          `http://localhost:8080/api/todo/delete/${id}`,
+          {
+            headers: {
+              Authorization: token, //헤더에 토큰 포함
+            },
+          }
+        );
+        openAlert("일정이 삭제되었습니다.");
+        await getTodoList();
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -188,7 +208,12 @@ const SchedulePage = () => {
             todoList.map((todo, i) => (
               <div key={i} className="todo-item">
                 <span>{todo.content}</span>
-                <button className="delete-btn">삭제</button>
+                <button
+                  className="delete-btn"
+                  onClick={() => deleteTodo(todo.todoId)}
+                >
+                  삭제
+                </button>
               </div>
             ))
           ) : (
