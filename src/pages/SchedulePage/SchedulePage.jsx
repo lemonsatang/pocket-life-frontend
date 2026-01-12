@@ -14,6 +14,7 @@ const SchedulePage = () => {
   const [todoList, setTodoList] = useState([]); // 일정리스트
   const [todoInput, setTodoInput] = useState("");
 
+
   // [State] 모달 상태
   const [modalState, setModalState] = useState({
     open: false,
@@ -127,22 +128,31 @@ const SchedulePage = () => {
     }
   };
 
-  const deleteTodo = async (id) => {
-    if (confirm("삭제하시겠습니까?")) {
-      try {
-        const result = await axios.delete(
-          `http://localhost:8080/api/todo/delete/${id}`,
-          {
-            headers: {
-              Authorization: token, //헤더에 토큰 포함
-            },
-          }
-        );
-        openAlert("일정이 삭제되었습니다.");
-        await getTodoList();
-      } catch (e) {
-        console.error(e);
-      }
+  // 삭제 요청 (모달 띄우기)
+  const requestDelete = (id) => {
+    setModalState({
+      open: true,
+      title: "알림",
+      message: "삭제하시겠습니까?",
+      confirmText: "확인",
+      cancelText: "취소",
+      showCancel: true,
+      onConfirm: () => confirmDelete(id),
+      onCancel: closeModal,
+    });
+  };
+
+  // 실제 삭제 실행
+  const confirmDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8080/api/todo/delete/${id}`, {
+        headers: { Authorization: token },
+      });
+      openAlert("일정이 삭제되었습니다."); 
+      await getTodoList();
+    } catch (e) {
+      console.error(e);
+      closeModal(); // 에러 시 닫기
     }
   };
 
@@ -210,7 +220,7 @@ const SchedulePage = () => {
                 <span>{todo.content}</span>
                 <button
                   className="delete-btn"
-                  onClick={() => deleteTodo(todo.todoId)}
+                  onClick={() => requestDelete(todo.todoId)}
                 >
                   삭제
                 </button>
@@ -227,6 +237,9 @@ const SchedulePage = () => {
         message={modalState.message}
         onConfirm={modalState.onConfirm}
         confirmText={modalState.confirmText}
+        cancelText={modalState.cancelText}
+        showCancel={modalState.showCancel}
+        onCancel={modalState.onCancel}
       />
     </div>
   );
