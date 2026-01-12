@@ -2,13 +2,13 @@
 import React from "react";
 import "../../styles/Common.css";
 
-const PlaceholderPage = ({ title, emoji }) => {
+const PlaceholderPage = ({ title, emoji, children }) => {
   return (
     <div className="placeholder-page">
       <h2>
         {emoji} {title}
       </h2>
-      <p>아직 준비 중입니다.</p>
+      {children ? children : <p>아직 준비 중입니다.</p>}
     </div>
   );
 };
