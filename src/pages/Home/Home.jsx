@@ -55,18 +55,23 @@ const Home = () => {
     const userId = "testUser";
     const fetchUrl = (path) => `http://localhost:8080/api/${path}`;
 
+    const getOptions = () => ({
+      headers: { Authorization: localStorage.getItem("token") },
+    });
+
     Promise.all([
-      fetch(fetchUrl(`meals?date=${dateStr}`)).then((res) =>
-        res.json().catch(() => [])
+      fetch(fetchUrl(`meals?date=${dateStr}`), getOptions()).then((res) =>
+        res.ok ? res.json() : []
       ),
-      fetch(fetchUrl(`cart?date=${dateStr}`)).then((res) =>
-        res.json().catch(() => [])
+      fetch(fetchUrl(`cart?date=${dateStr}`), getOptions()).then((res) =>
+        res.ok ? res.json() : []
       ),
-      fetch(fetchUrl(`todo?userId=${userId}&date=${dateStr}`)).then((res) =>
-        res.json().catch(() => [])
-      ),
-      fetch(fetchUrl(`tx?userId=${userId}&date=${dateStr}`)).then((res) =>
-        res.json().catch(() => [])
+      fetch(
+        `http://localhost:8080/api/todo/getList?date=${dateStr}`,
+        getOptions()
+      ).then((res) => (res.ok ? res.json() : [])),
+      fetch(fetchUrl(`tx?userId=${userId}&date=${dateStr}`), getOptions()).then(
+        (res) => (res.ok ? res.json() : [])
       ),
     ])
       .then(([meals, cartData, todos, txs]) => {
@@ -85,9 +90,13 @@ const Home = () => {
             index === self.findLastIndex((t) => t.text === item.text)
         );
 
-        const combinedTodos = [...dummyTodos, ...(todos || [])].filter(
-          (t) => t.dodate === dateStr
-        );
+        const validDummyTodos = dummyTodos.filter((t) => t.dodate === dateStr);
+        const validServerTodos = (todos || []).map((t) => ({
+          ...t,
+          text: t.content,
+        }));
+
+        const combinedTodos = [...validDummyTodos, ...validServerTodos];
 
         setDashboardData({
           meals: meals || [],
@@ -153,7 +162,6 @@ const Home = () => {
           emptyMsg="할 일이 없어요!"
           linkTo="/schedule"
           btnText="자세히 보기"
-          isTodo={true}
         />
         <DashboardCard
           title="오늘의 식단 🍚"
