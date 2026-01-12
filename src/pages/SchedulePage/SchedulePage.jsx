@@ -1,6 +1,7 @@
 // [Layout] 일정 페이지 컴포넌트
 import React, { useEffect, useState } from "react";
 import PlaceholderPage from "../PlaceholderPage/PlaceholderPage";
+import Modal from "../../components/Modal/Modal";
 import "./SchedulePage.css";
 import axios from "axios";
 
@@ -11,6 +12,29 @@ const SchedulePage = () => {
   const [textInput, setTextInput] = useState(""); // 일정 입력텍스트
   const token = localStorage.getItem("token"); // 토큰 가져오기
   const [todoList, setTodoList] = useState([]); // 일정리스트
+  const [todoInput, setTodoInput] = useState("");
+
+  // [State] 모달 상태
+  const [modalState, setModalState] = useState({
+    open: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
+  const closeModal = () => {
+    setModalState((prev) => ({ ...prev, open: false }));
+  };
+
+  const openAlert = (message) => {
+    setModalState({
+      open: true,
+      title: "알림",
+      message,
+      onConfirm: closeModal,
+      confirmText: "확인",
+    });
+  };
 
   // 이전달로 이동
   const prevMonth = () =>
@@ -172,6 +196,13 @@ const SchedulePage = () => {
           )}
         </div>
       </div>
+      <Modal
+        open={modalState.open}
+        title={modalState.title}
+        message={modalState.message}
+        onConfirm={modalState.onConfirm}
+        confirmText={modalState.confirmText}
+      />
     </div>
   );
 };

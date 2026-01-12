@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import { useMealData } from "../../hooks/useMealData";
 import MealStats from "../../components/Meal/MealStats/MealStats";
 import MealList from "../../components/Meal/MealList/MealList";
+import Modal from "../../components/Modal/Modal";
 import "./MealPage.css";
 
 const MealPage = () => {
@@ -13,8 +14,31 @@ const MealPage = () => {
   const [calorieInput, setCalorieInput] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editingText, setEditingText] = useState("");
+
   const [editingCalories, setEditingCalories] = useState("");
   const [displayRecs, setDisplayRecs] = useState([]);
+
+  // [State] 모달 상태
+  const [modalState, setModalState] = useState({
+    open: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
+  const closeModal = () => {
+    setModalState((prev) => ({ ...prev, open: false }));
+  };
+
+  const openAlert = (message) => {
+    setModalState({
+      open: true,
+      title: "알림",
+      message,
+      onConfirm: closeModal,
+      confirmText: "확인",
+    });
+  };
 
   const {
     meals,
@@ -114,7 +138,11 @@ const MealPage = () => {
           />
           <button
             className="pixel-btn"
-            onClick={() =>
+            onClick={() => {
+              if (!inputValue.trim()) {
+                openAlert("섭취한 음식과 칼로리를 입력해주세요!");
+                return;
+              }
               addMeal({
                 text: inputValue,
                 mealType,
@@ -122,8 +150,8 @@ const MealPage = () => {
               }).then(() => {
                 setInputValue("");
                 setCalorieInput("");
-              })
-            }
+              });
+            }}
           >
             추가
           </button>
@@ -147,6 +175,13 @@ const MealPage = () => {
         totalCalories={totalCalories}
         dailyGoal={2000}
         displayRecs={displayRecs}
+      />
+      <Modal
+        open={modalState.open}
+        title={modalState.title}
+        message={modalState.message}
+        onConfirm={modalState.onConfirm}
+        confirmText={modalState.confirmText}
       />
     </div>
   );

@@ -1,6 +1,7 @@
 // [Logic] 장바구니 리스트 컨테이너 - 상태 관리 및 API 호출
 import React, { useState, useEffect } from "react";
 import CartView from "./CartView/CartView";
+import Modal from "../Modal/Modal";
 
 const CartList = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -11,6 +12,28 @@ const CartList = () => {
   const [searchError, setSearchError] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchTarget, setSearchTarget] = useState("");
+
+  // [State] 모달 상태
+  const [modalState, setModalState] = useState({
+    open: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
+  const closeModal = () => {
+    setModalState((prev) => ({ ...prev, open: false }));
+  };
+
+  const openAlert = (message) => {
+    setModalState({
+      open: true,
+      title: "알림",
+      message,
+      onConfirm: closeModal,
+      confirmText: "확인",
+    });
+  };
 
   // [Logic] 날짜를 YYYY-MM-DD 형식으로 변환
   const getApiDate = (dateObj) =>
@@ -108,7 +131,8 @@ const CartList = () => {
   };
 
   return (
-    <CartView
+    <>
+      <CartView
       currentDate={currentDate}
       items={items}
       isLoading={isLoading}
@@ -125,7 +149,10 @@ const CartList = () => {
       }}
       onDatePickerChange={setCurrentDate}
       onSearch={() => {
-        if (!inputValue.trim()) return;
+        if (!inputValue.trim()) {
+          openAlert("검색할 물건을 입력해 주세요!");
+          return;
+        }
         fetch(
           `http://localhost:8080/api/cart/search?text=${encodeURIComponent(
             inputValue
@@ -145,7 +172,10 @@ const CartList = () => {
           });
       }}
       onAdd={(text) => {
-        if (!text || !text.trim()) return;
+        if (!text || !text.trim()) {
+          openAlert("추가할 물건을 입력해 주세요!");
+          return;
+        }
         fetch("http://localhost:8080/api/cart", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -190,6 +220,14 @@ const CartList = () => {
       getDateStr={getDateStr}
       getApiDate={getApiDate}
     />
+      <Modal
+        open={modalState.open}
+        title={modalState.title}
+        message={modalState.message}
+        onConfirm={modalState.onConfirm}
+        confirmText={modalState.confirmText}
+      />
+    </>
   );
 };
 
