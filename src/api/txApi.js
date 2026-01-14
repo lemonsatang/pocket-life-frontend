@@ -15,18 +15,14 @@ const txApi = axios.create({
  * - localStorage에 저장된 JWT를 그대로 Authorization 헤더에 추가
  * - ⚠️ Bearer를 다시 붙이면 안 됨 (이미 포함되어 있음)
  */
-txApi.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
+txApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
 
-    // 토큰이 있으면 그대로 헤더에 세팅
-    if (token) {
-      config.headers.Authorization = token;
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  // 토큰이 있으면 그대로 헤더에 세팅
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export default txApi;
