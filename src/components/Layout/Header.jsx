@@ -10,7 +10,8 @@ const Header = ({ onLogout }) => {
   const [username, setUsername] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    // [수정 2026-01-13 12:40] sessionStorage로 변경
+    const token = sessionStorage.getItem("token");
     if (token) {
       try {
         // Bearer 제외하고 토큰만 추출하여 해석

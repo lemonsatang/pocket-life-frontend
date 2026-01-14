@@ -4,6 +4,9 @@ export const useMealData = (currentDate) => {
   const [meals, setMeals] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // 토큰 가져오기
+  const token = sessionStorage.getItem("token");
+
   const getDateStr = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -13,7 +16,9 @@ export const useMealData = (currentDate) => {
 
   const fetchMeals = () => {
     const dateStr = getDateStr(currentDate);
-    fetch(`http://localhost:8080/api/meals?date=${dateStr}`)
+    fetch(`http://localhost:8080/api/meals?date=${dateStr}`, {
+      headers: { Authorization: token },
+    })
       .then((res) => (res.ok ? res.json() : []))
       .then(setMeals)
       .catch(console.error);
@@ -36,7 +41,10 @@ export const useMealData = (currentDate) => {
 
     return fetch("http://localhost:8080/api/meals", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
       body: JSON.stringify({ ...meal, mealDate: getDateStr(currentDate) }),
     })
       .then((res) => res.json())
@@ -47,7 +55,10 @@ export const useMealData = (currentDate) => {
   };
 
   const deleteMeal = (id) => {
-    fetch(`http://localhost:8080/api/meals/${id}`, { method: "DELETE" }).then(
+    fetch(`http://localhost:8080/api/meals/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: token },
+    }).then(
       () => {
         setMeals((prev) => prev.filter((m) => m.id !== id));
         setErrorMessage("");
@@ -59,7 +70,10 @@ export const useMealData = (currentDate) => {
     const meal = meals.find((m) => m.id === id);
     return fetch(`http://localhost:8080/api/meals/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
       body: JSON.stringify({ ...meal, ...updatedData }),
     })
       .then((res) => res.json())

@@ -22,7 +22,8 @@ export default function App() {
 
   // 로그인 유지
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    // [수정 2026-01-13 12:40] sessionStorage로 변경 - 브라우저 종료 시 로그아웃 처리
+    const token = sessionStorage.getItem("token");
 
     if (token) {
       setAuthed(true); // 토큰이 있다면 로그인 유지
@@ -31,7 +32,8 @@ export default function App() {
 
   // [Logic] 로그아웃 처리
   const logout = () => {
-    localStorage.removeItem("token");
+    // [수정 2026-01-13 12:40] sessionStorage로 변경
+    sessionStorage.removeItem("token");
     setAuthed(false);
     setView("login");
     window.history.pushState(null, "", "/");

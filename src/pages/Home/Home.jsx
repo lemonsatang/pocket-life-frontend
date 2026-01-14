@@ -56,7 +56,8 @@ const Home = () => {
     const fetchUrl = (path) => `http://localhost:8080/api/${path}`;
 
     const getOptions = () => ({
-      headers: { Authorization: localStorage.getItem("token") },
+      // [수정 2026-01-13 12:40] sessionStorage로 변경
+      headers: { Authorization: sessionStorage.getItem("token") },
     });
 
     Promise.all([
@@ -70,7 +71,7 @@ const Home = () => {
         `http://localhost:8080/api/todo/getList?date=${dateStr}`,
         getOptions()
       ).then((res) => (res.ok ? res.json() : [])),
-      fetch(fetchUrl(`tx?userId=${userId}&date=${dateStr}`), getOptions()).then(
+      fetch(fetchUrl(`tx?date=${dateStr}`), getOptions()).then(
         (res) => (res.ok ? res.json() : [])
       ),
     ])

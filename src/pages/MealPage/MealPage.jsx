@@ -4,8 +4,10 @@ import DatePicker from "react-datepicker";
 import { useMealData } from "../../hooks/useMealData";
 import MealStats from "../../components/Meal/MealStats/MealStats";
 import MealList from "../../components/Meal/MealList/MealList";
+import MealChatbot from "../../components/Meal/MealChatbot/MealChatbot";
 import Modal from "../../components/Modal/Modal";
 import "./MealPage.css";
+import { lightMeals, heartyMeals, cheatMeals } from "../../data/recommendedMeals";
 
 const MealPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -55,14 +57,66 @@ const MealPage = () => {
     0
   );
 
-  // [Logic] 칼로리에 따른 추천 식단 생성
+  // [Logic] 초기 로딩 시(또는 데이터 로드 후) 안 먹은 끼니로 자동 선택
+  const hasInitializedRef = React.useRef(false);
   useEffect(() => {
-    const base =
-      totalCalories > 2000
-        ? ["연어 샐러드", "두부 포케", "구운 야채"]
-        : ["불고기 덮밥", "고등어 정식", "비빔밥"];
-    setDisplayRecs([...base].sort(() => Math.random() - 0.5).slice(0, 3));
-  }, [totalCalories]);
+    if (meals.length > 0 && !hasInitializedRef.current) {
+        const eatenTypes = meals.map(m => m.mealType);
+        const types = ["아침", "점심", "저녁", "간식"];
+        
+        // 순서대로 확인해서 안 먹은 첫 번째 끼니를 찾음
+        for (const type of types) {
+            if (!eatenTypes.includes(type)) {
+                setMealType(type);
+                break;
+            }
+        }
+        hasInitializedRef.current = true;
+    }
+  }, [meals]);
+
+  // [Logic] 칼로리에 따른 스마트 추천 식단 생성
+  useEffect(() => {
+    const dailyGoal = 2000;
+    const remainingCalories = Math.max(0, dailyGoal - totalCalories);
+
+    // 남은 끼니 수 계산
+    const types = meals.map((m) => m.mealType);
+    let remainingCount = 0;
+    if (!types.includes("아침")) remainingCount++;
+    if (!types.includes("점심")) remainingCount++;
+    if (!types.includes("저녁")) remainingCount++;
+
+    // 예산 계산 (남은 끼니가 없으면 간식용으로 남은 칼로리 전체 사용)
+    const budgetPerMeal =
+      remainingCount > 0
+        ? Math.floor(remainingCalories / remainingCount)
+        : remainingCalories;
+
+    const allMeals = [...lightMeals, ...heartyMeals];
+    
+    // 1. 예산 필터링 (엄격하게)
+    let candidates = allMeals.filter((m) => m.calories <= budgetPerMeal);
+    
+    // 2. 이미 먹은 메뉴 제외
+    const eatenNames = meals.map(m => m.text);
+    candidates = candidates.filter(m => !eatenNames.includes(m.name));
+
+    // 3. 후보가 없으면?
+    if (candidates.length === 0) {
+        // 예산 초과 시 가장 칼로리 낮은거 3개 보여주기 (이미 먹은거 제외하고)
+        const notEatenAll = allMeals.filter(m => !eatenNames.includes(m.name));
+        candidates = notEatenAll.sort((a, b) => a.calories - b.calories).slice(0, 3);
+    }
+
+    // 4. 랜덤 3개 선택
+    setDisplayRecs(
+      [...candidates]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3)
+        .map((meal) => meal.name)
+    );
+  }, [totalCalories, meals]);
 
   // [Layout] DatePicker 커스텀 입력 컴포넌트
   const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
@@ -128,7 +182,17 @@ const MealPage = () => {
             className="pixel-input meal-food-input"
             placeholder="음식명"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setInputValue(value);
+
+              // [Logic] 입력한 음식명이 추천 식단에 있으면 칼로리 자동 입력
+              const allMeals = [...lightMeals, ...heartyMeals];
+              const found = allMeals.find((meal) => meal.name === value);
+              if (found) {
+                setCalorieInput(String(found.calories));
+              }
+            }}
           />
           <input
             className="pixel-input meal-calorie-input"
@@ -150,6 +214,13 @@ const MealPage = () => {
               }).then(() => {
                 setInputValue("");
                 setCalorieInput("");
+                
+                // [Logic] 입력 후 다음 끼니로 자동 포커스 이동
+                const types = ["아침", "점심", "저녁", "간식"];
+                const currentIndex = types.indexOf(mealType);
+                if (currentIndex < types.length - 1) {
+                  setMealType(types[currentIndex + 1]);
+                }
               });
             }}
           >
@@ -182,6 +253,15 @@ const MealPage = () => {
         message={modalState.message}
         onConfirm={modalState.onConfirm}
         confirmText={modalState.confirmText}
+      />
+      <MealChatbot
+        mealData={[...lightMeals, ...heartyMeals]}
+        // [Cheat] 치팅 모드 데이터 전달
+        cheatMeals={cheatMeals}
+        eatenMeals={meals}
+        currentCalories={totalCalories}
+        dailyGoal={2000}
+        onAddMeal={addMeal}
       />
     </div>
   );

@@ -77,9 +77,9 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
       // 토큰 추출
       const token = response.headers["authorization"];
 
-      // 토큰 있을시 로컬스토리지에 저장
       if (token) {
-        localStorage.setItem("token", token);
+        // [수정 2026-01-13 12:40] sessionStorage로 변경 - 브라우저 종료 시 로그아웃 처리
+        sessionStorage.setItem("token", token);
 
         openOk("로그인 성공", () => {
           setId("");
@@ -95,7 +95,8 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
 
   // [Logic] 소셜 로그인 처리
   const handleSocialLogin = (provider) => {
-    localStorage.setItem(
+    // [수정 2026-01-13 12:40] sessionStorage로 변경
+    sessionStorage.setItem(
       "mock_token",
       "mock-social-" + provider + "-" + Date.now()
     );
