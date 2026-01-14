@@ -4,16 +4,18 @@ import PlaceholderPage from "../PlaceholderPage/PlaceholderPage";
 import Modal from "../../components/Modal/Modal";
 import "./SchedulePage.css";
 import axios from "axios";
+import dataApi from "../../api/api";
 
 const SchedulePage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().getDate()); // 선택 날짜
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
   const [currentDate, setCurrentDate] = useState(new Date()); // 오늘 날짜
-  const [textInput, setTextInput] = useState(""); // 일정 입력텍스트
+  const [textInput, setTextInput] = useState(""); // 일정 입력 텍스트
   const token = localStorage.getItem("token"); // 토큰 가져오기
   const [todoList, setTodoList] = useState([]); // 일정리스트
-  const [todoInput, setTodoInput] = useState("");
-
+  const [editId, setEditId] = useState(null); // 수정모드인지 구분용 아이디
+  const [editText, setEditText] = useState(""); // 일정 수정 텍스트
+  const [todoDates, setTodoDates] = useState([]);
 
   // [State] 모달 상태
   const [modalState, setModalState] = useState({
@@ -82,13 +84,9 @@ const SchedulePage = () => {
       .padStart(2, "0")}-${selectedDate.toString().padStart(2, "0")}`;
 
     try {
-      const list = await axios.get("http://localhost:8080/api/todo/getList", {
+      const list = await dataApi.get("/api/todo/getList", {
         params: {
           date: formattedDate, // 3. 백엔드에서 요구하는 파라미터명 (date)
-        },
-
-        headers: {
-          Authorization: token, //헤더에 토큰 포함
         },
       });
       setTodoList(list.data); // 가져온 데이터 저장
@@ -105,26 +103,48 @@ const SchedulePage = () => {
     }
 
     let domonth = (currentDate.getMonth() + 1).toString(); // 월 문자화(자릿수 확인 위해)
+    let doday = selectedDate.toString();
 
     if (domonth.length == 1) {
       domonth = "0" + domonth; // 월이 한자리 수 일시 앞에 0붙이기
     }
-    let dodate = currentDate.getFullYear() + "-" + domonth + "-" + selectedDate;
+
+    if (doday.length == 1) {
+      doday = "0" + doday; // 일이 한자리 수 일시 앞에 0붙이기
+    }
+
+    let dodate = currentDate.getFullYear() + "-" + domonth + "-" + doday;
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/todo/create",
-        { content: textInput, doDate: dodate },
-        {
-          headers: {
-            Authorization: token, //헤더에 토큰 포함
-          },
-        }
-      );
+      await dataApi.post("/api/todo/create", {
+        content: textInput,
+        doDate: dodate,
+      });
       await getTodoList();
       setTextInput("");
+      getTodoDates();
     } catch (e) {
       console.error("에러 발생: ", e);
+    }
+  };
+
+  // 수정버튼 => 저장 버튼 변경
+  const handleEdit = (todo) => {
+    setEditId(todo.todoId);
+    setEditText(todo.content);
+  };
+
+  // 일정 수정
+  const updateTodo = async (todoId) => {
+    try {
+      await dataApi.put("/api/todo/update", {
+        content: editText,
+        todoId: todoId,
+      });
+      setEditId(null);
+      getTodoList();
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -145,20 +165,51 @@ const SchedulePage = () => {
   // 실제 삭제 실행
   const confirmDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/todo/delete/${id}`, {
-        headers: { Authorization: token },
-      });
-      openAlert("일정이 삭제되었습니다."); 
+      await dataApi.delete(`/api/todo/delete/${id}`);
+      openAlert("일정이 삭제되었습니다.");
       await getTodoList();
+      getTodoDates();
     } catch (e) {
       console.error(e);
       closeModal(); // 에러 시 닫기
     }
   };
 
+  // 할일 체크박스 토글
+  const toggleDone = async (todoId) => {
+    try {
+      await dataApi.put("/api/todo/toggleDone", {
+        todoId: todoId,
+      });
+      getTodoList();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  // 일정있는 날짜만 가져오기(달력에 표시용도)
+  const getTodoDates = async () => {
+    let domonth = (currentDate.getMonth() + 1).toString(); // 월 문자화(자릿수 확인 위해)
+
+    if (domonth.length == 1) {
+      domonth = "0" + domonth; // 월이 한자리 수 일시 앞에 0붙이기
+    }
+    let yearMonth = currentDate.getFullYear() + "-" + domonth;
+
+    try {
+      const res = await dataApi.get("/api/todo/getTodoDates", {
+        params: { yearMonth: yearMonth },
+      });
+
+      setTodoDates(res.data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   // 페이지 로딩 or 날짜 변경시 호출
   useEffect(() => {
     getTodoList();
+    getTodoDates();
   }, [selectedDate, currentDate]);
 
   return (
@@ -190,6 +241,7 @@ const SchedulePage = () => {
               onClick={() => d && setSelectedDate(d)}
             >
               {d}
+              {d && todoDates.includes(d) && <div className="todo-dot"></div>}
             </div>
           ))}
         </div>
@@ -216,14 +268,47 @@ const SchedulePage = () => {
         <div className="todo-list">
           {todoList.length > 0 ? (
             todoList.map((todo, i) => (
-              <div key={i} className="todo-item">
-                <span>{todo.content}</span>
-                <button
-                  className="delete-btn"
-                  onClick={() => requestDelete(todo.todoId)}
-                >
-                  삭제
-                </button>
+              <div key={i} className="todo-item-card">
+                <div className="todo-content-area">
+                  <input
+                    type="checkbox"
+                    className="todo-checkbox"
+                    onChange={() => toggleDone(todo.todoId)}
+                    checked={todo.isDone || false}
+                  />
+                  {editId === todo.todoId ? (
+                    <input
+                      type="text"
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                    />
+                  ) : (
+                    <span>{todo.content}</span>
+                  )}
+                </div>
+                <div className="todo-btn-group">
+                  {editId === todo.todoId ? (
+                    <button
+                      className="save-btn"
+                      onClick={() => updateTodo(todo.todoId)}
+                    >
+                      저장
+                    </button>
+                  ) : (
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEdit(todo)}
+                    >
+                      수정
+                    </button>
+                  )}
+                  <button
+                    className="delete-btn"
+                    onClick={() => requestDelete(todo.todoId)}
+                  >
+                    삭제
+                  </button>
+                </div>
               </div>
             ))
           ) : (

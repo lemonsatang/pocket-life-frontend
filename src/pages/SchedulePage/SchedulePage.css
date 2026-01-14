@@ -12,7 +12,7 @@
 /* 왼쪽 달력 카드 */
 .calendar-card {
   flex: 2; /* 달력을 일정보다 좀 더 넓게 */
-  min-width: 600px; /* 너무 좁아지지 않게 최소폭 설정 */
+  min-width: 800px; /* 너무 좁아지지 않게 최소폭 설정 */
   background: white;
   border-radius: 20px;
   padding: 40px;
@@ -22,7 +22,7 @@
 /* 오른쪽 할 일 카드 */
 .todo-card {
   flex: 1;
-  min-width: 400px;
+  min-width: 600px;
   background: white;
   border-radius: 20px;
   padding: 40px;
@@ -141,26 +141,101 @@
   overflow-y: auto;
 }
 
-.todo-item {
+.todo-item-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  margin-bottom: 10px;
-  background: #f8fafc;
-  border-radius: 10px;
-  border-left: 5px solid #5a67d8;
+  background: #fff;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid #5d66d0; /* 왼쪽 파란 포인트 라인 */
 }
-
-.todo-item span {
-  font-weight: 600;
-  color: #4a5568;
-}
-
-.delete-btn {
-  background: none;
+/* 버튼 */
+.edit-btn {
+  background-color: #4caf50;
+  color: white;
   border: none;
-  color: #e53e3e;
+  padding: 8px 15px;
+  border-radius: 6px;
+  margin-right: 8px;
   cursor: pointer;
-  font-weight: bold;
+}
+.save-btn {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.edit-input {
+  border: 1px solid #ddd;
+  padding: 5px;
+  border-radius: 4px;
+  width: 100%;
+  font-size: 16px;
+}
+
+/* 체크박스 커스텀 스타일 */
+.todo-checkbox {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 15px; /* 글자와의 간격 */
+  transition: all 0.2s;
+  position: relative;
+}
+
+/* 체크되었을 때 보라색 배경 */
+.todo-checkbox:checked {
+  background-color: #5d66d0; /* 보라색 */
+  border-color: #5d66d0;
+}
+
+/* 체크 표시(V) 구현 */
+.todo-checkbox:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.todo-content-area {
+  display: flex;
+  align-items: center; /* 세로 중앙 정렬 */
+  flex: 1;
+}
+
+/* 일정이 있을 시 달력 날짜에 점 */
+.day {
+  position: relative; /* 점 위치 잡기용 */
+}
+
+.todo-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #5a67d8;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
 }
