@@ -23,12 +23,22 @@
 .todo-card {
   flex: 1;
   min-width: 600px;
+  max-height: 750px;
+  overflow-y: auto;
   background: white;
   border-radius: 20px;
   padding: 40px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column; /* 내부 요소 세로 정렬 */
+}
+.todo-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.todo-list::-webkit-scrollbar-thumb {
+  background-color: #e2e8f0;
+  border-radius: 10px;
 }
 
 .calendar-header,
@@ -55,7 +65,9 @@
 /* 달력 그리드 설정 */
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  width: 100%;
+  table-layout: fixed;
   gap: 12px;
 }
 
@@ -152,6 +164,14 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-left: 5px solid #5d66d0; /* 왼쪽 파란 포인트 라인 */
 }
+
+.holiday-text-inline {
+  color: #ff4d4f;
+  margin-left: 5px;
+  font-weight: bold;
+  font-size: 17px;
+}
+
 /* 버튼 */
 .edit-btn {
   background-color: #4caf50;
@@ -226,16 +246,47 @@
 
 /* 일정이 있을 시 달력 날짜에 점 */
 .day {
-  position: relative; /* 점 위치 잡기용 */
+  min-height: 80px; /* 칸 높이를 넉넉하게 확보 */
+  display: flex;
+  flex-direction: column; /* 세로 방향 정렬 */
+  align-items: center; /* 가로 중앙 정렬 */
+  justify-content: flex-start; /* 위에서부터 배치 */
+  padding: 5px 0;
+  cursor: pointer;
+  position: relative;
 }
 
+/* 공휴일 날짜 숫자 빨간색 */
+.day.holiday {
+  color: #ff4d4f;
+  font-weight: bold;
+}
+
+.day-number {
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+/* 공휴일 이름 */
+.day .holiday-name {
+  color: #ff4d4f !important;
+  font-size: 16px !important;
+  text-align: center;
+  display: block;
+  width: 95%;
+  white-space: nowrap; /* 줄바꿈 금지 */
+  overflow: hidden; /* 넘치는 글자 숨김 */
+  text-overflow: ellipsis; /* 넘치면 ... 표시 */
+
+  margin: 2px auto 0;
+}
+
+/* 기존 점 위치 살짝 하단으로 조정 */
 .todo-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   background-color: #5a67d8;
   border-radius: 50%;
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: auto; /* 점을 칸 아래쪽으로 밀어내기 */
+  margin-bottom: 6px;
 }

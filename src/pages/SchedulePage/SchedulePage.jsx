@@ -15,6 +15,7 @@ const SchedulePage = () => {
   const [editId, setEditId] = useState(null); // 수정모드인지 구분용 아이디
   const [editText, setEditText] = useState(""); // 일정 수정 텍스트
   const [todoDates, setTodoDates] = useState([]);
+  const [holidays, setHolidays] = useState([]); // 공휴일 저장용 state 추가
 
   // [State] 모달 상태
   const [modalState, setModalState] = useState({
@@ -205,10 +206,38 @@ const SchedulePage = () => {
     }
   };
 
+  // 공휴일 api 가져오기
+  const getHolidays = async () => {
+    const serviceKey = import.meta.env.VITE_HOLIDAY_SERVICE_KEY;
+    try {
+      const res = await dataApi.get("/api/todo/getHolidays", {
+        params: {
+          year: currentDate.getFullYear(),
+          month: (currentDate.getMonth() + 1).toString().padStart(2, "0"),
+          _type: "json",
+        },
+      });
+      // 공공데이터 특유의 복잡한 경로 뚫기
+      const item = res.data.response.body.items.item;
+
+      // 데이터가 없으면 빈 배열, 하나면 배열로 감싸기, 여러 개면 그대로 저장
+      if (!item) {
+        setHolidays([]);
+      } else if (Array.isArray(item)) {
+        setHolidays(item);
+      } else {
+        setHolidays([item]);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   // 페이지 로딩 or 날짜 변경시 호출
   useEffect(() => {
     getTodoList();
     getTodoDates();
+    getHolidays();
   }, [selectedDate, currentDate]);
 
   return (
@@ -231,26 +260,49 @@ const SchedulePage = () => {
               {w}
             </div>
           ))}
-          {days.map((d, i) => (
-            <div
-              key={i}
-              className={`day ${d === selectedDate ? "selected" : ""} ${
-                d === null ? "empty" : ""
-              }`}
-              onClick={() => d && setSelectedDate(d)}
-            >
-              {d}
-              {d && todoDates.includes(d) && <div className="todo-dot"></div>}
-            </div>
-          ))}
+          {days.map((d, i) => {
+            // 공휴일 가져오기
+            const holiday = holidays.find((h) => Number(h.locdate) % 100 === d);
+            // 일요일인지 확인 (인덱스 i가 0, 7, 14... 일 때)
+            const isSunday = i % 7 === 0;
+
+            // 둘 중 하나라도 해당되면 holiday 클래스를 준다!
+            const holidayClass = holiday || isSunday ? "holiday" : "";
+
+            return (
+              <div
+                key={i}
+                className={`day ${d === selectedDate ? "selected" : ""} ${
+                  d === null ? "empty" : ""
+                } ${holidayClass}`}
+                onClick={() => d && setSelectedDate(d)}
+              >
+                {d}
+                {holiday && (
+                  <div className="holiday-name">{holiday.dateName}</div>
+                )}
+                {d && todoDates.includes(d) && <div className="todo-dot"></div>}
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* 오른쪽: 일정 영역 */}
       <div className="todo-card">
         <div className="todo-header">
-          {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월{" "}
-          {selectedDate}일
+          <div className="header-date-group">
+            {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월{" "}
+            {selectedDate}일
+            {(() => {
+              const h = holidays.find(
+                (h) => Number(h.locdate) % 100 === selectedDate
+              );
+              return h ? (
+                <span className="holiday-text-inline"> {h.dateName}</span>
+              ) : null;
+            })()}
+          </div>
         </div>
         <div className="todo-input-row">
           <input
@@ -258,6 +310,7 @@ const SchedulePage = () => {
             placeholder="일정을 입력하세요"
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
+            maxLength={20}
           />
           <button className="add-btn" onClick={createTodo}>
             추가
@@ -280,6 +333,7 @@ const SchedulePage = () => {
                       type="text"
                       value={editText}
                       onChange={(e) => setEditText(e.target.value)}
+                      maxLength={20}
                     />
                   ) : (
                     <span>{todo.content}</span>

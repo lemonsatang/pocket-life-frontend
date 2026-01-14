@@ -28,3 +28,4 @@ Self_Practice/
 .settings/
 .project
 .classpath
+.env
