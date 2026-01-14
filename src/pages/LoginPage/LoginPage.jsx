@@ -80,6 +80,10 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
       if (token) {
         // [수정 2026-01-13 12:40] sessionStorage로 변경 - 브라우저 종료 시 로그아웃 처리
         sessionStorage.setItem("token", token);
+        // [수정 2026-01-14 12:50] 403 에러 해결 (토큰 충돌 방지):
+        // 이유: 소셜 로그인 후 일반 로그인 시, api.js가 만료된 소셜 토큰을 참조하는 문제 발생.
+        // 방법: 일반 로그인 성공 시 기존의 소셜 토큰(mock_token)을 명시적으로 삭제.
+        sessionStorage.removeItem("mock_token");
 
         openOk("로그인 성공", () => {
           setId("");
@@ -95,7 +99,10 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
 
   // [Logic] 소셜 로그인 처리
   const handleSocialLogin = (provider) => {
-    // [수정 2026-01-13 12:40] sessionStorage로 변경
+    // [수정 2026-01-14 12:50] 403 에러 해결 (토큰 충돌 방지):
+    // 이유: 일반 로그인 후 소셜 로그인 시, api.js가 기존 일반 토큰을 우선 참조하는 문제 발생.
+    // 방법: 소셜 로그인 시도 시 기존의 일반 토큰(token)을 명시적으로 삭제.
+    sessionStorage.removeItem("token");
     sessionStorage.setItem(
       "mock_token",
       "mock-social-" + provider + "-" + Date.now()

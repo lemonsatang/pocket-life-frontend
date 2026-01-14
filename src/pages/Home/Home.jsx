@@ -5,9 +5,13 @@ import { ko } from "date-fns/locale";
 import DashboardCard from "../../components/DashboardCard/DashboardCard";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Home.css";
+import dataApi from "../../api/api";
 
 registerLocale("ko", ko);
 
+// [수정 2026-01-14 12:50] 403 에러 해결:
+// 이유: 대시보드 API 요청 시 토큰 누락 및 에러 처리 미흡.
+// 방법: fetch를 dataApi(axios)로 대체하여 인증 토큰 자동 포함 및 Promise.all 에러 핸들링 개선.
 const Home = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dashboardData, setDashboardData] = useState({
@@ -52,28 +56,12 @@ const Home = () => {
   // [Logic] 대시보드 데이터 로드
   useEffect(() => {
     const dateStr = getDateStr(currentDate);
-    const userId = "testUser";
-    const fetchUrl = (path) => `http://localhost:8080/api/${path}`;
-
-    const getOptions = () => ({
-      // [수정 2026-01-13 12:40] sessionStorage로 변경
-      headers: { Authorization: sessionStorage.getItem("token") },
-    });
 
     Promise.all([
-      fetch(fetchUrl(`meals?date=${dateStr}`), getOptions()).then((res) =>
-        res.ok ? res.json() : []
-      ),
-      fetch(fetchUrl(`cart?date=${dateStr}`), getOptions()).then((res) =>
-        res.ok ? res.json() : []
-      ),
-      fetch(
-        `http://localhost:8080/api/todo/getList?date=${dateStr}`,
-        getOptions()
-      ).then((res) => (res.ok ? res.json() : [])),
-      fetch(fetchUrl(`tx?date=${dateStr}`), getOptions()).then(
-        (res) => (res.ok ? res.json() : [])
-      ),
+      dataApi.get(`/api/meals?date=${dateStr}`).then(res => res.data).catch(() => []),
+      dataApi.get(`/api/cart?date=${dateStr}`).then(res => res.data).catch(() => []),
+      dataApi.get(`/api/todo/getList?date=${dateStr}`).then(res => res.data).catch(() => []),
+      dataApi.get(`/api/tx?date=${dateStr}`).then(res => res.data).catch(() => [])
     ])
       .then(([meals, cartData, todos, txs]) => {
         const income = (txs || [])

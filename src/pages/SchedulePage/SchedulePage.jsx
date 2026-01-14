@@ -11,7 +11,6 @@ const SchedulePage = () => {
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
   const [currentDate, setCurrentDate] = useState(new Date()); // 오늘 날짜
   const [textInput, setTextInput] = useState(""); // 일정 입력 텍스트
-  const token = localStorage.getItem("token"); // 토큰 가져오기
   const [todoList, setTodoList] = useState([]); // 일정리스트
   const [editId, setEditId] = useState(null); // 수정모드인지 구분용 아이디
   const [editText, setEditText] = useState(""); // 일정 수정 텍스트

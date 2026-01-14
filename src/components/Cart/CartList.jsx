@@ -4,6 +4,9 @@ import CartView from "./CartView/CartView";
 import Modal from "../Modal/Modal";
 import dataApi from "../../api/api";
 
+// [수정 2026-01-14 12:50] 403 에러 해결:
+// 이유: fetch 사용 시 토큰이 누락되어 403 Forbidden 에러 및 JSON 파싱 에러 발생.
+// 방법: fetch를 dataApi(axios)로 대체하여 인증 토큰 자동 헤더 주입 및 에러 처리 강화.
 const CartList = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [items, setItems] = useState([]);
