@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import CartView from "./CartView/CartView";
 import Modal from "../Modal/Modal";
+import dataApi from "../../api/api";
 
 const CartList = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -44,20 +45,18 @@ const CartList = () => {
 
   // [Logic] 즐겨찾기 목록 로드
   const fetchFavorites = () => {
-    fetch("http://localhost:8080/api/cart/favorites")
-      .then((res) => res.json())
-      .then((data) => setFavorites(data))
+    dataApi.get("/api/cart/favorites")
+      .then((res) => setFavorites(res.data))
       .catch((e) => console.log("즐겨찾기 로드 실패(혹은 API 없음):", e));
   };
 
   // [Logic] 장바구니 아이템 로드
   const fetchItems = () => {
     setIsLoading(true);
-    fetch(`http://localhost:8080/api/cart?date=${getApiDate(currentDate)}`)
-      .then((res) => res.json())
-      .then((data) => {
+    dataApi.get(`/api/cart?date=${getApiDate(currentDate)}`)
+      .then((res) => {
         setItems(
-          data.map((i) => ({
+          res.data.map((i) => ({
             ...i,
             isFavorite: i.isFavorite || false,
             count: i.count || 1,
@@ -94,22 +93,15 @@ const CartList = () => {
     }
 
     const updated = { ...item, isFavorite: newFavStatus };
-    fetch(`http://localhost:8080/api/cart/${item.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updated),
-    });
+    dataApi.put(`/api/cart/${item.id}`, updated);
   };
 
   // [Logic] 아이템 삭제
   const handleDelete = (item) => {
     setItems((prev) => prev.filter((i) => i.id !== item.id));
 
-    fetch(`http://localhost:8080/api/cart/${item.id}`, {
-      method: "DELETE",
-    }).then((res) => {
-      if (!res.ok) fetchItems();
-    });
+    dataApi.delete(`/api/cart/${item.id}`)
+      .catch(() => fetchItems());
   };
 
   // [Logic] 날짜 문자열 포맷팅
@@ -153,13 +145,9 @@ const CartList = () => {
           openAlert("검색할 물건을 입력해 주세요!");
           return;
         }
-        fetch(
-          `http://localhost:8080/api/cart/search?text=${encodeURIComponent(
-            inputValue
-          )}`
-        )
-          .then((res) => res.json())
-          .then((data) => {
+        dataApi.get(`/api/cart/search?text=${encodeURIComponent(inputValue)}`)
+          .then((res) => {
+            const data = res.data;
             setSearchResults(data);
             const dated = data.filter((r) => r.shoppingDate);
             if (dated.length > 0) {
@@ -169,6 +157,10 @@ const CartList = () => {
               setTimeout(() => setSearchTarget(""), 5000);
             }
             setSearchError(data.length === 0 ? "검색 결과가 없습니다." : "");
+          })
+          .catch(err => {
+             console.error(err);
+             setSearchError("검색 중 오류가 발생했습니다.");
           });
       }}
       onAdd={(text) => {
@@ -176,19 +168,15 @@ const CartList = () => {
           openAlert("추가할 물건을 입력해 주세요!");
           return;
         }
-        fetch("http://localhost:8080/api/cart", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        dataApi.post("/api/cart", {
             text,
             isBought: false,
             shoppingDate: getApiDate(currentDate),
             isFavorite: false,
             count: 1,
-          }),
         })
-          .then((res) => res.json())
-          .then((saved) => {
+          .then((res) => {
+            const saved = res.data;
             setItems((prev) => {
               const idx = prev.findIndex((i) => i.id === saved.id);
               if (idx !== -1) {
@@ -207,13 +195,10 @@ const CartList = () => {
       }}
       onMark={(item) => {
         const updated = { ...item, isBought: true };
-        fetch(`http://localhost:8080/api/cart/${item.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updated),
-        }).then(() =>
-          setItems(items.map((i) => (i.id === item.id ? updated : i)))
-        );
+        dataApi.put(`/api/cart/${item.id}`, updated)
+          .then(() =>
+            setItems(items.map((i) => (i.id === item.id ? updated : i)))
+          );
       }}
       onDelete={handleDelete}
       onToggleFav={handleToggleFav}
