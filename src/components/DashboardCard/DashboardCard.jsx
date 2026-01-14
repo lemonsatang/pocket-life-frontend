@@ -1,4 +1,3 @@
-// [Layout] 대시보드 카드 컴포넌트 - 데이터 요약 카드
 import React from "react";
 import { Link } from "react-router-dom";
 import "./DashboardCard.css";
@@ -17,20 +16,21 @@ const DashboardCard = ({
   expense,
   totalCalories,
 }) => {
-  // [Logic] 안전한 숫자 변환
   const safeIncome = Number(income) || 0;
   const safeExpense = Number(expense) || 0;
   const totalBalance = safeIncome - safeExpense;
   const safeCalories = Number(totalCalories) || 0;
   const isOver = safeCalories > 2000;
 
-  // [Logic] 미확인 장바구니 아이템 확인
   const hasUnconfirmedItems =
     isCart && list?.length > 0 && list.some((item) => !item.isBought);
+
+  const finalLink = isAccount ? "/ledger" : linkTo;
 
   return (
     <div className="card dashboard-card">
       <h3 className="dashboard-card-title">{title}</h3>
+
       <div className="dashboard-card-content">
         {isAccount ? (
           <div className="dashboard-card-account">
@@ -47,7 +47,9 @@ const DashboardCard = ({
               </span>
             </div>
             <div className="dashboard-card-account-summary">
-              <p className="dashboard-card-account-summary-label">오늘의 합계</p>
+              <p className="dashboard-card-account-summary-label">
+                오늘의 합계
+              </p>
               <span
                 className={`dashboard-card-account-summary-value ${
                   totalBalance >= 0 ? "positive" : "negative"
@@ -109,7 +111,7 @@ const DashboardCard = ({
         <div className="dashboard-card-warning">⚠️ 구매완료 해주세요!</div>
       )}
 
-      <Link to={linkTo} className="dashboard-card-link">
+      <Link to={finalLink} className="dashboard-card-link">
         <button className="pixel-btn dashboard-card-button">{btnText}</button>
       </Link>
     </div>
