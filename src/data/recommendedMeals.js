@@ -40,16 +40,16 @@ export const heartyMeals = [
 
 // 치팅 식단 (고칼로리/특식)
 export const cheatMeals = [
-  { name: "치킨", calories: 2000, nutrients: "단백질 150g, 지방 100g, 탄수화물 50g" },
-  { name: "피자", calories: 2500, nutrients: "단백질 100g, 지방 120g, 탄수화물 300g" },
-  { name: "닭갈비", calories: 1200, nutrients: "단백질 80g, 지방 60g, 탄수화물 150g" },
-  { name: "떡볶이", calories: 1000, nutrients: "단백질 20g, 지방 30g, 탄수화물 200g" },
-  { name: "삼겹살", calories: 1500, nutrients: "단백질 100g, 지방 120g, 탄수화물 10g" },
-  { name: "햄버거 세트", calories: 1100, nutrients: "단백질 40g, 지방 50g, 탄수화물 120g" },
-  { name: "족발", calories: 1300, nutrients: "단백질 120g, 지방 80g, 탄수화물 20g" },
-  { name: "보쌈", calories: 1200, nutrients: "단백질 110g, 지방 70g, 탄수화물 15g" },
-  { name: "라면", calories: 500, nutrients: "단백질 10g, 지방 20g, 탄수화물 80g" },
-  { name: "짜장면", calories: 800, nutrients: "단백질 20g, 지방 30g, 탄수화물 110g" },
-  { name: "짬뽕", calories: 700, nutrients: "단백질 25g, 지방 20g, 탄수화물 100g" },
-  { name: "탕수육", calories: 900, nutrients: "단백질 50g, 지방 40g, 탄수화물 80g" },
+  { name: "치킨", calories: 2000, unit: "조각", unitCalories: 250, totalName: "한 마리", nutrients: { 단백질: 150, 지방: 100, 탄수화물: 50 } },
+  { name: "피자", calories: 2500, unit: "조각", unitCalories: 300, totalName: "한 판", nutrients: { 단백질: 100, 지방: 120, 탄수화물: 300 } },
+  { name: "닭갈비", calories: 1200, unit: "인분", unitCalories: 600, totalName: "2인분 기준", nutrients: { 단백질: 80, 지방: 60, 탄수화물: 150 } },
+  { name: "떡볶이", calories: 1000, unit: "인분", unitCalories: 500, totalName: "2인분 기준", nutrients: { 단백질: 20, 지방: 30, 탄수화물: 200 } },
+  { name: "삼겹살", calories: 1500, unit: "인분", unitCalories: 750, totalName: "2인분 기준", nutrients: { 단백질: 100, 지방: 120, 탄수화물: 10 } },
+  { name: "햄버거 세트", calories: 1100, unit: "세트", unitCalories: 1100, totalName: "1세트", nutrients: { 단백질: 40, 지방: 50, 탄수화물: 120 } },
+  { name: "족발", calories: 1300, unit: "인분", unitCalories: 650, totalName: "2인분 기준", nutrients: { 단백질: 120, 지방: 80, 탄수화물: 20 } },
+  { name: "보쌈", calories: 1200, unit: "인분", unitCalories: 600, totalName: "2인분 기준", nutrients: { 단백질: 110, 지방: 70, 탄수화물: 15 } },
+  { name: "라면", calories: 500, unit: "봉지", unitCalories: 500, totalName: "1봉지", nutrients: { 단백질: 10, 지방: 20, 탄수화물: 80 } },
+  { name: "짜장면", calories: 800, unit: "그릇", unitCalories: 800, totalName: "1그릇", nutrients: { 단백질: 20, 지방: 30, 탄수화물: 110 } },
+  { name: "짬뽕", calories: 700, unit: "그릇", unitCalories: 700, totalName: "1그릇", nutrients: { 단백질: 25, 지방: 20, 탄수화물: 100 } },
+  { name: "탕수육", calories: 900, unit: "접시", unitCalories: 900, totalName: "소(小)", nutrients: { 단백질: 50, 지방: 40, 탄수화물: 80 } },
 ];

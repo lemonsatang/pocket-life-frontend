@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import CartView from "./CartView/CartView";
 import Modal from "../Modal/Modal";
 import dataApi from "../../api/api";
+// import txApi from "../../api/txapi"; // [Deleted]
+import { useMealContext } from "../../context/MealContext.jsx"; // [New]
 
 // [수정 2026-01-14 12:50] 403 에러 해결:
 // 이유: fetch 사용 시 토큰이 누락되어 403 Forbidden 에러 및 JSON 파싱 에러 발생.
@@ -25,7 +27,11 @@ const CartList = () => {
     // [수정 2026-01-15 09:44] 타입 추가
     type: "success",
     onConfirm: null,
+    confirmText: "확인"
   });
+
+  // [Context]
+  const { triggerUpdate } = useMealContext();
 
   const closeModal = () => {
     setModalState((prev) => ({ ...prev, open: false }));
@@ -214,9 +220,29 @@ const CartList = () => {
       onMark={(item) => {
         const updated = { ...item, isBought: true };
         dataApi.put(`/api/cart/${item.id}`, updated)
-          .then(() =>
-            setItems(items.map((i) => (i.id === item.id ? updated : i)))
-          );
+          .then(async () => {
+            setItems(items.map((i) => (i.id === item.id ? updated : i)));
+            
+            // [New] 가계부 지출 자동 생성
+            const amount = 10000 * (item.count || 1); // 기본 단가 1만원 * 수량
+            try {
+                // [수정] txApi 대신 인증이 검증된 dataApi 사용 (/api/tx 경로 명시)
+                await dataApi.post("/api/tx", {
+                    type: "EXPENSE",
+                    category: "장바구니/쇼핑",
+                    title: item.text,
+                    amount: amount,
+                    txDate: new Date().toISOString().split('T')[0] // YYYY-MM-DD
+                });
+                openAlert(`구매 완료! 가계부에 ${amount.toLocaleString()}원 지출이 기록되었습니다.`, "success");
+            } catch (err) {
+                console.error("지출 기록 실패", err);
+                openAlert("구매 상태는 변경되었으나, 가계부 기록에 실패했습니다.", "warning");
+            }
+            
+            // 전역 업데이트 트리거 (통계/대시보드 반영)
+            triggerUpdate();
+          });
       }}
       onDelete={handleDelete}
       onToggleFav={handleToggleFav}

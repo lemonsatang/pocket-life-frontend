@@ -1,5 +1,6 @@
 // [Layout] 식단 관리 페이지 - 식사 기록 및 통계
 import React, { useState, useEffect } from "react";
+import { useMealContext } from "../../context/MealContext.jsx"; // [New] import
 import DatePicker from "react-datepicker";
 import { useMealData } from "../../hooks/useMealData";
 import MealStats from "../../components/Meal/MealStats/MealStats";
@@ -30,6 +31,7 @@ const MealPage = () => {
     message: "",
     // [수정 2026-01-15 09:44] 타입 추가
     type: "success",
+    children: null, // [수정] 커스텀 컨텐츠
     onConfirm: null,
   });
 
@@ -44,8 +46,199 @@ const MealPage = () => {
       message,
       // [수정 2026-01-15 09:44] 타입 적용
       type: type,
+      children: null, // 초기화
       onConfirm: closeModal,
       confirmText: "확인",
+    });
+  };
+
+  // [Logic] 식단 직접 추가 핸들러 (버튼, 추천메뉴, 메뉴판 공용)
+  const handleManualAdd = (name, calories) => {
+    if (!name || !name.trim()) {
+      openAlert("섭취한 음식과 칼로리를 입력해주세요!", "warning");
+      return;
+    }
+
+    // [New Logic] 치팅 식단인지 확인
+    const cheatMeal = cheatMeals.find(cheat => name === cheat.name);
+
+    if (cheatMeal) {
+        // [UI] 수량 선택 모달 띄우기
+        let quantity = 1; // 기본값
+        
+        const updateModalContent = (qty) => {
+            const calculatedCalories = cheatMeal.unitCalories * qty;
+            
+            setModalState({
+                open: true,
+                title: `🍕 ${name} 수량 선택`,
+                message: ``,
+                type: 'success',
+                confirmText: "입력 완료",
+                
+                // [Logic] 입력 완료 버튼 클릭 시 실제 추가
+                onConfirm: () => {
+                   const finalCalories = cheatMeal.unitCalories * quantity;
+                   // 실제 추가 로직 호출
+                   addMealItem(name, finalCalories);
+                   closeModal();
+                },
+                
+                children: (
+                    <div className="quantity-modal-content" style={{textAlign: 'center', padding: '10px 0'}}>
+                        <p style={{marginBottom: '15px', color: '#718096'}}>
+                            몇 {cheatMeal.unit} 드셨나요?<br/>
+                            <small>(1{cheatMeal.unit} 당 {cheatMeal.unitCalories}kcal)</small>
+                        </p>
+                        
+                        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginBottom: '20px'}}>
+                            <input 
+                                type="number" 
+                                min="1" 
+                                defaultValue={qty}
+                                onChange={(e) => {
+                                    quantity = Number(e.target.value);
+                                    // 실시간 칼로리 표시 업데이트를 위해 모달 다시 렌더링 (간이 방식)
+                                    // 실제로는 state로 분리하는게 좋지만, 여기서는 함수 내부 변수 + 재호출로 처리
+                                    const nextCal = cheatMeal.unitCalories * quantity;
+                                    document.getElementById('calculated-cal-display').innerText = `${nextCal} kcal`;
+                                }}
+                                style={{
+                                    width: '80px', 
+                                    padding: '8px', 
+                                    fontSize: '1.2rem', 
+                                    textAlign: 'center',
+                                    border: '2px solid #e2e8f0',
+                                    borderRadius: '8px'
+                                }} 
+                            />
+                            <span style={{fontSize: '1.1rem', fontWeight: 'bold'}}>{cheatMeal.unit}</span>
+                        </div>
+
+                        <div style={{marginBottom: '20px', fontSize: '1.2rem', fontWeight: 'bold', color: '#5e72e4'}}>
+                            총 <span id="calculated-cal-display">{cheatMeal.unitCalories * qty} kcal</span>
+                        </div>
+
+                        <button 
+                            className="pixel-btn" 
+                            style={{width: '100%', backgroundColor: '#f57c00', marginTop: '10px'}}
+                            onClick={() => {
+                                // 전체 먹기
+                                addMealItem(name, cheatMeal.calories);
+                                closeModal();
+                            }}
+                        >
+                            {cheatMeal.totalName} 다 먹음! ({cheatMeal.calories}kcal)
+                        </button>
+                    </div>
+                )
+            });
+        };
+        
+        updateModalContent(1); // 초기 실행
+        return;
+    }
+    
+    // 일반 메뉴는 바로 추가
+    const calValue = String(calories).replace(/\D/g, "");
+    addMealItem(name, calValue);
+  };
+
+  // [Context] 실시간 업데이트 트리거
+  const { triggerUpdate } = useMealContext();
+
+  // [Logic] 실제 식단 추가 내부 함수 (모달/직접입력 공통 사용)
+  const addMealItem = (name, calories) => {
+    const calValue = String(calories).replace(/\D/g, "");
+
+    addMeal({
+      text: name,
+      mealType,
+      calories: calValue,
+    }).then(() => {
+      setInputValue("");
+      setCalorieInput("");
+      
+      // [New] 전역 업데이트 트리거 (통계 페이지 등 반영)
+      triggerUpdate();
+      
+      const isCheatMeal = cheatMeals.some(cheat => name.includes(cheat.name));
+      const projectedCalories = totalCalories + (Number(calValue) || 0);
+
+      // [Conditions] 완벽한 치팅 데이 조건(치팅식단 + 2000kcal 초과)일 때만 알림
+      if (isCheatMeal && projectedCalories > 2000 && !cheatingMode) {
+          openAlert("치팅 메뉴가 감지되었습니다! 오늘은 치팅데이! 🥳", "success");
+      }
+      
+      // [Logic] 입력 후 다음 끼니로 자동 포커스 이동
+      const types = ["아침", "점심", "저녁", "간식"];
+      const currentIndex = types.indexOf(mealType);
+      if (currentIndex < types.length - 1) {
+        setMealType(types[currentIndex + 1]);
+      }
+    });
+  };
+
+  // [Logic] 메뉴판 모달 열기
+  const handleOpenMenu = () => {
+    setModalState({
+        open: true,
+        title: "📋 전체 메뉴판",
+        message: "", // 메시지 없음
+        type: "success",
+        confirmText: "닫기",
+        onConfirm: closeModal,
+        children: (
+            <div className="menu-board-container" style={{ maxHeight: '400px', overflowY: 'auto', textAlign: 'left', padding: '0 10px' }}>
+                <h4 style={{marginTop: '10px', borderBottom: '2px solid #ddd', paddingBottom: '5px'}}>🥗 가벼운 식단</h4>
+                <ul style={{listStyle: 'none', padding: 0}}>
+                    {lightMeals.map((m, i) => (
+                        <li 
+                            key={i} 
+                            className="menu-board-item"
+                            onClick={() => {
+                                handleManualAdd(m.name, m.calories); // 바로 추가
+                                closeModal(); // 모달 닫기
+                            }}
+                        >
+                            - {m.name} ({m.calories}kcal)
+                        </li>
+                    ))}
+                </ul>
+                
+                <h4 style={{marginTop: '20px', borderBottom: '2px solid #ddd', paddingBottom: '5px'}}>🍚 든든한 식단</h4>
+                <ul style={{listStyle: 'none', padding: 0}}>
+                    {heartyMeals.map((m, i) => (
+                        <li 
+                            key={i} 
+                            className="menu-board-item"
+                            onClick={() => {
+                                handleManualAdd(m.name, m.calories); // 바로 추가
+                                closeModal();
+                            }}
+                        >
+                            - {m.name} ({m.calories}kcal)
+                        </li>
+                    ))}
+                </ul>
+
+                <h4 style={{marginTop: '20px', borderBottom: '2px solid #ff5722', color: '#ff5722', paddingBottom: '5px'}}>🍕 치팅 식단</h4>
+                <ul style={{listStyle: 'none', padding: 0}}>
+                    {cheatMeals.map((m, i) => (
+                        <li 
+                            key={i} 
+                            className="menu-board-item"
+                            onClick={() => {
+                                handleManualAdd(m.name, m.calories); // 바로 추가
+                                closeModal();
+                            }}
+                        >
+                            - {m.name} ({m.calories}kcal)
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        )
     });
   };
 
@@ -91,8 +284,8 @@ const MealPage = () => {
   useEffect(() => {
     const dailyGoal = 2000;
 
-    // 1. [New Logic] 치팅 식단을 먹었지만 2000kcal 이하인 경우 -> 다이어트 + 치팅 믹스 추천
-    if (hasEatenCheatMeal && totalCalories < dailyGoal) {
+    // 1. [New Logic] 오직 1끼만 입력했고, 그게 치팅 식단이며 2000kcal 이하인 경우 -> 다이어트 + 치팅 믹스 추천
+    if (meals.length === 1 && hasEatenCheatMeal && totalCalories <= dailyGoal) {
          // 다이어트 식단과 치팅 식단을 합침
          const mixedMeals = [...lightMeals, ...heartyMeals, ...cheatMeals];
          // 이미 먹은거 제외
@@ -108,8 +301,8 @@ const MealPage = () => {
         return;
     }
 
-    // 2. [New Logic] 목표 칼로리(2000kcal) 이상이거나 치팅 모드가 켜져있으면 무조건 치팅 식단만 추천
-    if (totalCalories >= dailyGoal || cheatingMode) {
+    // 2. [New Logic] 목표 칼로리(2000kcal) 초과하거나 치팅 모드가 켜져있으면 무조건 치팅 식단만 추천
+    if (totalCalories > dailyGoal || cheatingMode) {
         setDisplayRecs(
             [...cheatMeals]
                 .sort(() => Math.random() - 0.5)
@@ -194,13 +387,20 @@ const MealPage = () => {
   };
 
   const handleRecommendationClick = (mealName) => {
-      updateInputAndCalories(mealName);
+      // updateInputAndCalories(mealName); // [변경] 기존 로직 (입력만 함)
+      
+      // [수정] 추천 식단 클릭 시 바로 추가
+      const allMeals = [...lightMeals, ...heartyMeals, ...cheatMeals];
+      const found = allMeals.find((meal) => meal.name === mealName);
+      if (found) {
+        handleManualAdd(found.name, found.calories);
+      }
   };
 
   // [State] 모달 상태
 
-  const showBanner = cheatingMode || (hasEatenCheatMeal && totalCalories >= 2000);
-  const isStrictCheating = hasEatenCheatMeal && totalCalories >= 2000;
+  const showBanner = cheatingMode || (hasEatenCheatMeal && totalCalories > 2000);
+  const isStrictCheating = hasEatenCheatMeal && totalCalories > 2000;
 
   return (
     <div className="main-content meal-container">
@@ -287,38 +487,7 @@ const MealPage = () => {
           />
           <button
             className="pixel-btn"
-            onClick={() => {
-              if (!inputValue.trim()) {
-                // [수정 2026-01-15 09:44] 빈 입력값 경고 -> warning (빨강)
-                openAlert("섭취한 음식과 칼로리를 입력해주세요!", "warning");
-                return;
-              }
-              addMeal({
-                text: inputValue,
-                mealType,
-                calories: calorieInput,
-              }).then(() => {
-                setInputValue("");
-                setCalorieInput("");
-                
-                // [Logic] 입력한 음식이 치팅 메뉴라면 자동으로 치팅 모드 활성화 (state 변경 X, 파생 상태로 처리)
-                const isCheatMeal = cheatMeals.some(cheat => inputValue.includes(cheat.name));
-                const projectedCalories = totalCalories + (Number(calorieInput) || 0);
-
-                // [수정] 완벽한 치팅 데이 조건(치팅식단 + 2000kcal 이상)일 때만 알림
-                if (isCheatMeal && projectedCalories >= 2000 && !cheatingMode) {
-                    // setCheatingMode(true); // [삭제] 삭제 시 자동으로 꺼지게 하기 위해 state 변경 안함
-                    openAlert("치팅 메뉴가 감지되었습니다! 오늘은 치팅데이! 🥳", "success");
-                }
-                
-                // [Logic] 입력 후 다음 끼니로 자동 포커스 이동
-                const types = ["아침", "점심", "저녁", "간식"];
-                const currentIndex = types.indexOf(mealType);
-                if (currentIndex < types.length - 1) {
-                  setMealType(types[currentIndex + 1]);
-                }
-              });
-            }}
+            onClick={() => handleManualAdd(inputValue, calorieInput)}
           >
             추가
           </button>
@@ -347,6 +516,7 @@ const MealPage = () => {
         isCheating={showBanner}
         hasEatenCheatMeal={hasEatenCheatMeal}
         isStrictCheating={isStrictCheating}
+        onOpenMenu={handleOpenMenu}
       />
       </div> {/* End of meal-content-row */}
       <Modal
@@ -357,6 +527,7 @@ const MealPage = () => {
         confirmText={modalState.confirmText}
         // [수정 2026-01-15 09:44] type 전달
         type={modalState.type}
+        children={modalState.children}
       />
       <MealChatbot
         mealData={[...lightMeals, ...heartyMeals]}

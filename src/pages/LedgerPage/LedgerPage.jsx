@@ -1,13 +1,15 @@
 // [Page] 가계부 페이지
 import React, { useEffect, useState } from "react";
-import txApi from "../../api/txapi";
+// import txApi from "../../api/txapi"; // [Deleted]
+import dataApi from "../../api/api"; // [New]
 
 const LedgerPage = () => {
   const [list, setList] = useState([]);
 
   useEffect(() => {
-    txApi
-      .get("/latest")
+    // [수정] txApi 대신 dataApi 사용
+    dataApi
+      .get("/api/tx/latest")
       .then((res) => {
         console.log("✅ 최신 거래 조회 성공", res.data);
         setList(res.data); // ← 화면에 쓸 데이터 저장

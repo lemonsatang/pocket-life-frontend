@@ -11,8 +11,14 @@ dataApi.interceptors.request.use((config) => {
     sessionStorage.getItem("token") ||
     sessionStorage.getItem("mock_token") ||
     localStorage.getItem("token");
+
   if (token) {
-    config.headers.Authorization = token;
+    // [수정] 표준 규격대로 "Bearer " 접두사 보장 (Step 456의 Raw Token 시도는 실패)
+    config.headers.Authorization = token.startsWith("Bearer ")
+      ? token
+      : `Bearer ${token}`;
+      
+     console.log("DEBUG: Final Header:", config.headers.Authorization);
   }
   return config;
 });

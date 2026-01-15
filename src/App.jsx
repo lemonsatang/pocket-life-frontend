@@ -16,6 +16,8 @@ import AuthLayout from "./components/Layout/AuthLayout/AuthLayout";
 import "./styles/Common.css";
 import "./styles/DatePicker.css";
 
+import { MealProvider } from "./context/MealContext.jsx"; // [New]
+
 // [Logic] 메인 App 컴포넌트
 export default function App() {
   const [authed, setAuthed] = useState(false);
@@ -60,8 +62,9 @@ export default function App() {
 
   // [Layout] 인증 상태 - 메인 애플리케이션
   return (
-    <BrowserRouter>
-      <div className="app-layout">
+    <MealProvider>
+      <BrowserRouter>
+        <div className="app-layout">
         <Header onLogout={logout} />
         <main className="main-content">
           <Routes>
@@ -77,5 +80,6 @@ export default function App() {
         <Footer />
       </div>
     </BrowserRouter>
+  </MealProvider>
   );
 }

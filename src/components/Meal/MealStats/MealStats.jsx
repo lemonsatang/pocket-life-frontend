@@ -2,7 +2,7 @@
 import React from "react";
 import "./MealStats.css";
 
-const MealStats = ({ totalCalories, dailyGoal, displayRecs, onRecClick, isCheating, hasEatenCheatMeal, isStrictCheating }) => {
+const MealStats = ({ totalCalories, dailyGoal, displayRecs, onRecClick, isCheating, hasEatenCheatMeal, isStrictCheating, onOpenMenu }) => {
   // [Logic] 목표 칼로리 초과 여부
   const isOver = totalCalories > dailyGoal;
   const progressPercent = (totalCalories / dailyGoal) * 100;
@@ -53,7 +53,9 @@ const MealStats = ({ totalCalories, dailyGoal, displayRecs, onRecClick, isCheati
         )}
       </div>
       <div className="pixel-card meal-stats-recommend-card">
-        <h3 className="meal-stats-recommend-title">💡 추천 식단</h3>
+        <h3 className="meal-stats-recommend-title">
+            <span onClick={onOpenMenu} style={{cursor: 'pointer'}} title="전체 메뉴 보기">📋</span> 추천 식단
+        </h3>
         <p className="meal-stats-recommend-desc">
           {isCheating 
             ? "오늘은 치팅데이! 마음껏 즐기세요 😋"

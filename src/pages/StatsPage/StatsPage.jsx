@@ -1,5 +1,6 @@
 // [Layout] 통계 페이지 - 방사형 차트 및 분석 요약
 import React, { useState, useEffect } from "react";
+import { useMealContext } from "../../context/MealContext.jsx"; // [New]
 import dataApi from "../../api/api";
 import {
   Chart as ChartJS,
@@ -45,16 +46,20 @@ const StatsPage = () => {
   const [statsData, setStatsData] = useState([0, 0, 0, 0, 0]); // [식비, 저축, 일정, 장바구니, 건강]
   const [hasData, setHasData] = useState(false); // 해당 월에 데이터가 있는지 여부
 
-  // [Logic] 실제 데이터 가져오기
+  // [Context] 실시간 업데이트 감지
+  const { updateKey } = useMealContext();
+
+  // [Logic] 실제 데이터 가져오기 (updateKey 변경 시 재조회)
   useEffect(() => {
     const fetchData = async () => {
       const year = currentDate.getFullYear();
       const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+      const day = String(currentDate.getDate()).padStart(2, "0"); // [Fix] 일자 추가
       const yearMonth = `${year}-${month}`;
+      const dateStr = `${year}-${month}-${day}`; // [Fix] dateStr 정의
       const today = new Date();
 
       // 1. 미래 날짜 체크 (현재보다 미래면 데이터 조회 X)
-      // 단, "이번 달"은 조회해야 함. "다음 달" 1일부터가 미래.
       const nextMonthOfCurrent = new Date(today.getFullYear(), today.getMonth() + 1, 1);
       const viewMonthStart = new Date(year, currentDate.getMonth(), 1);
 
@@ -64,100 +69,104 @@ const StatsPage = () => {
         return;
       }
 
+      // [Config] 소비율 기준 (월 50만원) - 변경 용이하도록 상수화
+      const CONSUMPTION_TARGET = 500000;
+
       try {
-        // (1) 일정 데이터 (Schedule) - 일정 달성(체크)한 날들
-        // API 한계: 월별 '완료된' 일정을 한 번에 주는 API가 없음. (일별 조회만 가능)
-        // 대안: '일정이 있는 날짜(getTodoDates)'를 가져와서, 그 날짜 수로 점수화 (약 n일 * 5점)
-        let scheduleScore = 0;
-        try {
-          const resTodo = await dataApi.get("/api/todo/getTodoDates", {
-            params: { yearMonth: yearMonth },
-          });
-          const activeDays = resTodo.data.length; 
-          // *수정*: 사용자가 "1개당 10점" 요청
-          scheduleScore = Math.min(activeDays * 10, 100); 
-        } catch (e) {
-          console.error("일정 통계 로드 실패", e);
-        }
+        // [Logic] 병렬 API 호출 (사용자 요청: /api/stats/meal, /api/stats/cart, /api/todo, /api/tx)
+        // 각각 실패해도 전체가 멈추지 않도록 개별 catch 처리
+        const [resMeal, resCart, resTodo, resTx] = await Promise.all([
+            // 1. 식단 (GET /api/stats/meal)
+            dataApi.get(`/api/stats/meal?date=${dateStr}`).catch(() => ({ data: null })),
+            // 2. 장바구니 (GET /api/stats/cart)
+            dataApi.get(`/api/stats/cart?date=${dateStr}`).catch(() => ({ data: null })),
+            // 3. 일정 (GET /api/todo) - 팀원 API
+            dataApi.get(`/api/todo`).catch(() => ({ data: [] })),
+            // 4. 가계부 (GET /api/tx) - 팀원 API
+            dataApi.get(`/api/tx`).catch(() => ({ data: [] }))
+        ]);
 
-        // (2) 식단 관리 (Diet) - 2000kcal 이하의 날들
-        // API 한계: 월별 전체 식단 기록 API 부재
-        // 대안: 일정 기록이 있는 날(activeDays) 중 약 80%가 성공했다고 가정 (Mock Logic for 'Real Feel')
         let dietScore = 0;
-        if (scheduleScore > 0) {
-            dietScore = Math.min(scheduleScore * 0.9, 100);
-        }
-
-        // (3) 장바구니 (Cart) - 구매완료까지 누른 날들
-        // 실제 데이터 반영: 장바구니에 담긴 아이템 수로 "장바구니 활동성"을 평가
-        // (3) 장바구니 (Cart)
-        // (API: /api/cart 사용)
         let cartScore = 0;
-        try {
-           // 1. 전체 조회 시도
-           let cartItems = [];
-           try {
-             // 혹시 쿼리 없이 보내면 전체를 줄 수도 있음
-             const resAll = await dataApi.get("/api/cart");
-             if (resAll.data && Array.isArray(resAll.data)) {
-                cartItems = resAll.data;
-             }
-           } catch (e1) {
-             // 2. 전체 조회 실패 시, 만약 "이번 달"을 보고 있다면 "오늘 날짜"로 재시도
-             const isCurrentMonthView = 
-                today.getFullYear() === year && 
-                today.getMonth() === currentDate.getMonth();
-             
-             if (isCurrentMonthView) {
-                const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-                try {
-                  const resToday = await dataApi.get(`/api/cart?date=${todayStr}`);
-                  if (resToday.data && Array.isArray(resToday.data)) {
-                     cartItems = resToday.data;
-                  }
-                } catch (e2) {
-                  // 오늘 날짜 조회도 실패하면... 어쩔 수 없음
-                }
-             }
-           }
-
-           if (cartItems.length > 0) {
-              // *수정*: 사용자가 "1개당 10점" 요청
-              cartScore = Math.min(cartItems.length * 10, 100);
-           } else {
-              // 아이템이 없지만, 일정이 있다면 (과거 데이터 추정 등)
-              if (scheduleScore > 0) {
-                 cartScore = Math.min(scheduleScore * 0.6, 100);
-              }
-           }
-        } catch (e) {
-             console.error("장바구니 통계 로드 실패", e);
-        }
-
-        // (4) 소비률 / 저축률 - 가계부 미완성으로 0
+        let scheduleScore = 0;
         let consumptionScore = 0;
         let savingScore = 0;
 
-        // 데이터 존재 여부 판단
-        const hasAnyData = scheduleScore > 0 || dietScore > 0 || cartScore > 0;
+        // (1) 식단 관리: (totalCalories / targetCalories) * 100
+        if (resMeal.data) {
+            const { totalCalories = 0, targetCalories = 2000 } = resMeal.data;
+            if (targetCalories > 0) {
+                // 100% 넘어가면 100점으로 제한
+                dietScore = Math.min(Math.floor((totalCalories / targetCalories) * 100), 100);
+            }
+        }
 
-        setHasData(hasAnyData);
+        // (2) 장바구니: purchaseRate 그대로 반영
+        if (resCart.data) {
+            const { purchaseRate = 0 } = resCart.data;
+            cartScore = Math.floor(purchaseRate);
+        }
+
+        // (3) 일정 달성: is_done 비율 (팀원 API 방어적 코딩)
+        if (resTodo.data && Array.isArray(resTodo.data)) {
+            // 이번 달 데이터만 필터링 (dodate 혹은 writedate 기준? 명세 없으므로 전체 혹은 날짜 필터링)
+            // 명세: /api/todo (파라미터 없음 -> 전체) -> 여기서 날짜 필터링 필수
+            // 데이터 구조 가정: { dodate: "YYYY-MM-DD", is_done: boolean, ... }
+            const monthTodos = resTodo.data.filter(todo => todo.dodate && todo.dodate.startsWith(yearMonth));
+            
+            if (monthTodos.length > 0) {
+                const doneCount = monthTodos.filter(t => t.isDone || t.is_done).length;
+                scheduleScore = Math.floor((doneCount / monthTodos.length) * 100);
+            }
+        }
+
+        // (4) 소비율/저축률: 가계부 (팀원 API 방어적 코딩)
+        if (resTx.data && Array.isArray(resTx.data)) {
+            // 이번 달 데이터 필터링
+            const monthTxs = resTx.data.filter(tx => tx.txDate && tx.txDate.startsWith(yearMonth));
+            
+            const income = monthTxs
+                .filter(t => t.type === 'INCOME')
+                .reduce((acc, cur) => acc + (Number(cur.amount) || 0), 0);
+            
+            const expense = monthTxs
+                .filter(t => t.type === 'EXPENSE')
+                .reduce((acc, cur) => acc + (Number(cur.amount) || 0), 0);
+            
+            // 소비율: (총 지출 / 기준값) * 100
+            consumptionScore = Math.min(Math.floor((expense / CONSUMPTION_TARGET) * 100), 100);
+
+            // 저축률: (수입 - 지출) / 수입 (수입이 있을 때만)
+            if (income > 0) {
+                 const profit = income - expense;
+                 savingScore = profit > 0 ? Math.floor((profit / income) * 100) : 0;
+            }
+        }
+
+        setHasData(true);
         setStatsData([
-          consumptionScore, // 소비률 (0)
-          savingScore,      // 저축률 (0)
-          scheduleScore,    // 일정 달성
-          cartScore,        // 장바구니 (실시간 반영)
-          dietScore         // 식단 관리 (일정 기반 추정)
+            consumptionScore,
+            savingScore,
+            scheduleScore,
+            cartScore,
+            dietScore
         ]);
+        
+        // [Fix] 점수가 모두 0점이어도, 미래가 아니면 차트를 보여준다 (빈 차트라도 내 기록임)
+        setHasData(true);
 
       } catch (e) {
         console.error("통계 데이터 로드 실패", e);
-        setHasData(false);
+        // 에러가 나도 차트는 보여주기 위해 hasData true 시도 (단, 데이터는 0)
+        setStatsData([0, 0, 0, 0, 0]);
+        // 현재/과거 달이라면 true로 설정
+        const isFuture = viewMonthStart >= nextMonthOfCurrent;
+        setHasData(!isFuture);
       }
     };
 
     fetchData();
-  }, [currentDate]);
+  }, [currentDate, updateKey]); // updateKey 의존성 추가
 
   // [Data] 2030 평균 데이터 (Mock Data: 2025.12 ~ 2026.12) - 분포 다양화
   const average2030Data = {
@@ -301,7 +310,11 @@ const StatsPage = () => {
             <div className="stats-text-box">
               <span className="stats-card-title">소비률</span>
               <span className="stats-card-desc">
-                아직 소비 내역이 <span style={{color: '#2196f3'}}>없습니다</span>
+                {statsData[0] > 0 ? (
+                  <>지출이 발생했습니다. <span style={{color: '#f57c00'}}>{statsData[0]}점</span></>
+                ) : (
+                   <>아직 소비 내역이 <span style={{color: '#2196f3'}}>없습니다</span></>
+                )}
               </span>
             </div>
           </div>
@@ -341,7 +354,11 @@ const StatsPage = () => {
             <div className="stats-text-box">
               <span className="stats-card-title">장바구니</span>
               <span className="stats-card-desc">
-                필요한 물건을 <span style={{color: '#fbc02d'}}>꼼꼼히</span> 챙겼어요
+                 {statsData[3] > 0 ? (
+                    <>구매율 <span style={{color: '#fbc02d'}}>{statsData[3]}%</span> 달성!</>
+                 ) : (
+                    <>필요한 물건을 <span style={{color: '#fbc02d'}}>꼼꼼히</span> 챙겼어요</>
+                 )}
               </span>
             </div>
           </div>

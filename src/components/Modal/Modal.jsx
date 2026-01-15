@@ -11,6 +11,7 @@ export default function Modal({
   showCancel = false,
   onConfirm,
   onCancel,
+  children, // [수정] children prop 추가
   type = "success", // [수정 2026-01-15 09:35] 성공/실패 구분 (success | warning) - 기본값: success
 }) {
   if (!open) return null;
@@ -21,6 +22,7 @@ export default function Modal({
         {title && <div className="modalTitle">{title}</div>}
         {/* [수정 2026-01-15 09:35] type에 따라 클래스 추가 (성공: 초록, 실패/경고: 빨강) */}
         <div className={`modalMsg ${type}`}>{message}</div>
+        {children} {/* [수정] 커스텀 컨텐츠 렌더링 */}
         <div className="modalBtns">
           {showCancel && (
             <button type="button" className="modalBtn ghost" onClick={onCancel}>
