@@ -1,4 +1,3 @@
-// [Layout] 대시보드 카드 컴포넌트 - 데이터 요약 카드
 import React from "react";
 import { Link } from "react-router-dom";
 import "./DashboardCard.css";
@@ -12,17 +11,18 @@ const DashboardCard = ({
   linkTo,
   btnText,
   isMeal,
-  isAccount,
+  isAccount, // ✅ 가계부 카드 여부 (true면 수입/지출 요약 표시)
   isCart,
   isTodo,
-  income,
-  expense,
+  income, // ✅ 대시보드에서 /api/tx/summary로 받아온 수입
+  expense, // ✅ 대시보드에서 /api/tx/summary로 받아온 지출
   totalCalories,
 }) => {
-  // [Logic] 안전한 숫자 변환
+  // ✅ 숫자가 안 넘어올 경우를 대비한 안전 처리
   const safeIncome = Number(income) || 0;
   const safeExpense = Number(expense) || 0;
   const totalBalance = safeIncome - safeExpense;
+
   const safeCalories = Number(totalCalories) || 0;
   const isOver = safeCalories > 2000;
 
