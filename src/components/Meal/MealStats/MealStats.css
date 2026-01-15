@@ -4,12 +4,10 @@
 
 /* 1. 컨테이너 */
 .meal-stats-container {
-  flex: 0 0 400px;
+  flex: 0 0 420px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  position: sticky;
-  top: 115px;
 }
 
 /* 2. 영양 요약 카드 */
@@ -22,6 +20,7 @@
 
 .meal-stats-title {
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .meal-stats-label {
@@ -131,4 +130,47 @@
   padding: 8px 0;
   font-size: 0.95rem;
   color: #4a5568;
+}
+
+/* 6. 블러 및 오버레이 효과 (치팅 데이용) */
+.meal-stats-content {
+  width: 100%;
+}
+
+.blurred-content {
+  filter: blur(8px);
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.3s ease;
+}
+
+.meal-stats-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.meal-stats-reveal-btn {
+  background-color: white;
+  border: 2px solid #f56565;
+  color: #f56565;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+
+.meal-stats-reveal-btn:hover {
+  background-color: #f56565;
+  color: white;
+  transform: scale(1.05);
 }

@@ -64,6 +64,13 @@ const Header = ({ onLogout }) => {
           >
             가계부
           </Link>
+          <div className="nav-divider"></div>
+          <Link
+            to="/stats"
+            className={`nav-tab ${path === "/stats" ? "active" : ""}`}
+          >
+            통계
+          </Link>
         </div>
 
         <div className="nav-user-actions">

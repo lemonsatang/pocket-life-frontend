@@ -5,8 +5,22 @@
 /* 1. 컨테이너 */
 .meal-list-container {
   width: 100%;
-  max-height: 500px;
+  max-height: 320px; /* 5개째부터 스크롤 생성 (4개까지 딱 보이게 조정) */
   overflow-y: auto;
+  /* 스크롤바 커스텀 */
+  padding-right: 5px;
+}
+
+/* 스크롤바 디자인 */
+.meal-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+.meal-list-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.meal-list-container::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0;
+  border-radius: 3px;
 }
 
 /* 2. 아이템 행 */
@@ -32,8 +46,8 @@
 }
 
 .meal-list-edit-calorie-input {
-  flex: 0 0 70px !important;
-  width: 70px !important;
+  flex: 0 0 100px !important;
+  width: 100px !important;
   height: 35px;
   text-align: center !important;
 }

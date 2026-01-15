@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import "./MealChatbot.css";
 
 // [Props] cheatMeals: 치팅 모드용 고칼로리 식단 데이터
-const MealChatbot = ({ mealData, cheatMeals = [], eatenMeals, currentCalories, dailyGoal = 2000, onAddMeal }) => {
+const MealChatbot = ({ mealData, cheatMeals = [], eatenMeals, currentCalories, dailyGoal = 2000, onAddMeal, cheatingMode, onToggleCheatingMode }) => {
   const [isOpen, setIsOpen] = useState(false);
   
   // [Settings] 설정 상태
   const [showSettings, setShowSettings] = useState(false);
   const [settings, setSettings] = useState({
     detailMode: false,
-    cheatingMode: false,
+    // cheatingMode removed (controlled by parent)
   });
 
   // [Flow] 대화 진행 상태
@@ -103,6 +103,32 @@ const MealChatbot = ({ mealData, cheatMeals = [], eatenMeals, currentCalories, d
 
     // 봇 응답 로직 (0.5초 딜레이)
     setTimeout(() => {
+      // --- [Flow] 치팅 모드 전환 확인 ---
+      if (chatStep === 'CONFIRM_CHEAT_MODE') {
+        if (userMsg === "예" || userMsg === "네" || userMsg === "응" || userMsg === "ㅇㅇ") {
+            // [Modified] 부모 컴포넌트 핸들러 호출
+            if (!cheatingMode) onToggleCheatingMode();
+            
+            // [Logic] 칼로리 초과 여부 계산
+            const potentialCalories = currentCalories + (pendingMeal?.calories || 0);
+            const isOver = potentialCalories > dailyGoal;
+            
+            let message = `치팅 모드로 전환되었습니다! 🥳\n`;
+            if (isOver) {
+                message += `[${pendingMeal.name}]을(를) 추가하면 일일 칼로리 섭취량을 초과합니다.\n[${pendingMeal.name}]을(를) 식단에 추가할까요?`;
+            } else {
+                message += `[${pendingMeal.name}]을(를) 식단에 추가할까요?`;
+            }
+
+            botReply(message, ["식단에 추가해줘", "괜찮아"]);
+            setChatStep('CONFIRM_ADD');
+        } else {
+            botReply(`치팅 모드 없이 진행합니다.\n[${pendingMeal.name}]을(를) 식단에 추가할까요?`, ["식단에 추가해줘", "괜찮아"]);
+            setChatStep('CONFIRM_ADD');
+        }
+        return;
+      }
+
       // --- [Flow] 메뉴 추가 대화 중일 때 ---
       if (chatStep === 'CONFIRM_ADD') {
         if (userMsg === "식단에 추가해줘" || userMsg === "응" || userMsg === "ㅇㅇ") {
@@ -158,7 +184,7 @@ const MealChatbot = ({ mealData, cheatMeals = [], eatenMeals, currentCalories, d
       if (notEatenMeals.length > 0) affordableMeals = notEatenMeals;
 
       // [Cheating Mode] 치팅 모드면 칼로리/중복 무시하고 치팅 메뉴에서 랜덤
-      if (settings.cheatingMode) {
+      if (cheatingMode) {
           affordableMeals = cheatMeals; 
       }
 
@@ -169,7 +195,7 @@ const MealChatbot = ({ mealData, cheatMeals = [], eatenMeals, currentCalories, d
         randomMenu = affordableMeals[Math.floor(Math.random() * affordableMeals.length)].name;
       } else {
         const lowestCalorieMeal = mealData.sort((a, b) => a.calories - b.calories)[0];
-         if (lowestCalorieMeal.calories > remainingCalories && !settings.cheatingMode) {
+         if (lowestCalorieMeal.calories > remainingCalories && !cheatingMode) {
           randomMenu = lowestCalorieMeal.name;
           warningMsg = `(남은 칼로리가 부족하여 [${randomMenu}] 섭취 시 목표를 초과할 수 있어요 😢)`;
         } else {
@@ -194,11 +220,11 @@ const MealChatbot = ({ mealData, cheatMeals = [], eatenMeals, currentCalories, d
       } 
       // 2. 추천 요청
       else if (userMsg.includes("추천") || userMsg.includes("뭐 먹") || userMsg.includes("먹을까")) {
-        const targetPool = settings.cheatingMode ? cheatMeals : mealData;
+        const targetPool = cheatingMode ? cheatMeals : mealData;
         const detailInfo = settings.detailMode ? ` (칼로리: ${targetPool.find(m=>m.name===randomMenu)?.calories}kcal)` : "";
         let menuMsg = `[${randomMenu}]${detailInfo}`;
 
-        if (settings.cheatingMode) menuMsg = `오늘은 치팅데이! 마음껏 드세요! 🍔 [${randomMenu}]`;
+        if (cheatingMode) menuMsg = `오늘은 치팅데이! 마음껏 드세요! 🍔 [${randomMenu}]`;
 
         if (userMsg.includes("아침")) {
              response = `상쾌한 아침 메뉴로 ${menuMsg} 추천드려요! ☀️ ${warningMsg}`;
@@ -223,15 +249,27 @@ const MealChatbot = ({ mealData, cheatMeals = [], eatenMeals, currentCalories, d
       }
       // 3. 특정 메뉴 검색 (여기에 추가 로직 적용)
       else {
-        const found = mealData.find((meal) =>
+        // [수정 2026-01-15 11:36] 치팅 메뉴도 검색 범위에 포함
+        const allData = [...mealData, ...cheatMeals];
+        const found = allData.find((meal) =>
           meal.name.includes(userMsg) || userMsg.includes(meal.name)
         );
 
         if (found) {
-          response = `[${found.name}]\n칼로리: ${found.calories}kcal\n주요 성분: ${found.nutrients}`;
-          setChatStep('CONFIRM_ADD');
-          setPendingMeal(found);
-          botReply(response, ["식단에 추가해줘", "괜찮아"]);
+          // [Logic] 치팅 메뉴인데 치팅 모드가 아니라면 전환 질문 (식사 기록 여부 상관없이)
+          const isCheatMeal = cheatMeals.some(m => m.name === found.name);
+          
+          if (isCheatMeal && !cheatingMode) {
+             response = `[${found.name}]\n칼로리: ${found.calories}kcal\n주요 성분: ${found.nutrients}\n\n지금부터 치팅 모드로 전환할까요?`;
+             setChatStep('CONFIRM_CHEAT_MODE');
+             setPendingMeal(found);
+             botReply(response, ["네", "아니오"]);
+          } else {
+             response = `[${found.name}]\n칼로리: ${found.calories}kcal\n주요 성분: ${found.nutrients}`;
+             setChatStep('CONFIRM_ADD');
+             setPendingMeal(found);
+             botReply(response, ["식단에 추가해줘", "괜찮아"]);
+          }
         } else {
           botReply("죄송해요, 그 메뉴는 아직 정보가 없어요. 😢\n'안녕'하고 인사하거나 '메뉴 추천'이라고 물어봐주세요!");
         }
@@ -251,9 +289,9 @@ const MealChatbot = ({ mealData, cheatMeals = [], eatenMeals, currentCalories, d
           sessionStorage.removeItem("meal_chat_history");
           sessionStorage.removeItem("meal_chat_step");
       } else if (action === 'cheating') {
-          // [Logic] 상태 업데이트 전 다음 모드 계산 (이중 메시지 방지)
-          const nextMode = !settings.cheatingMode;
-          setSettings(prev => ({ ...prev, cheatingMode: nextMode }));
+          // [Logic] 부모 컴포넌트의 핸들러 호출
+          const nextMode = !cheatingMode;
+          onToggleCheatingMode();
           
           if (nextMode) {
               botReply("오늘 하루는 다이어트 걱정 없이 기분 좋게 즐기세요! 🥳 맛있는 음식 추천해드릴까요?");
@@ -326,13 +364,15 @@ const MealChatbot = ({ mealData, cheatMeals = [], eatenMeals, currentCalories, d
           </div>
 
           <div className="chatbot-header">
-            <span style={{flex: 1}}>🥗 영양 톡톡</span>
+            <span style={{flex: 1, display: 'flex', alignItems: 'center'}}>
+              🥗 영양 톡톡 
+            </span>
             <div className="chatbot-settings-container">
                 <button className="chatbot-util-btn" onClick={() => setShowSettings(!showSettings)}>⚙️</button>
                 {showSettings && (
                     <div className="chatbot-context-menu">
                         <div onClick={() => handleSettingAction('cheating')}>
-                            {settings.cheatingMode ? "✅" : "⬜"} 치팅 모드
+                            {cheatingMode ? "✅" : "⬜"} 치팅 모드
                         </div>
                         <div onClick={() => handleSettingAction('detail')}>
                             {settings.detailMode ? "✅" : "⬜"} 자세히 추천
@@ -347,6 +387,22 @@ const MealChatbot = ({ mealData, cheatMeals = [], eatenMeals, currentCalories, d
               ✖
             </button>
           </div>
+          
+          {/* [Logic] 치팅 데이 배너 (치팅 모드 활성화 시에만 표시) */}
+          {cheatingMode && (
+              <div style={{
+                  backgroundColor: '#fff3e0',
+                  color: '#f57c00',
+                  padding: '8px',
+                  textAlign: 'center',
+                  fontSize: '13px',
+                  fontWeight: 'bold',
+                  borderBottom: '1px solid #ffe0b2'
+              }}>
+                  오늘은 치팅 데이 🥳
+              </div>
+          )}
+
           <div className="chatbot-messages">
             {messages.map((msg) => (
               <div key={msg.id} className={`chatbot-msg-container ${msg.isBot ? "bot" : "user"}`}>

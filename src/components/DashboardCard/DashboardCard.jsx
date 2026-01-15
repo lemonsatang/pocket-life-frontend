@@ -2,6 +2,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./DashboardCard.css";
+// [Data] 치팅 식단 데이터 가져오기 (치팅 여부 판단용)
+import { cheatMeals } from "../../data/recommendedMeals";
 
 const DashboardCard = ({
   title,
@@ -23,6 +25,14 @@ const DashboardCard = ({
   const totalBalance = safeIncome - safeExpense;
   const safeCalories = Number(totalCalories) || 0;
   const isOver = safeCalories > 2000;
+
+  // [Logic] 치팅 식단 포함 여부 확인
+  const hasCheatMeal = isMeal && list?.some((item) => 
+    cheatMeals.some((cheat) => (item.text || item.menuName || "").includes(cheat.name))
+  );
+
+  // [Logic] 치팅 데이 조건: 칼로리 2000 초과 AND 치팅 식단 포함
+  const isCheatingDay = isOver && hasCheatMeal;
 
   // [Logic] 미확인 장바구니 아이템 확인
   const hasUnconfirmedItems =
@@ -62,29 +72,39 @@ const DashboardCard = ({
         ) : (
           <ul className="dashboard-card-list">
             {list?.length > 0 ? (
-              list.slice(0, 5).map((item, idx) => (
-                <li
-                  key={idx}
-                  className={`dashboard-card-list-item ${
-                    item.isBought ? "bought" : "not-bought"
-                  }`}
-                >
-                  <span className="dashboard-card-list-item-text">
-                    {isCart ? (item.isBought ? "✅ " : "🛒 ") : "• "}
-                    {isMeal && item.mealType && (
+              list.slice(0, 5).map((item, idx) => {
+                const isCompleted = item.isBought || item.isDone;
+                return (
+                  <li
+                    key={idx}
+                    className={`dashboard-card-list-item ${
+                      isCompleted ? "completed" : "active"
+                    }`}
+                  >
+                    <span className="dashboard-card-list-item-text">
+                      {isCart
+                        ? item.isBought
+                          ? "✅ "
+                          : "🛒 "
+                        : item.isDone
+                        ? "✅ "
+                        : "• "}
+                      {isMeal && item.mealType && (
                       <strong className="dashboard-card-list-item-meal-type">
                         [{item.mealType}]
                       </strong>
                     )}
                     {item.text || item.menuName}
                   </span>
-                  {isMeal && item.calories !== undefined && (
+                  {/* [Logic] 치팅 데이(2000kcal 초과 + 치팅메뉴)가 아닐 때만 칼로리 표시 */}
+                  {isMeal && item.calories !== undefined && !isCheatingDay && (
                     <span className="dashboard-card-list-item-calories">
                       {item.calories} kcal
                     </span>
                   )}
                 </li>
-              ))
+                );
+              })
             ) : (
               <p className="dashboard-card-empty-list">{emptyMsg}</p>
             )}
@@ -94,13 +114,14 @@ const DashboardCard = ({
 
       {isMeal && (
         <div className="dashboard-card-calories">
-          <p className="dashboard-card-calories-label">오늘 총 칼로리</p>
+          {!isCheatingDay && <p className="dashboard-card-calories-label">오늘 총 칼로리</p>}
           <span
             className={`dashboard-card-calories-value ${
               isOver ? "over" : "normal"
             }`}
           >
-            {safeCalories.toLocaleString()} kcal
+            {/* [Logic] 치팅 데이 조건 충족 시 문구 변경 */}
+            {isCheatingDay ? "치팅데이!" : `${safeCalories.toLocaleString()} kcal`}
           </span>
         </div>
       )}

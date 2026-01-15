@@ -120,11 +120,12 @@
   align-items: center;
 }
 
-.dashboard-card-list-item.bought {
+.dashboard-card-list-item.completed {
   color: #cbd5e0;
+  text-decoration: line-through;
 }
 
-.dashboard-card-list-item.not-bought {
+.dashboard-card-list-item.active {
   color: #4a5568;
 }
 

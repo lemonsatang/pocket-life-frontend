@@ -146,7 +146,7 @@ const Home = () => {
 
       <div className="home-cards-container">
         <DashboardCard
-          title="일정 📅"
+          title="오늘의 일정 📅"
           list={dashboardData.todos}
           emptyMsg="할 일이 없어요!"
           linkTo="/schedule"

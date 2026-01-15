@@ -6,6 +6,7 @@ import MealPage from "./pages/MealPage/MealPage";
 import Cart from "./pages/Cart";
 import SchedulePage from "./pages/SchedulePage/SchedulePage";
 import LedgerPage from "./pages/LedgerPage/LedgerPage";
+import StatsPage from "./pages/StatsPage/StatsPage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import Header from "./components/Layout/Header";
 import Footer from "./components/Layout/Footer";
@@ -69,6 +70,7 @@ export default function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/schedule" element={<SchedulePage />} />
             <Route path="/ledger" element={<LedgerPage />} />
+            <Route path="/stats" element={<StatsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

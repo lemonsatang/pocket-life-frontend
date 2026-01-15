@@ -53,7 +53,16 @@ const CartList = () => {
   // [Logic] 즐겨찾기 목록 로드
   const fetchFavorites = () => {
     dataApi.get("/api/cart/favorites")
-      .then((res) => setFavorites(res.data))
+      .then((res) => {
+        // [수정 2026-01-15 11:27] 즐겨찾기 중복 제거 (text 기준)
+        const unique = res.data.reduce((acc, current) => {
+          if (!acc.find((item) => item.text === current.text)) {
+            acc.push(current);
+          }
+          return acc;
+        }, []);
+        setFavorites(unique);
+      })
       .catch((e) => console.log("즐겨찾기 로드 실패(혹은 API 없음):", e));
   };
 

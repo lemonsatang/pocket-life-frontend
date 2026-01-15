@@ -1,13 +1,24 @@
 .meal-container {
   display: flex;
+  flex-direction: column; /* 세로 정렬 (배너 - 콘텐츠) */
+  gap: 20px;
+  align-items: center;
+  justify-content: flex-start !important; /* 수직 중앙 정렬 방지 */
+  padding-top: 0px; /* 배너 공간 확보 (최소화) */
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  /* 스크롤 제거 */
+  height: calc(100vh - 100px); /* 헤더 높이만큼 뺌 */
+  overflow-y: hidden;
+}
+
+.meal-content-row {
+  display: flex;
   gap: 30px;
   align-items: flex-start;
   justify-content: center;
   width: 100%;
-  max-width: 1600px;
-  margin: 100px auto 0;
-  padding: 0 40px;
-  box-sizing: border-box;
 }
 
 .meal-card {

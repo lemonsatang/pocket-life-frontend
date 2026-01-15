@@ -12,6 +12,7 @@ const MealList = ({
   setEditingCalories,
   updateMeal,
   deleteMeal,
+  isStrictCheating,
 }) => {
   return (
     <div className="meal-list-container">
@@ -22,16 +23,19 @@ const MealList = ({
               <div className="meal-list-edit-group">
                 <input
                   className="pixel-input meal-list-edit-input"
+                  style={isStrictCheating ? { width: '100%' } : {}}
                   value={editingText}
                   onChange={(e) => setEditingText(e.target.value)}
                 />
-                <input
-                  className="pixel-input meal-list-edit-calorie-input"
-                  value={editingCalories}
-                  onChange={(e) =>
-                    setEditingCalories(e.target.value.replace(/\D/g, ""))
-                  }
-                />
+                {!isStrictCheating && (
+                  <input
+                    className="pixel-input meal-list-edit-calorie-input"
+                    value={editingCalories}
+                    onChange={(e) =>
+                      setEditingCalories(e.target.value.replace(/\D/g, ""))
+                    }
+                  />
+                )}
               </div>
             ) : (
               <div className="meal-list-display-group">
@@ -39,9 +43,11 @@ const MealList = ({
                   [{meal.mealType}]
                 </strong>
                 <span className="meal-list-meal-text">{meal.text}</span>
-                <span className="meal-list-meal-calories">
-                  ({meal.calories || 0} kcal)
-                </span>
+                {!isStrictCheating && (
+                  <span className="meal-list-meal-calories">
+                    ({meal.calories || 0} kcal)
+                  </span>
+                )}
               </div>
             )}
           </span>
@@ -52,7 +58,7 @@ const MealList = ({
                 onClick={() =>
                   updateMeal(meal.id, {
                     text: editingText,
-                    calories: editingCalories,
+                    calories: isStrictCheating ? meal.calories : editingCalories,
                   }).then(() => setEditingId(null))
                 }
               >
