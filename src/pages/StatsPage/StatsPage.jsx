@@ -73,17 +73,19 @@ const StatsPage = () => {
       const CONSUMPTION_TARGET = 500000;
 
       try {
-        // [Logic] 병렬 API 호출 (사용자 요청: /api/stats/meal, /api/stats/cart, /api/todo, /api/tx)
-        // 각각 실패해도 전체가 멈추지 않도록 개별 catch 처리
+        // [Logic] 병렬 API 호출
+        // 백엔드 피드백 반영: 
+        // 1. /api/todo -> /api/todo/getList (파라미터: date)
+        // 2. /api/tx -> /api/tx/latest (기존 작동 엔드포인트 복구)
         const [resMeal, resCart, resTodo, resTx] = await Promise.all([
             // 1. 식단 (GET /api/stats/meal)
-            dataApi.get(`/api/stats/meal?date=${dateStr}`).catch(() => ({ data: null })),
+            dataApi.get(`/api/stats/meal`, { params: { date: dateStr } }).catch(() => ({ data: null })),
             // 2. 장바구니 (GET /api/stats/cart)
-            dataApi.get(`/api/stats/cart?date=${dateStr}`).catch(() => ({ data: null })),
-            // 3. 일정 (GET /api/todo) - 팀원 API
-            dataApi.get(`/api/todo`).catch(() => ({ data: [] })),
-            // 4. 가계부 (GET /api/tx) - 팀원 API
-            dataApi.get(`/api/tx`).catch(() => ({ data: [] }))
+            dataApi.get(`/api/stats/cart`, { params: { date: dateStr } }).catch(() => ({ data: null })),
+            // 3. 일정 (GET /api/todo/getList) - date 파라미터 필수
+            dataApi.get(`/api/todo/getList`, { params: { date: dateStr } }).catch(() => ({ data: [] })),
+            // 4. 가계부 (GET /api/tx/latest) - 최신 내역 조회로 복구
+            dataApi.get(`/api/tx/latest`).catch(() => ({ data: [] }))
         ]);
 
         let dietScore = 0;
