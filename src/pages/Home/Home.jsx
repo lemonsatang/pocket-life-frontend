@@ -9,9 +9,6 @@ import dataApi from "../../api/api";
 
 registerLocale("ko", ko);
 
-// [수정 2026-01-14 12:50] 403 에러 해결:
-// 이유: 대시보드 API 요청 시 토큰 누락 및 에러 처리 미흡.
-// 방법: fetch를 dataApi(axios)로 대체하여 인증 토큰 자동 포함 및 Promise.all 에러 핸들링 개선.
 const Home = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dashboardData, setDashboardData] = useState({
@@ -46,7 +43,6 @@ const Home = () => {
     return `${year}-${month}-${day}`;
   };
 
-  // [Layout] DatePicker 커스텀 입력 컴포넌트
   const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
     <span onClick={onClick} ref={ref} className="home-date-input">
       {value} 📅
@@ -58,17 +54,35 @@ const Home = () => {
     const dateStr = getDateStr(currentDate);
 
     Promise.all([
-      dataApi.get(`/api/meals?date=${dateStr}`).then(res => res.data).catch(() => []),
-      dataApi.get(`/api/cart?date=${dateStr}`).then(res => res.data).catch(() => []),
-      dataApi.get(`/api/todo/getList?date=${dateStr}`).then(res => res.data).catch(() => []),
-      dataApi.get(`/api/tx?date=${dateStr}`).then(res => res.data).catch(() => [])
+      dataApi
+        .get(`/api/meals?date=${dateStr}`)
+        .then((res) => res.data)
+        .catch(() => []),
+      dataApi
+        .get(`/api/cart?date=${dateStr}`)
+        .then((res) => res.data)
+        .catch(() => []),
+      dataApi
+        .get(`/api/todo/getList?date=${dateStr}`)
+        .then((res) => res.data)
+        .catch(() => []),
+
+      // ✅ [가계부 수정 핵심]
+      // 기존: /api/tx?date=... (백엔드에 없음)
+      // 변경: 최신 10건 조회 API 사용
+      dataApi
+        .get(`/api/tx/latest`)
+        .then((res) => res.data)
+        .catch(() => []),
     ])
       .then(([meals, cartData, todos, txs]) => {
+        // ✅ 백엔드 Tx 필드명 기준(type, amount)
         const income = (txs || [])
-          .filter((t) => t.txType === "INCOME")
+          .filter((t) => t.type === "INCOME")
           .reduce((sum, t) => sum + (t.amount || 0), 0);
+
         const expense = (txs || [])
-          .filter((t) => t.txType === "EXPENSE")
+          .filter((t) => t.type === "EXPENSE")
           .reduce((sum, t) => sum + (t.amount || 0), 0);
 
         const todayCartItems = (cartData || []).filter(
@@ -85,12 +99,10 @@ const Home = () => {
           text: t.content,
         }));
 
-        const combinedTodos = [...validDummyTodos, ...validServerTodos];
-
         setDashboardData({
           meals: meals || [],
           cartItems: uniqueCartItems,
-          todos: combinedTodos,
+          todos: [...validDummyTodos, ...validServerTodos],
           income,
           expense,
         });
@@ -98,13 +110,11 @@ const Home = () => {
       .catch((err) => console.error("로딩 실패", err));
   }, [currentDate]);
 
-  // [Logic] 총 칼로리 계산
   const totalCalories = dashboardData.meals.reduce(
     (sum, m) => sum + (Number(m.calories) || 0),
     0
   );
 
-  // [Logic] 미확인 장바구니 아이템 확인
   const hasUnconfirmedItems = dashboardData.cartItems.some(
     (item) => !item.isBought
   );
@@ -113,6 +123,7 @@ const Home = () => {
     <div className="home-container">
       <header className="home-header">
         <h2 className="home-title">👛 POCKET DASHBOARD</h2>
+
         <div className="home-date-picker-container">
           <button
             onClick={() => {
@@ -124,6 +135,7 @@ const Home = () => {
           >
             ◀
           </button>
+
           <DatePicker
             locale="ko"
             selected={currentDate}
@@ -131,6 +143,7 @@ const Home = () => {
             dateFormat="yyyy년 MM월 dd일 eeee"
             customInput={<CustomInput />}
           />
+
           <button
             onClick={() => {
               const d = new Date(currentDate);
@@ -152,30 +165,33 @@ const Home = () => {
           linkTo="/schedule"
           btnText="자세히 보기"
         />
+
         <DashboardCard
           title="오늘의 식단 🍚"
           list={dashboardData.meals}
           emptyMsg="기록이 없어요!"
           linkTo="/meal"
           btnText="기록하러 가기"
-          isMeal={true}
+          isMeal
           totalCalories={totalCalories}
         />
+
         <DashboardCard
           title="장바구니 🛍️"
           list={dashboardData.cartItems}
           emptyMsg="구매 목록이 비어있어요!"
           linkTo="/cart"
           btnText="목록 확인"
-          isCart={true}
+          isCart
           hasUnconfirmedItems={hasUnconfirmedItems}
         />
+
         <DashboardCard
           title="가계부 💰"
-          isAccount={true}
+          isAccount
           income={dashboardData.income}
           expense={dashboardData.expense}
-          linkTo="/account"
+          linkTo="/ledger"
           btnText="가계부 보기"
         />
       </div>
