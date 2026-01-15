@@ -69,7 +69,7 @@ const StatsPage = () => {
         return;
       }
 
-      // [Config] 소비율 기준 (월 50만원) - 변경 용이하도록 상수화
+      // [Modified 2026-01-16 02:07] Reason: Consumption target adjustment. What: Moved constant to top-level or kept here as config. How: Set target to 500,000 KRW.
       const CONSUMPTION_TARGET = 500000;
 
       try {
@@ -88,6 +88,10 @@ const StatsPage = () => {
             dataApi.get(`/api/tx/latest`).catch(() => ({ data: [] }))
         ]);
 
+        console.log("DEBUG: Stats API Called with date:", dateStr); // [Debug]
+        console.log("DEBUG: Meal API Response:", resMeal.data);     // [Debug]
+        console.log("DEBUG: Cart API Response:", resCart.data);     // [Debug]
+
         let dietScore = 0;
         let cartScore = 0;
         let scheduleScore = 0;
@@ -96,7 +100,20 @@ const StatsPage = () => {
 
         // (1) 식단 관리: (totalCalories / targetCalories) * 100
         if (resMeal.data) {
-            const { totalCalories = 0, targetCalories = 2000 } = resMeal.data;
+            let { totalCalories = 0, targetCalories = 2000 } = resMeal.data;
+            
+            // [Modified 2026-01-16 02:07] Reason: Backend stats API returns 0. What: added Fallback Logic. How: Fetch list APIs if stats are 0.
+            if (totalCalories === 0) {
+               try {
+                  const fallbackRes = await dataApi.get(`/api/meals?date=${dateStr}`);
+                  if (fallbackRes.data && Array.isArray(fallbackRes.data)) {
+                      totalCalories = fallbackRes.data.reduce((acc, cur) => acc + (Number(cur.calories) || 0), 0);
+                      console.log(`DEBUG: Diet Fallback Calc - Total: ${totalCalories}`);
+                  }
+               } catch (e) { console.error("Diet Fallback Error", e); }
+            }
+
+            console.log(`DEBUG: Diet Calc - Total: ${totalCalories}, Target: ${targetCalories}`); // [Debug]
             if (targetCalories > 0) {
                 // 100% 넘어가면 100점으로 제한
                 dietScore = Math.min(Math.floor((totalCalories / targetCalories) * 100), 100);
@@ -105,7 +122,25 @@ const StatsPage = () => {
 
         // (2) 장바구니: purchaseRate 그대로 반영
         if (resCart.data) {
-            const { purchaseRate = 0 } = resCart.data;
+            let { purchaseRate = 0 } = resCart.data;
+            
+            // [Modified 2026-01-16 02:07] Reason: Backend stats API returns 0. What: added Fallback Logic. How: Fetch list APIs if stats are 0.
+            if (purchaseRate === 0) {
+                try {
+                    // [Fix] CartList.jsx와 동일하게 date 파라미터 전달 (없으면 403 가능성)
+                    const fallbackRes = await dataApi.get(`/api/cart?date=${dateStr}`); 
+                    if (fallbackRes.data && Array.isArray(fallbackRes.data)) {
+                        const items = fallbackRes.data;
+                        if (items.length > 0) {
+                            const boughtCount = items.filter(i => i.isBought).length;
+                            purchaseRate = (boughtCount / items.length) * 100;
+                            console.log(`DEBUG: Cart Fallback Calc - Rate: ${purchaseRate}`);
+                        }
+                    }
+                } catch (e) { console.error("Cart Fallback Error", e); }
+            }
+
+            console.log(`DEBUG: Cart Calc - Rate: ${purchaseRate}`); // [Debug]
             cartScore = Math.floor(purchaseRate);
         }
 
