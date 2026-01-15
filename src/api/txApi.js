@@ -7,7 +7,7 @@ const txApi = axios.create({
 txApi.interceptors.request.use(
   (config) => {
     // 1. 저장된 토큰 꺼내기
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     // 2. 토큰이 있다면 규격에 맞게(Bearer ) 헤더에 넣어주기
     if (token) {

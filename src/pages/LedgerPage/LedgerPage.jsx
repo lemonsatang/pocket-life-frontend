@@ -1,18 +1,16 @@
 // [Page] 가계부 페이지
-// - 로그인 후 JWT가 localStorage에 있어야 정상 동작
-// - /api/tx/latest 는 파라미터 없이 최신 10건 조회
-// - /api/tx 는 year, month 필수라 여기서는 latest만 사용
-
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import txApi from "../../api/txapi";
 
 const LedgerPage = () => {
+  const [list, setList] = useState([]);
+
   useEffect(() => {
-    // ✅ 최신 거래 조회 (파라미터 필요 없음)
     txApi
       .get("/latest")
       .then((res) => {
         console.log("✅ 최신 거래 조회 성공", res.data);
+        setList(res.data); // ← 화면에 쓸 데이터 저장
       })
       .catch((err) => {
         console.error("❌ 가계부 조회 실패", err);
@@ -22,7 +20,25 @@ const LedgerPage = () => {
   return (
     <div style={{ padding: "40px" }}>
       <h2>💰 가계부 페이지</h2>
-      <p>콘솔에 최신 거래 데이터가 찍히면 정상입니다.</p>
+
+      {list.length === 0 ? (
+        <p>거래 내역이 없습니다.</p>
+      ) : (
+        list.map((tx) => (
+          <div
+            key={tx.id}
+            style={{
+              borderBottom: "1px solid #ddd",
+              padding: "12px 0",
+            }}
+          >
+            <div>{tx.txDate}</div>
+            <div>{tx.title}</div>
+            <div>{tx.amount}</div>
+            <div>{tx.category}</div>
+          </div>
+        ))
+      )}
     </div>
   );
 };
