@@ -17,6 +17,8 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
     showCancel: false,
     confirmText: "확인",
     cancelText: "취소",
+    // [수정 2026-01-15 09:40] 모달 타입 상태 추가 (success | warning)
+    type: "success",
     onConfirm: null,
     onCancel: null,
   });
@@ -33,6 +35,8 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
       showCancel: true,
       confirmText: "회원가입",
       cancelText: "취소",
+      // [수정 2026-01-15 09:40] 로그인 실패는 경고성 메시지로 처리 (빨강)
+      type: "warning",
       onConfirm: () => {
         close();
         onGoSignup?.();
@@ -41,8 +45,8 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
     });
   };
 
-  // [Logic] 확인 모달
-  const openOk = (msg, after) => {
+  // [Logic] 확인 모달 (기본값 warning -> 실패/경고가 많으므로, 성공일때만 success 명시)
+  const openOk = (msg, after, type = "warning") => {
     setM({
       open: true,
       title: "안내",
@@ -50,6 +54,8 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
       showCancel: false,
       confirmText: "확인",
       cancelText: "취소",
+      // [수정 2026-01-15 09:40] 인자로 받은 type 적용
+      type: type,
       onConfirm: () => {
         close();
         after?.();
@@ -85,14 +91,16 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
         // 방법: 일반 로그인 성공 시 기존의 소셜 토큰(mock_token)을 명시적으로 삭제.
         sessionStorage.removeItem("mock_token");
 
+        // [수정 2026-01-15 09:40] 로그인 성공 -> success (초록)
         openOk("로그인 성공", () => {
           setId("");
           setPw("");
           onLoginSuccess?.();
-        });
+        }, "success");
       }
     } catch (e) {
       console.error("로그인 에러: ", e);
+      // [수정 2026-01-15 09:40] 로그인 실패 -> warning (빨강, 기본값)
       openOk("로그인 정보를 확인해주세요.");
     }
   };
@@ -107,9 +115,10 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
       "mock_token",
       "mock-social-" + provider + "-" + Date.now()
     );
+    // [수정 2026-01-15 09:40] 로그인 성공 -> success (초록)
     openOk(`${provider} 계정으로 로그인되었습니다.`, () => {
       onLoginSuccess?.();
-    });
+    }, "success");
   };
 
   return (
@@ -223,6 +232,8 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
         showCancel={m.showCancel}
         confirmText={m.confirmText}
         cancelText={m.cancelText}
+        // [수정 2026-01-15 09:40] type 전달
+        type={m.type}
         onConfirm={m.onConfirm}
         onCancel={m.onCancel}
       />

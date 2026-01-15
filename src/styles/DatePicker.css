@@ -88,5 +88,6 @@
   outline: none !important;
   cursor: pointer;
   font-size: 1.2rem;
-  color: #a0aec0;
+  color: #5e72e4;
+  /* [수정 2026-01-15 09:45] 버튼 색상 변경 */
 }

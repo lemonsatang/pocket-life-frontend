@@ -25,6 +25,8 @@ const MealPage = () => {
     open: false,
     title: "",
     message: "",
+    // [수정 2026-01-15 09:44] 타입 추가
+    type: "success",
     onConfirm: null,
   });
 
@@ -32,11 +34,13 @@ const MealPage = () => {
     setModalState((prev) => ({ ...prev, open: false }));
   };
 
-  const openAlert = (message) => {
+  const openAlert = (message, type = "warning") => {
     setModalState({
       open: true,
       title: "알림",
       message,
+      // [수정 2026-01-15 09:44] 타입 적용
+      type: type,
       onConfirm: closeModal,
       confirmText: "확인",
     });
@@ -204,7 +208,8 @@ const MealPage = () => {
             className="pixel-btn"
             onClick={() => {
               if (!inputValue.trim()) {
-                openAlert("섭취한 음식과 칼로리를 입력해주세요!");
+                // [수정 2026-01-15 09:44] 빈 입력값 경고 -> warning (빨강)
+                openAlert("섭취한 음식과 칼로리를 입력해주세요!", "warning");
                 return;
               }
               addMeal({
@@ -253,6 +258,8 @@ const MealPage = () => {
         message={modalState.message}
         onConfirm={modalState.onConfirm}
         confirmText={modalState.confirmText}
+        // [수정 2026-01-15 09:44] type 전달
+        type={modalState.type}
       />
       <MealChatbot
         mealData={[...lightMeals, ...heartyMeals]}

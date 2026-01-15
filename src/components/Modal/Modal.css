@@ -38,13 +38,24 @@
 }
 
 /* 4. 모달 메시지 */
+/* 4. 모달 메시지 */
 .modalMsg {
   white-space: pre-line;
-  color: #d32f2f; /* Red color */
-  font-size: 18px; /* Examples: 14 -> 18 */
+  /* color: #4caf50; */ /* [수정 2026-01-15 09:35] 기본 색상 제거, type 클래스로 제어 */
+  font-size: 18px;
   line-height: 1.4;
   text-align: center;
   font-family: "Jua", sans-serif !important;
+}
+
+/* [수정 2026-01-15 09:35] 성공 메시지: 초록색 */
+.modalMsg.success {
+  color: #4caf50;
+}
+
+/* [수정 2026-01-15 09:35] 경고/실패 메시지: 빨간색 */
+.modalMsg.warning {
+  color: #ef5350; /* Red color */
 }
 
 /* 5. 모달 버튼 영역 */

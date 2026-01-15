@@ -22,6 +22,8 @@ const SchedulePage = () => {
     open: false,
     title: "",
     message: "",
+    // [수정 2026-01-15 09:42] 타입 추가
+    type: "success",
     onConfirm: null,
   });
 
@@ -29,11 +31,13 @@ const SchedulePage = () => {
     setModalState((prev) => ({ ...prev, open: false }));
   };
 
-  const openAlert = (message) => {
+  const openAlert = (message, type = "warning") => {
     setModalState({
       open: true,
       title: "알림",
       message,
+      // [수정 2026-01-15 09:42] 타입 적용
+      type: type,
       onConfirm: closeModal,
       confirmText: "확인",
     });
@@ -98,7 +102,8 @@ const SchedulePage = () => {
   // 일정 추가
   const createTodo = async () => {
     if (!textInput) {
-      openAlert("일정을 입력해주세요.");
+      // [수정 2026-01-15 09:42] 빈 입력 경고 -> warning (빨강)
+      openAlert("일정을 입력해주세요.", "warning");
       return;
     }
 
@@ -157,6 +162,8 @@ const SchedulePage = () => {
       confirmText: "확인",
       cancelText: "취소",
       showCancel: true,
+      // [수정 2026-01-15 09:42] 삭제 질문 -> warning (빨강)
+      type: "warning",
       onConfirm: () => confirmDelete(id),
       onCancel: closeModal,
     });
@@ -166,7 +173,8 @@ const SchedulePage = () => {
   const confirmDelete = async (id) => {
     try {
       await dataApi.delete(`/api/todo/delete/${id}`);
-      openAlert("일정이 삭제되었습니다.");
+      // [수정 2026-01-15 09:42] 삭제 성공 -> success (초록)
+      openAlert("일정이 삭제되었습니다.", "success");
       await getTodoList();
       getTodoDates();
     } catch (e) {
@@ -378,6 +386,8 @@ const SchedulePage = () => {
         cancelText={modalState.cancelText}
         showCancel={modalState.showCancel}
         onCancel={modalState.onCancel}
+        // [수정 2026-01-15 09:42] type 전달
+        type={modalState.type}
       />
     </div>
   );

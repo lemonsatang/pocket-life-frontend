@@ -22,6 +22,8 @@ const CartList = () => {
     open: false,
     title: "",
     message: "",
+    // [수정 2026-01-15 09:44] 타입 추가
+    type: "success",
     onConfirm: null,
   });
 
@@ -29,11 +31,13 @@ const CartList = () => {
     setModalState((prev) => ({ ...prev, open: false }));
   };
 
-  const openAlert = (message) => {
+  const openAlert = (message, type = "warning") => {
     setModalState({
       open: true,
       title: "알림",
       message,
+      // [수정 2026-01-15 09:44] 타입 적용
+      type: type,
       onConfirm: closeModal,
       confirmText: "확인",
     });
@@ -145,7 +149,8 @@ const CartList = () => {
       onDatePickerChange={setCurrentDate}
       onSearch={() => {
         if (!inputValue.trim()) {
-          openAlert("검색할 물건을 입력해 주세요!");
+          // [수정 2026-01-15 09:44] 빈 입력값 경고 -> warning (빨강)
+          openAlert("검색할 물건을 입력해 주세요!", "warning");
           return;
         }
         dataApi.get(`/api/cart/search?text=${encodeURIComponent(inputValue)}`)
@@ -168,7 +173,8 @@ const CartList = () => {
       }}
       onAdd={(text) => {
         if (!text || !text.trim()) {
-          openAlert("추가할 물건을 입력해 주세요!");
+          // [수정 2026-01-15 09:44] 빈 입력값 경고 -> warning (빨강)
+          openAlert("추가할 물건을 입력해 주세요!", "warning");
           return;
         }
         dataApi.post("/api/cart", {
@@ -214,6 +220,8 @@ const CartList = () => {
         message={modalState.message}
         onConfirm={modalState.onConfirm}
         confirmText={modalState.confirmText}
+        // [수정 2026-01-15 09:44] type 전달
+        type={modalState.type}
       />
     </>
   );

@@ -29,6 +29,8 @@ export default function SignupPage({ onGoLogin }) {
     showCancel: false,
     confirmText: "확인",
     cancelText: "취소",
+    // [수정 2026-01-15 09:41] 모달 타입 상태 추가 (success | warning)
+    type: "success",
     onConfirm: null,
     onCancel: null,
   });
@@ -36,8 +38,8 @@ export default function SignupPage({ onGoLogin }) {
   // [Logic] 모달 닫기
   const close = () => setM((s) => ({ ...s, open: false }));
 
-  // [Logic] 확인 모달
-  const openOk = (title, msg, after) => {
+  // [Logic] 확인 모달 (기본값 warning -> 경고/실패)
+  const openOk = (title, msg, after, type = "warning") => {
     setM({
       open: true,
       title,
@@ -45,6 +47,8 @@ export default function SignupPage({ onGoLogin }) {
       showCancel: false,
       confirmText: "확인",
       cancelText: "취소",
+      // [수정 2026-01-15 09:41] 타입 적용
+      type: type,
       onConfirm: () => {
         close();
         after?.();
@@ -73,6 +77,8 @@ export default function SignupPage({ onGoLogin }) {
       showCancel: true,
       confirmText: "이동",
       cancelText: "취소",
+      // [수정 2026-01-15 09:41] 회원가입 성공은 성공 타입 (초록)
+      type: "success",
       onConfirm: () => {
         close();
         onGoLogin?.();
@@ -367,6 +373,8 @@ export default function SignupPage({ onGoLogin }) {
         showCancel={m.showCancel}
         confirmText={m.confirmText}
         cancelText={m.cancelText}
+        // [수정 2026-01-15 09:41] type 전달
+        type={m.type}
         onConfirm={m.onConfirm}
         onCancel={m.onCancel}
       />
