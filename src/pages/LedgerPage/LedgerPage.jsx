@@ -1,12 +1,13 @@
 // [Page] 가계부 페이지 - 최신 거래 목록 + 합계 표시
 import React, { useEffect, useState } from "react";
+import dataApi from "../../api/api";
 
 const LedgerPage = () => {
   const [txs, setTxs] = useState([]);
 
   useEffect(() => {
-    txApi
-      .get("/latest")
+    dataApi
+      .get("/api/tx")
       .then((res) => {
         setTxs(res.data || []);
       })
