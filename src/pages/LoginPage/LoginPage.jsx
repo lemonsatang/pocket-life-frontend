@@ -92,11 +92,15 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
         sessionStorage.removeItem("mock_token");
 
         // [수정 2026-01-15 09:40] 로그인 성공 -> success (초록)
-        openOk("로그인 성공", () => {
-          setId("");
-          setPw("");
-          onLoginSuccess?.();
-        }, "success");
+        openOk(
+          "로그인 성공",
+          () => {
+            setId("");
+            setPw("");
+            onLoginSuccess?.();
+          },
+          "success"
+        );
       }
     } catch (e) {
       console.error("로그인 에러: ", e);
@@ -107,18 +111,21 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
 
   // [Logic] 소셜 로그인 처리
   const handleSocialLogin = (provider) => {
-    // [수정 2026-01-14 12:50] 403 에러 해결 (토큰 충돌 방지):
-    // 이유: 일반 로그인 후 소셜 로그인 시, api.js가 기존 일반 토큰을 우선 참조하는 문제 발생.
-    // 방법: 소셜 로그인 시도 시 기존의 일반 토큰(token)을 명시적으로 삭제.
     sessionStorage.removeItem("token");
-    sessionStorage.setItem(
-      "mock_token",
-      "mock-social-" + provider + "-" + Date.now()
-    );
+
+    const lowerProvider = provider.toLowerCase();
+
+    // 백엔드 시큐리티가 기다리고 있는 인증 주소로 이동!
+    window.location.href = `http://localhost:8080/oauth2/authorization/${lowerProvider}`;
+
     // [수정 2026-01-15 09:40] 로그인 성공 -> success (초록)
-    openOk(`${provider} 계정으로 로그인되었습니다.`, () => {
-      onLoginSuccess?.();
-    }, "success");
+    // openOk(
+    //   `${provider} 계정으로 로그인되었습니다.`,
+    //   () => {
+    //     onLoginSuccess?.();
+    //   },
+    //   "success"
+    // );
   };
 
   return (
@@ -197,23 +204,15 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
         <div className="socialRow">
           <button
             type="button"
-            className="social google"
-            aria-label="Google"
-            onClick={() => handleSocialLogin("Google")}
+            className="social kakao"
+            aria-label="Kakao"
+            onClick={() => handleSocialLogin("kakao")}
           >
             <img
-              src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-              alt="Google"
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/KakaoTalk_logo.svg/1024px-KakaoTalk_logo.svg.png"
+              alt="Kakao"
               className="login-social-img"
             />
-          </button>
-          <button
-            type="button"
-            className="social naver"
-            aria-label="Naver"
-            onClick={() => handleSocialLogin("Naver")}
-          >
-            N
           </button>
         </div>
 

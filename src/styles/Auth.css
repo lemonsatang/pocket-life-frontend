@@ -352,6 +352,11 @@
   font-family: "Jua", sans-serif !important;
 }
 
+.kakao {
+  background: #fee500;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+}
+
 /* 17. 하단 링크 */
 .bottomLink {
   margin-top: 10px;
