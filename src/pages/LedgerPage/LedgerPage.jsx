@@ -1,46 +1,46 @@
-// [Page] 가계부 페이지
+// [Page] 가계부 페이지 - 최신 거래 목록 + 합계 표시
 import React, { useEffect, useState } from "react";
-// import txApi from "../../api/txapi"; // [Deleted]
-import dataApi from "../../api/api"; // [New]
 
 const LedgerPage = () => {
-  const [list, setList] = useState([]);
+  const [txs, setTxs] = useState([]);
 
   useEffect(() => {
-    // [수정] txApi 대신 dataApi 사용
-    dataApi
-      .get("/api/tx/latest")
+    txApi
+      .get("/latest")
       .then((res) => {
-        console.log("✅ 최신 거래 조회 성공", res.data);
-        setList(res.data); // ← 화면에 쓸 데이터 저장
+        setTxs(res.data || []);
       })
       .catch((err) => {
-        console.error("❌ 가계부 조회 실패", err);
+        console.error("가계부 조회 실패", err);
       });
   }, []);
 
+  const income = txs
+    .filter((t) => t.txType === "INCOME")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+
+  const expense = txs
+    .filter((t) => t.txType === "EXPENSE")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+
   return (
     <div style={{ padding: "40px" }}>
-      <h2>💰 가계부 페이지</h2>
+      <h2>💰 가계부</h2>
 
-      {list.length === 0 ? (
-        <p>거래 내역이 없습니다.</p>
-      ) : (
-        list.map((tx) => (
-          <div
-            key={tx.id}
-            style={{
-              borderBottom: "1px solid #ddd",
-              padding: "12px 0",
-            }}
-          >
-            <div>{tx.txDate}</div>
-            <div>{tx.title}</div>
-            <div>{tx.amount}</div>
-            <div>{tx.category}</div>
-          </div>
-        ))
-      )}
+      <div style={{ marginBottom: "20px" }}>
+        <p>수입: +{income.toLocaleString()}원</p>
+        <p>지출: -{expense.toLocaleString()}원</p>
+        <p>합계: {(income - expense).toLocaleString()}원</p>
+      </div>
+
+      <ul>
+        {txs.length === 0 && <p>거래 내역이 없습니다.</p>}
+        {txs.map((t) => (
+          <li key={t.id}>
+            [{t.txDate}] {t.title} / {t.txType} / {t.amount.toLocaleString()}원
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
