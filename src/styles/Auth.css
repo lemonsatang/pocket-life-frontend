@@ -8,7 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #eceaf3 0%, #e0e7ff 100%);
+  background: linear-gradient(135deg, #eceaf3 0%, #eceaf3 0%);
   padding: 20px;
 }
 
