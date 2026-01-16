@@ -1,62 +1,67 @@
 @import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
 
-body {
-  background-color: #eeedf7;
-}
-
 .ledger-wrap {
   font-family: "Jua", sans-serif;
-  padding: 60px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 32px;
+  background: #f4f6fb;
 }
-
-/* 제목 */
 .ledger-title {
   font-size: 24px;
+  margin-bottom: 18px;
+  color: #2b2b2b;
+}
+
+.ledger-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
   margin-bottom: 24px;
 }
-
-/* 요약 영역 */
-.ledger-summary {
+.summary-box {
   background: #ffffff;
-  border-radius: 20px;
-  padding: 20px 32px;
-  display: flex;
-  gap: 28px;
+  border-radius: 14px;
+  padding: 16px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  margin-bottom: 36px;
-  font-size: 16px;
+}
+.summary-box.income b {
+  color: #3b82f6;
+} /* 수입 - 블루 */
+.summary-box.expense b {
+  color: #ef4444;
+} /* 지출 - 레드 */
+.summary-box.total b {
+  color: #111827;
 }
 
-/* 수입 / 지출 색상 */
-.plus {
-  color: #2fb344;
-  margin-left: 6px;
-}
-
-.minus {
-  color: #e03131;
-  margin-left: 6px;
-}
-
-/* 거래 리스트 */
 .ledger-list {
-  width: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ledger-item {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+.ledger-item.INCOME {
+  border-left: 6px solid #3b82f6;
+}
+.ledger-item.EXPENSE {
+  border-left: 6px solid #ef4444;
 }
 
-/* 거래 아이템 */
-.ledger-list li {
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 14px 18px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+.item-title {
   font-size: 15px;
+  margin-bottom: 6px;
+  color: #1f2937;
+}
+.item-meta {
+  display: flex;
+  justify-content: space-between;
+  color: #6b7280;
+  font-size: 13px;
 }

@@ -25,21 +25,28 @@ const LedgerPage = () => {
       <h2 className="ledger-title">💰 가계부</h2>
 
       <div className="ledger-summary">
-        <div>
-          수입 <span className="plus">+{income.toLocaleString()}원</span>
+        <div className="summary-box income">
+          수입 <b>+{income.toLocaleString()}원</b>
         </div>
-        <div>
-          지출 <span className="minus">-{expense.toLocaleString()}원</span>
+        <div className="summary-box expense">
+          지출 <b>-{expense.toLocaleString()}원</b>
         </div>
-        <div>
+        <div className="summary-box total">
           합계 <b>{(income - expense).toLocaleString()}원</b>
         </div>
       </div>
 
       <ul className="ledger-list">
         {txs.map((t) => (
-          <li key={t.id} className={t.txType === "INCOME" ? "in" : "out"}>
-            [{t.txDate}] {t.title} / {t.amount.toLocaleString()}원
+          <li
+            key={t.id}
+            className={`ledger-item ${
+              t.txType === "INCOME" ? "income" : "expense"
+            }`}
+          >
+            <span className="item-date">[{t.txDate}]</span>
+            <span className="item-title">{t.title}</span>
+            <span className="item-amount">{t.amount.toLocaleString()}원</span>
           </li>
         ))}
       </ul>
