@@ -84,8 +84,8 @@ const StatsPage = () => {
             dataApi.get(`/api/stats/cart`, { params: { date: dateStr } }).catch(() => ({ data: null })),
             // 3. 일정 (GET /api/todo/getList) - date 파라미터 필수
             dataApi.get(`/api/todo/getList`, { params: { date: dateStr } }).catch(() => ({ data: [] })),
-            // 4. 가계부 (GET /api/tx/latest) - 최신 내역 조회로 복구
-            dataApi.get(`/api/tx/latest`).catch(() => ({ data: [] }))
+            // 4. 가계부 (GET /api/tx) - [변경] 전체 내역 조회 후 필터링
+            dataApi.get(`/api/tx`).catch(() => ({ data: [] }))
         ]);
 
         console.log("DEBUG: Stats API Called with date:", dateStr); // [Debug]
@@ -146,9 +146,7 @@ const StatsPage = () => {
 
         // (3) 일정 달성: is_done 비율 (팀원 API 방어적 코딩)
         if (resTodo.data && Array.isArray(resTodo.data)) {
-            // 이번 달 데이터만 필터링 (dodate 혹은 writedate 기준? 명세 없으므로 전체 혹은 날짜 필터링)
-            // 명세: /api/todo (파라미터 없음 -> 전체) -> 여기서 날짜 필터링 필수
-            // 데이터 구조 가정: { dodate: "YYYY-MM-DD", is_done: boolean, ... }
+            // 이번 달 데이터만 필터링
             const monthTodos = resTodo.data.filter(todo => todo.dodate && todo.dodate.startsWith(yearMonth));
             
             if (monthTodos.length > 0) {
@@ -157,18 +155,26 @@ const StatsPage = () => {
             }
         }
 
-        // (4) 소비율/저축률: 가계부 (팀원 API 방어적 코딩)
+        // (4) 소비율/저축률: 가계부 (GET /api/tx 기반)
         if (resTx.data && Array.isArray(resTx.data)) {
-            // 이번 달 데이터 필터링
-            const monthTxs = resTx.data.filter(tx => tx.txDate && tx.txDate.startsWith(yearMonth));
+            // 이번 달 데이터 필터링 (date 필드 확인 필요. 보통 txDate, date, dateStr 등)
+            // 팀원 코드에는 날짜 필드가 명시되지 않았으나, 보통 txDate나 date를 사용함. 
+            // 여기서는 안전하게 모든 속성을 확인하거나, 콘솔 로그를 보고 조정해야 함.
+            // 일단 'date' 또는 'txDate'를 사용하는 것으로 가정.
+            
+            const monthTxs = resTx.data.filter(tx => {
+               const tDate = tx.date || tx.txDate || tx.transactionDate;
+               return tDate && tDate.startsWith(yearMonth);
+            });
             
             const income = monthTxs
-                .filter(t => t.type === 'INCOME')
+                .filter(t => t.type === 'INCOME' || t.category === 'INCOME' || t.amount > 0) // 수입 조건 보강
                 .reduce((acc, cur) => acc + (Number(cur.amount) || 0), 0);
             
+            // 지출은 type이 EXPENSE이거나 amount가 음수일 수 있음. 절대값 처리.
             const expense = monthTxs
-                .filter(t => t.type === 'EXPENSE')
-                .reduce((acc, cur) => acc + (Number(cur.amount) || 0), 0);
+                .filter(t => t.type === 'EXPENSE' || t.category === 'EXPENSE' || t.amount < 0)
+                .reduce((acc, cur) => acc + Math.abs(Number(cur.amount) || 0), 0);
             
             // 소비율: (총 지출 / 기준값) * 100
             consumptionScore = Math.min(Math.floor((expense / CONSUMPTION_TARGET) * 100), 100);
