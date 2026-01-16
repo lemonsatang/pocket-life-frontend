@@ -1,6 +1,5 @@
 // [Page] 가계부 페이지 - 최신 거래 목록 + 합계 표시
 import React, { useEffect, useState } from "react";
-import txApi from "../../api/txApi";
 
 const LedgerPage = () => {
   const [txs, setTxs] = useState([]);
