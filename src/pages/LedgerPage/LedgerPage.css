@@ -1,0 +1,62 @@
+@import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
+
+body {
+  background-color: #eeedf7;
+}
+
+.ledger-wrap {
+  font-family: "Jua", sans-serif;
+  padding: 60px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 제목 */
+.ledger-title {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+/* 요약 영역 */
+.ledger-summary {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px 32px;
+  display: flex;
+  gap: 28px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  margin-bottom: 36px;
+  font-size: 16px;
+}
+
+/* 수입 / 지출 색상 */
+.plus {
+  color: #2fb344;
+  margin-left: 6px;
+}
+
+.minus {
+  color: #e03131;
+  margin-left: 6px;
+}
+
+/* 거래 리스트 */
+.ledger-list {
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 거래 아이템 */
+.ledger-list li {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 14px 18px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  font-size: 15px;
+}
