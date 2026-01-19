@@ -7,7 +7,6 @@ import MealStats from "../../components/Meal/MealStats/MealStats";
 import MealList from "../../components/Meal/MealList/MealList";
 import MealChatbot from "../../components/Meal/MealChatbot/MealChatbot";
 import Modal from "../../components/Modal/Modal";
-import dataApi from "../../api/api"; // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API 호출을 위한 import 추가, 어디서: MealPage.jsx 10번째 줄, 어떻게: dataApi import 추가, 왜: 목표 칼로리를 API에서 가져오기 위해
 import "./MealPage.css";
 import { lightMeals, heartyMeals, cheatMeals } from "../../data/recommendedMeals";
 
@@ -166,9 +165,8 @@ const MealPage = () => {
       const isCheatMeal = cheatMeals.some(cheat => name.includes(cheat.name));
       const projectedCalories = totalCalories + (Number(calValue) || 0);
 
-      // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 치팅데이 기준을 목표 칼로리 대비 100% 초과로 변경, 어디서: MealPage.jsx 171번째 줄, 어떻게: 2000을 targetCalories로 변경, 왜: 통계 페이지와 일관된 기준을 사용하기 위해
-      // [Conditions] 완벽한 치팅 데이 조건(치팅식단 + 목표 칼로리 100% 초과)일 때만 알림
-      if (isCheatMeal && projectedCalories > targetCalories && !cheatingMode) {
+      // [Conditions] 완벽한 치팅 데이 조건(치팅식단 + 2000kcal 초과)일 때만 알림
+      if (isCheatMeal && projectedCalories > 2000 && !cheatingMode) {
           openAlert("치팅 메뉴가 감지되었습니다! 오늘은 치팅데이! 🥳", "success");
       }
       
@@ -253,32 +251,11 @@ const MealPage = () => {
     setErrorMessage,
   } = useMealData(currentDate);
 
-  // [State] 목표 칼로리 (API에서 가져오기)
-  // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 목표 칼로리를 API에서 가져오는 state 추가, 어디서: MealPage.jsx 254-255번째 줄, 어떻게: useState로 목표 칼로리 state 추가, 왜: 통계 페이지와 일관된 기준을 사용하기 위해
-  const [targetCalories, setTargetCalories] = useState(2000); // 기본값 2000
-
   // [Logic] 총 칼로리 계산
   const totalCalories = meals.reduce(
     (sum, m) => sum + (Number(m.calories) || 0),
     0
   );
-
-  // [Logic] 목표 칼로리 가져오기
-  // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API에서 목표 칼로리 조회, 어디서: MealPage.jsx 262-275번째 줄, 어떻게: /api/stats/meal API로 목표 칼로리 조회, 왜: 통계 페이지와 동일한 목표 칼로리를 사용하기 위해
-  useEffect(() => {
-    const fetchTargetCalories = async () => {
-      const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-      try {
-        const res = await dataApi.get(`/api/stats/meal`, { params: { date: dateStr } }).catch(() => ({ data: null }));
-        if (res.data && res.data.targetCalories !== undefined) {
-          setTargetCalories(Number(res.data.targetCalories) || 2000);
-        }
-      } catch (e) {
-        console.error('목표 칼로리 조회 실패:', e);
-      }
-    };
-    fetchTargetCalories();
-  }, [currentDate]);
 
   // [Logic] 치팅 식단 포함 여부 확인 (useEffect에서 사용하기 위해 위치 이동)
   const hasEatenCheatMeal = meals.some((meal) =>
@@ -304,9 +281,8 @@ const MealPage = () => {
   }, [meals]);
 
   // [Logic] 칼로리에 따른 스마트 추천 식단 생성
-  // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 목표 칼로리를 API에서 가져온 값으로 변경, 어디서: MealPage.jsx 287번째 줄, 어떻게: dailyGoal을 targetCalories state로 변경, 왜: 통계 페이지와 일관된 기준을 사용하기 위해
   useEffect(() => {
-    const dailyGoal = targetCalories;
+    const dailyGoal = 2000;
 
     // 1. [New Logic] 오직 1끼만 입력했고, 그게 치팅 식단이며 2000kcal 이하인 경우 -> 다이어트 + 치팅 믹스 추천
     if (meals.length === 1 && hasEatenCheatMeal && totalCalories <= dailyGoal) {
@@ -423,9 +399,8 @@ const MealPage = () => {
 
   // [State] 모달 상태
 
-  // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 치팅데이 기준을 목표 칼로리 대비 100% 초과로 변경, 어디서: MealPage.jsx 404-405번째 줄, 어떻게: 2000을 targetCalories로 변경, 왜: 통계 페이지와 일관된 기준을 사용하기 위해
-  const showBanner = cheatingMode || (hasEatenCheatMeal && totalCalories > targetCalories);
-  const isStrictCheating = hasEatenCheatMeal && totalCalories > targetCalories;
+  const showBanner = cheatingMode || (hasEatenCheatMeal && totalCalories > 2000);
+  const isStrictCheating = hasEatenCheatMeal && totalCalories > 2000;
 
   return (
     <div className="main-content meal-container">
@@ -535,7 +510,7 @@ const MealPage = () => {
       </div>
       <MealStats
         totalCalories={totalCalories}
-        dailyGoal={targetCalories}
+        dailyGoal={2000}
         displayRecs={displayRecs}
         onRecClick={handleRecommendationClick}
         isCheating={showBanner}
@@ -560,7 +535,7 @@ const MealPage = () => {
         cheatMeals={cheatMeals}
         eatenMeals={meals}
         currentCalories={totalCalories}
-        dailyGoal={targetCalories}
+        dailyGoal={2000}
         onAddMeal={addMeal}
         // [State] 치팅 모드 상태 전달 (파생 상태인 showBanner 전달)
         cheatingMode={showBanner} 
