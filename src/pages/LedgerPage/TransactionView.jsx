@@ -116,8 +116,8 @@ const TransactionView = ({ txs, fetchTx, incomeSum, expenseSum }) => {
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
           >
-            <option value="DESC">최신순 ↓</option>
-            <option value="ASC">과거순 ↑</option>
+            <option value="DESC">내림차순</option>
+            <option value="ASC">오름차순</option>
           </select>
         </div>
 
@@ -186,7 +186,7 @@ const TransactionView = ({ txs, fetchTx, incomeSum, expenseSum }) => {
       <aside className="pocket-right">
         {/* 입력 카드 */}
         <div className="card-box">
-          <h4 style={{ textAlign: "center", marginTop: 0 }}>거래내용</h4>
+          <h4 style={{ textAlign: "center", marginTop: 0 }}>거래 내용</h4>
           <div className="type-tabs">
             <button
               className={form.type === "INCOME" ? "active" : ""}
@@ -231,7 +231,7 @@ const TransactionView = ({ txs, fetchTx, incomeSum, expenseSum }) => {
             onChange={(e) => setForm({ ...form, memo: e.target.value })}
           />
           <button className="btn-save-main" onClick={handleSave}>
-            {editingId ? "저장(수정)" : "저장(기록)"}
+            {editingId ? "수정" : "저장"}
           </button>
           {editingId && (
             <button
