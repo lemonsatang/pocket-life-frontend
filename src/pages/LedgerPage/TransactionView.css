@@ -1,0 +1,173 @@
+/* 레이아웃: 목록(2.5) : 입력/요약(1.2) */
+.tx-flex-row {
+  display: flex;
+  gap: 25px;
+  align-items: flex-start;
+}
+
+.list-section {
+  flex: 2.5;
+  min-height: 800px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 필터 탭 (전체/수입/지출) */
+.list-header-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.filter-tabs button {
+  padding: 10px 22px;
+  border-radius: 25px;
+  border: none;
+  background: #f1f3f9;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 8px;
+  color: #888;
+}
+
+.filter-tabs button.active {
+  background-color: #8e8efc;
+  color: white;
+}
+
+/* 거래 목록 테이블 */
+.main-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.main-table th {
+  padding: 15px;
+  border-bottom: 2px solid #f8faff;
+  color: #aaa;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.main-table td {
+  padding: 20px 10px;
+  text-align: center;
+  border-bottom: 1px solid #f2f5ff;
+  font-size: 18px;
+}
+
+/* 카테고리 뱃지 */
+.badge {
+  background: #f0f4ff;
+  color: #5c62d6;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+/* 🔢 하단 페이징: 시안의 보라색 원형 */
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 30px;
+}
+
+.page-num-btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: none;
+  background: #eaedf7;
+  color: #777;
+  cursor: pointer;
+}
+
+.page-num-btn.active {
+  background-color: #8e8efc;
+  color: white;
+}
+
+/* ✍️ 오른쪽 사이드 섹션 */
+.side-section {
+  flex: 1.2;
+}
+
+/* 입력 필드 스택 */
+.type-toggle {
+  display: flex;
+  background: #f2f4f8;
+  padding: 6px;
+  border-radius: 18px;
+  margin-bottom: 20px;
+}
+
+.type-toggle button {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 14px;
+}
+
+.type-toggle button.active {
+  background-color: #8e8efc;
+  color: white;
+}
+
+.input-stack input,
+.input-stack textarea {
+  width: 100%;
+  padding: 18px;
+  margin-bottom: 12px;
+  border: 1.5px solid #f0f2f9;
+  border-radius: 20px;
+  background: #fafbff;
+  outline: none;
+}
+
+.main-save-btn {
+  width: 100%;
+  padding: 20px;
+  border-radius: 20px;
+  border: none;
+  background: #b8b8ff;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* 📊 요약 점선 디자인 (시안의 핵심) */
+.sum-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 0;
+  border-bottom: 1px solid #f9faff;
+}
+
+.total-row {
+  border-top: 2px dashed #eee; /* 시안의 그 가로 점선 */
+  margin-top: 15px;
+  padding-top: 20px;
+}
+
+.balance-text {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.text-plus {
+  color: #2ecc71;
+}
+.text-minus {
+  color: #e74c3c;
+}
+
+.row-action-btn {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  cursor: pointer;
+}
