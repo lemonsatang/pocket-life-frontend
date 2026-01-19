@@ -1,0 +1,123 @@
+.dash-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.stat-card-white {
+  background: white;
+  border-radius: 25px;
+  padding: 40px 20px;
+  text-align: center;
+  position: relative;
+}
+
+.card-tag-top {
+  position: absolute;
+  top: 18px;
+  left: 25px;
+  font-size: 13px;
+  color: #888;
+  font-weight: bold;
+}
+.card-tag-bottom {
+  position: absolute;
+  bottom: 18px;
+  right: 25px;
+  font-size: 11px;
+  color: #ccc;
+}
+.card-amount-black {
+  font-size: 22px;
+  font-weight: bold;
+  color: #000;
+}
+
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 20px;
+  height: 320px;
+}
+
+.bottom-white-box {
+  background-color: white;
+  border-radius: 30px;
+  padding: 25px; /* 여백을 조금 더 줌 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 📍 텍스트 영역 정렬 */
+.section-header-text {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.section-title {
+  font-size: 17px;
+  color: #333;
+  margin: 0;
+  font-weight: bold;
+}
+
+.section-sub {
+  font-size: 12px;
+  color: #999;
+  margin: 5px 0 0 0;
+}
+
+.section-title-center {
+  font-size: 17px;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.inner-red-box {
+  flex: 1;
+  background-color: #ffdae0;
+  border-radius: 20px;
+}
+
+.recent-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.recent-table th {
+  font-size: 12px;
+  color: #bbb;
+  border-bottom: 1px solid #f5f5f5;
+  padding-bottom: 8px;
+}
+.recent-table td {
+  padding: 10px 5px;
+  text-align: center;
+  font-size: 13px;
+  color: #333;
+}
+.row-amount-black {
+  font-weight: bold;
+  color: #000;
+}
+
+.badge-in {
+  background: #28a745;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+}
+.badge-ex {
+  background: #dc3545;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+}
