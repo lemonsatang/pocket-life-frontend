@@ -1,146 +1,233 @@
+@import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
+
+/* 전체 컨테이너 */
 .pocket-container {
   display: flex;
   gap: 20px;
-  padding: 20px;
-  background: #f0f2ff;
+  padding: 25px;
+  background-color: #f0f2ff;
   min-height: 100vh;
-  font-family: "Pretendard", sans-serif;
+  font-family: "Jua", sans-serif;
+  justify-content: center;
 }
 
-/* 사이드바 */
+/* 1. 사이드바 (왼쪽 보라색 박스) */
 .pocket-sidebar {
-  width: 180px;
+  width: 160px;
   background: #c2c2ff;
-  padding: 20px;
+  padding: 40px 15px;
   border-radius: 20px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.side-title {
+  color: #333;
+  font-size: 20px;
+  margin-bottom: 20px;
 }
 .side-btn {
-  width: 100%;
+  width: 90%;
   padding: 10px;
-  margin-top: 10px;
-  border-radius: 15px;
+  border-radius: 25px;
   border: none;
   background: white;
   cursor: pointer;
+  font-family: "Jua";
+  font-size: 16px;
 }
 .side-btn.active {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   font-weight: bold;
-  background: #eeeeff;
 }
 
-/* 메인 영역 */
+/* 2. 메인 영역 (가운데 거래내역 박스) */
 .pocket-main {
-  flex: 1;
+  width: 700px;
   background: white;
   padding: 25px;
   border-radius: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 .main-header {
   display: flex;
   justify-content: space-between;
-  font-weight: bold;
+  align-items: center;
   margin-bottom: 20px;
 }
 .month-badge {
   background: #8e8efc;
   color: white;
-  padding: 5px 15px;
-  border-radius: 15px;
+  padding: 5px 20px;
+  border-radius: 20px;
 }
 
-/* 테이블 */
+/* 필터 버튼 (시안과 동일한 연회색/보라색) */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.filter-row button {
+  padding: 6px 20px;
+  border-radius: 15px;
+  border: none;
+  background: #e0e0e0;
+  cursor: pointer;
+  font-family: "Jua";
+  font-size: 14px;
+}
+.filter-row button.active {
+  background: #8e8efc;
+  color: white;
+}
+
+/* 거래내역 테이블 (행 간격 및 선 스타일) */
 .tx-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 15px;
+  border-top: 2px solid #333;
 }
 .tx-table th {
-  border-bottom: 2px solid #eee;
-  padding: 10px;
-  font-size: 14px;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  color: #333;
+  font-size: 15px;
 }
 .tx-table td {
-  padding: 12px 10px;
+  padding: 12px;
   text-align: center;
-  border-bottom: 1px solid #f9f9f9;
-}
-.cate-tag {
-  background: #e0e0e0;
-  padding: 3px 10px;
-  border-radius: 10px;
-  font-size: 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
 }
 
-/* 버튼 스타일 */
-.btn-edit {
-  background: #4caf50;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 5px;
-  margin-right: 4px;
-}
-.btn-del {
-  background: #f44336;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 5px;
-}
+/* 수입/지출 텍스트 및 태그 */
 .txt-plus {
-  color: #2ecc71;
+  color: #27ae60;
   font-weight: bold;
 }
 .txt-minus {
   color: #e74c3c;
   font-weight: bold;
 }
+.cate-tag {
+  background: #e5e5e5;
+  padding: 3px 12px;
+  border-radius: 15px;
+  font-size: 13px;
+  color: #333;
+}
 
-/* 오른쪽 섹션 */
+/* 테이블 내 수정/삭제 버튼 (이미지처럼 둥글게) */
+.btn-row-edit {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-family: "Jua";
+  cursor: pointer;
+}
+.btn-row-del {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-family: "Jua";
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+/* 3. 오른쪽 패널 (입력 + 요약) */
 .pocket-right {
-  width: 280px;
+  width: 320px;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
-.card-input,
-.card-summary {
+.card-box {
   background: white;
-  padding: 20px;
+  padding: 25px;
   border-radius: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
-.type-toggle {
+
+/* 거래내용 입력 탭 (수입/지출 선택창) */
+.type-tabs {
   display: flex;
-  gap: 5px;
+  gap: 10px;
   margin-bottom: 15px;
+  justify-content: center;
 }
-.type-toggle button {
+.type-tabs button {
   flex: 1;
   padding: 8px;
-  border-radius: 10px;
-  border: 1px solid #eee;
-  background: #f9f9f9;
+  border-radius: 15px;
+  border: none;
+  background: #e5e5e5;
+  font-family: "Jua";
+  cursor: pointer;
 }
-.type-toggle button.active {
+.type-tabs button.active {
   background: #8e8efc;
   color: white;
 }
-.card-input input {
+
+.card-box input {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-family: "Jua";
 }
-.btn-save {
+.btn-save-main {
   width: 100%;
   padding: 12px;
   background: #a2a2ff;
   color: white;
   border: none;
+  border-radius: 20px;
+  font-size: 17px;
+  font-family: "Jua";
+  cursor: pointer;
+}
+
+/* 요약 박스 (선 구분 디테일) */
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #ddd;
   border-radius: 15px;
-  font-weight: bold;
+}
+.summary-line.total {
+  border: 2px solid #ccc;
+  font-size: 18px;
+  margin-top: 15px;
+}
+
+/* 페이징 버튼 (시안 위치) */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 25px;
+}
+.pagination button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: #e0e0e0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Jua";
+}
+.pagination button.active {
+  background: #8e8efc;
+  color: white;
 }

@@ -3,15 +3,14 @@ import dataApi from "../../api/api";
 import "./LedgerPage.css";
 
 const LedgerPage = () => {
-  const now = new Date();
-  const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth() + 1);
   const [txs, setTxs] = useState([]);
   const [filter, setFilter] = useState("ALL");
   const [editingId, setEditingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
 
   const [form, setForm] = useState({
-    txDate: new Date().toISOString().split("T")[0],
+    txDate: "2026-01-19",
     title: "",
     category: "",
     memo: "",
@@ -21,22 +20,44 @@ const LedgerPage = () => {
 
   const fetchTx = () => {
     dataApi
-      .get(`/api/tx?year=${year}&month=${month}`)
+      .get(`/api/tx?year=2026&month=1`)
       .then((res) => setTxs(res.data || []))
-      .catch((err) => console.error("데이터 로드 실패", err));
+      .catch((err) => console.error(err));
   };
 
   useEffect(() => {
     fetchTx();
-  }, [year, month]);
+  }, []);
+
+  const filteredTxs = txs.filter((t) =>
+    filter === "ALL" ? true : t.type === filter
+  );
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const currentItems = filteredTxs.slice(
+    indexOfLastItem - itemsPerPage,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(filteredTxs.length / itemsPerPage);
 
   const handleSave = async (e) => {
     e.preventDefault();
-    const sendData = { ...form, amount: Number(form.amount) };
     try {
-      if (editingId) await dataApi.put(`/api/tx/${editingId}`, sendData);
-      else await dataApi.post("/api/tx", sendData);
-      resetForm();
+      if (editingId)
+        await dataApi.put(`/api/tx/${editingId}`, {
+          ...form,
+          amount: Number(form.amount),
+        });
+      else
+        await dataApi.post("/api/tx", { ...form, amount: Number(form.amount) });
+      setEditingId(null);
+      setForm({
+        txDate: "2026-01-19",
+        title: "",
+        category: "",
+        memo: "",
+        amount: "",
+        type: "EXPENSE",
+      });
       fetchTx();
     } catch (err) {
       alert("저장 실패");
@@ -45,75 +66,45 @@ const LedgerPage = () => {
 
   const startEdit = (item) => {
     setEditingId(item.id);
-    setForm({ ...item, memo: item.memo || "" });
+    setForm(item);
   };
 
-  const resetForm = () => {
-    setEditingId(null);
-    setForm({
-      txDate: new Date().toISOString().split("T")[0],
-      title: "",
-      category: "",
-      memo: "",
-      amount: "",
-      type: "EXPENSE",
-    });
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("삭제하시겠습니까?")) {
-      await dataApi.delete(`/api/tx/${id}`);
-      fetchTx();
-    }
-  };
-
-  const income = txs
+  const incomeSum = txs
     .filter((t) => t.type === "INCOME")
     .reduce((s, t) => s + t.amount, 0);
-  const expense = txs
+  const expenseSum = txs
     .filter((t) => t.type === "EXPENSE")
     .reduce((s, t) => s + t.amount, 0);
-  const filteredTxs = txs.filter((t) =>
-    filter === "ALL" ? true : t.type === filter
-  );
 
   return (
     <div className="pocket-container">
-      {/* 1. 왼쪽 사이드바 */}
+      {/* 1. 사이드바 */}
       <aside className="pocket-sidebar">
-        <h3>포켓 라이프</h3>
+        <div className="side-title">Pocket Life</div>
         <button className="side-btn">대시보드</button>
         <button className="side-btn active">거래내역</button>
       </aside>
 
-      {/* 2. 메인 거래내역 영역 */}
+      {/* 2. 메인 거래내역 박스 */}
       <main className="pocket-main">
-        <header className="main-header">
-          <span>가계부 거래내역</span>
-          <div className="month-badge">
-            {year}년 {month}월
-          </div>
-        </header>
+        <div className="main-header">
+          <span style={{ fontSize: "20px", fontWeight: "bold" }}>가계부</span>
+          <div className="month-badge">2026년 1월</div>
+        </div>
 
         <div className="filter-row">
-          <button
-            className={filter === "ALL" ? "active" : ""}
-            onClick={() => setFilter("ALL")}
-          >
-            전체
-          </button>
-          <button
-            className={filter === "INCOME" ? "active" : ""}
-            onClick={() => setFilter("INCOME")}
-          >
-            수입
-          </button>
-          <button
-            className={filter === "EXPENSE" ? "active" : ""}
-            onClick={() => setFilter("EXPENSE")}
-          >
-            지출
-          </button>
+          {["ALL", "INCOME", "EXPENSE"].map((f) => (
+            <button
+              key={f}
+              className={filter === f ? "active" : ""}
+              onClick={() => {
+                setFilter(f);
+                setCurrentPage(1);
+              }}
+            >
+              {f === "ALL" ? "전체" : f === "INCOME" ? "수입" : "지출"}
+            </button>
+          ))}
         </div>
 
         <table className="tx-table">
@@ -128,9 +119,9 @@ const LedgerPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredTxs.map((t) => (
+            {currentItems.map((t) => (
               <tr key={t.id}>
-                <td>{t.txDate.substring(5)}</td>
+                <td>{t.txDate.substring(5).replace("-", ".")}</td>
                 <td>{t.title}</td>
                 <td>
                   <span className="cate-tag">{t.category}</span>
@@ -141,12 +132,15 @@ const LedgerPage = () => {
                   {t.amount.toLocaleString()}원
                 </td>
                 <td>
-                  <button className="btn-edit" onClick={() => startEdit(t)}>
+                  <button className="btn-row-edit" onClick={() => startEdit(t)}>
                     수정
                   </button>
                   <button
-                    className="btn-del"
-                    onClick={() => handleDelete(t.id)}
+                    className="btn-row-del"
+                    onClick={() => {
+                      if (window.confirm("삭제하시겠습니까?"))
+                        dataApi.delete(`/api/tx/${t.id}`).then(fetchTx);
+                    }}
                   >
                     삭제
                   </button>
@@ -155,13 +149,25 @@ const LedgerPage = () => {
             ))}
           </tbody>
         </table>
+
+        <div className="pagination">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              className={currentPage === i + 1 ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
       </main>
 
-      {/* 3. 오른쪽 입력 및 요약 영역 */}
+      {/* 3. 오른쪽 패널 */}
       <aside className="pocket-right">
-        <div className="card-input">
-          <h4>거래내용</h4>
-          <div className="type-toggle">
+        <div className="card-box">
+          <h4 style={{ textAlign: "center", marginTop: 0 }}>거래내용</h4>
+          <div className="type-tabs">
             <button
               className={form.type === "INCOME" ? "active" : ""}
               onClick={() => setForm({ ...form, type: "INCOME" })}
@@ -198,23 +204,24 @@ const LedgerPage = () => {
             value={form.memo}
             onChange={(e) => setForm({ ...form, memo: e.target.value })}
           />
-          <button className="btn-save" onClick={handleSave}>
-            {editingId ? "수정하기" : "저장(기록)"}
+          <button className="btn-save-main" onClick={handleSave}>
+            저장(수정)
           </button>
         </div>
 
-        <div className="card-summary">
-          <h4>요약</h4>
-          <div className="sum-item">
-            이번달 수입{" "}
-            <span className="txt-plus">+{income.toLocaleString()}원</span>
+        <div className="card-box">
+          <h4 style={{ textAlign: "center", marginTop: 0 }}>요약</h4>
+          <div className="summary-line">
+            <span>이번달 수입</span>
+            <span className="txt-plus">+{incomeSum.toLocaleString()}원</span>
           </div>
-          <div className="sum-item">
-            이번달 지출{" "}
-            <span className="txt-minus">-{expense.toLocaleString()}원</span>
+          <div className="summary-line">
+            <span>이번달 지출</span>
+            <span className="txt-minus">-{expenseSum.toLocaleString()}원</span>
           </div>
-          <div className="sum-item total">
-            남은금액 <span>+{(income - expense).toLocaleString()}원</span>
+          <div className="summary-line total">
+            <span>남은금액</span>
+            <span>+{(incomeSum - expenseSum).toLocaleString()}원</span>
           </div>
         </div>
       </aside>
