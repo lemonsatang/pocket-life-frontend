@@ -1,291 +1,100 @@
-/* 둥글둥글하고 귀여운 느낌의 'Jua' 폰트를 구글에서 가져옵니다 */
+/* LedgerPage.css */
 @import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
 
-/* 전체 컨테이너: 화면 전체의 배경색과 중앙 정렬을 담당합니다 */
-.pocket-container {
-  display: flex; /* 내부 박스들을 가로로 나열합니다 */
-  gap: 20px; /* 박스들 사이의 간격 */
-  padding: 25px; /* 화면 가장자리 여백 */
-  background-color: #f0f2ff; /* 시안 특유의 연보라색 배경 */
-  min-height: 100vh; /* 화면 높이를 꽉 채웁니다 */
-  font-family: "Jua", sans-serif; /* 전체에 주아 폰트 적용 */
-  justify-content: center; /* 박스들을 화면 정중앙으로 모읍니다 */
-}
-
-/* 1. 사이드바: 왼쪽 보라색 메뉴 박스 */
-.pocket-sidebar {
-  width: 160px; /* 가로 너비 */
-  background: #c2c2ff; /* 사이드바 배경색 */
-  padding: 40px 15px; /* 내부 여백 (위아래 40px, 좌우 15px) */
-  border-radius: 20px; /* 모서리를 둥글게 */
-  display: flex; /* 내부 버튼들을 세로로 쌓기 위함 */
-  flex-direction: column; /* 세로 방향으로 배치 */
-  align-items: center; /* 버튼들을 가운데로 정렬 */
-  gap: 20px; /* 버튼 사이의 간격 */
-}
-
-/* 사이드바 최상단 제목 (포켓 라이프) */
-.side-title {
-  color: #333; /* 진한 회색 */
-  font-size: 20px; /* 글자 크기 */
-  margin-bottom: 20px; /* 아래 버튼과의 간격 */
-}
-
-/* 사이드바 버튼: 대시보드, 거래내역 버튼 */
-.side-btn {
-  width: 90%; /* 사이드바 너비에 맞춤 */
-  padding: 10px; /* 버튼 내부 높이 */
-  border-radius: 25px; /* 캡슐 모양처럼 둥글게 */
-  border: none; /* 기본 테두리 제거 */
-  background: white; /* 기본 배경은 흰색 */
-  cursor: pointer; /* 마우스 올리면 손가락 모양 표시 */
-  font-family: "Jua"; /* 버튼에도 주아 폰트 적용 */
-  font-size: 16px;
-  transition: all 0.2s; /* 색이 바뀔 때 부드럽게 변함 */
-}
-
-/* 사이드바 버튼 활성화: 클릭된 메뉴 강조 스타일 */
-.side-btn.active {
-  background: #8e8efc !important; /* 클릭 시 진한 보라색으로 변경 */
-  color: white !important; /* 글자색은 흰색으로 */
-  font-weight: bold; /* 글자를 두껍게 */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 살짝 떠 있는 듯한 그림자 */
-}
-
-/* 2. 메인 영역: 가운데 흰색 큰 박스 (거래 내역 리스트) */
-.pocket-main {
-  width: 700px; /* 메인 영역 너비 */
-  background: white; /* 배경은 깔끔한 흰색 */
-  padding: 25px; /* 안쪽 여백 */
-  border-radius: 25px; /* 모서리를 아주 둥글게 */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* 은은한 바닥 그림자 */
-}
-
-/* 메인 헤더: 제목과 연월 배지가 들어가는 곳 */
-.main-header {
+.ledger-wrapper {
+  background-color: #f0f0ff;
+  min-height: 100vh;
   display: flex;
-  justify-content: space-between; /* 제목은 왼쪽, 날짜는 오른쪽 끝으로 */
+  justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  padding: 20px;
+  font-family: "Jua", sans-serif;
 }
 
-/* 연/월 표시 배지 (2026년 1월) */
-.month-badge {
-  background: #8e8efc; /* 보라색 배경 */
-  color: white; /* 글자 흰색 */
-  padding: 5px 20px; /* 배지 크기 조절 */
-  border-radius: 20px; /* 둥근 알약 모양 */
-}
-
-/* 필터 버튼(전체/수입/지출)과 정렬(최신순)이 들어가는 행 */
-.control-row {
+.ledger-container {
   display: flex;
-  justify-content: space-between; /* 필터는 왼쪽, 정렬은 오른쪽 */
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-/* 필터 버튼들 그룹 */
-.filter-row {
-  display: flex;
-  gap: 8px;
-}
-
-/* 필터 버튼 각각의 스타일 */
-.filter-row button {
-  padding: 6px 20px;
-  border-radius: 15px; /* 둥근 모서리 */
-  border: none;
-  background: #e0e0e0; /* 기본 배경은 연회색 */
-  cursor: pointer;
-  font-family: "Jua";
-}
-
-/* 선택된 필터 버튼 강조 */
-.filter-row button.active {
-  background: #8e8efc; /* 선택 시 보라색 */
-  color: white;
-}
-
-/* 정렬 선택창 (최신순/과거순) */
-.sort-select {
-  padding: 6px 12px;
-  border-radius: 12px;
-  border: 1px solid #ddd; /* 연한 회색 테두리 */
-  font-family: "Jua";
-  cursor: pointer;
-}
-
-/* 거래 내역 테이블 */
-.tx-table {
   width: 100%;
-  border-collapse: collapse; /* 테두리 사이 틈 제거 */
-  border-top: 2px solid #333; /* 테이블 맨 윗줄 굵은 선 */
-}
-
-/* 테이블 제목 줄 */
-.tx-table th {
-  padding: 12px;
-  border-bottom: 1px solid #ddd; /* 제목 아래 구분선 */
-  color: #333;
-  font-size: 15px;
-}
-
-/* 테이블 데이터 줄 */
-.tx-table td {
-  padding: 12px;
-  text-align: center;
-  border-bottom: 1px solid #eee; /* 데이터 사이사이 얇은 선 */
-  font-size: 15px;
-}
-
-/* 금액 색상 표시 (+) */
-.txt-plus {
-  color: #27ae60; /* 수입은 초록색 */
-  font-weight: bold;
-}
-
-/* 금액 색상 표시 (-) */
-.txt-minus {
-  color: #e74c3c; /* 지출은 빨간색 */
-  font-weight: bold;
-}
-
-/* 카테고리 태그 (식비, 쇼핑 등) */
-.cate-tag {
-  background: #e5e5e5; /* 태그 배경 회색 */
-  padding: 3px 12px;
-  border-radius: 15px; /* 동글동글한 태그 모양 */
-  font-size: 13px;
-  color: #333;
-}
-
-/* 테이블 내 수정 버튼 */
-.btn-row-edit {
-  background: #4caf50; /* 초록색 */
-  color: white;
-  border: none;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-family: "Jua";
-  cursor: pointer;
-  margin-right: 4px; /* 옆 버튼과의 간격 */
-}
-
-/* 테이블 내 삭제 버튼 */
-.btn-row-del {
-  background: #f44336; /* 빨간색 */
-  color: white;
-  border: none;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-family: "Jua";
-  cursor: pointer;
-}
-
-/* 3. 오른쪽 패널: 입력 폼과 요약 박스가 들어가는 곳 */
-.pocket-right {
-  width: 320px;
-  display: flex;
-  flex-direction: column; /* 박스들을 위아래로 배치 */
+  max-width: 1400px;
+  height: 850px;
   gap: 20px;
 }
 
-/* 오른쪽 패널 내부의 흰색 카드 박스 */
-.card-box {
-  background: white;
-  padding: 25px;
-  border-radius: 25px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
-
-/* 입력 폼 내의 수입/지출 선택 탭 */
-.type-tabs {
+/* 사이드바 */
+.sidebar {
+  width: 220px;
+  background-color: #b8b8ff;
+  border-radius: 40px;
+  padding: 50px 20px;
   display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-/* 탭 버튼 스타일 */
-.type-tabs button {
-  flex: 1; /* 너비를 공평하게 나눠 가짐 */
-  padding: 8px;
-  border-radius: 15px;
-  border: none;
-  background: #e5e5e5;
-  font-family: "Jua";
-  cursor: pointer;
+.brand-logo {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 50px;
 }
-
-/* 선택된 탭 강조 */
-.type-tabs button.active {
-  background: #8e8efc; /* 선택 시 보라색 */
-  color: white;
-}
-
-/* 입력창 스타일 (항목명, 금액, 메모 등) */
-.card-box input {
-  width: 100%; /* 박스 가로를 꽉 채움 */
-  padding: 10px;
-  margin-bottom: 10px; /* 입력창끼리의 간격 */
-  border-radius: 20px; /* 둥근 입력창 */
-  border: 1px solid #ccc; /* 테두리 회색 */
-  box-sizing: border-box; /* 패딩 포함 너비 계산 */
-  font-family: "Jua";
-}
-
-/* 메인 저장 버튼 */
-.btn-save-main {
+.side-nav {
   width: 100%;
-  padding: 12px;
-  background: #a2a2ff; /* 연보라색 버튼 */
-  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.nav-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 25px;
   border: none;
-  border-radius: 20px;
-  font-size: 17px;
-  font-family: "Jua";
+  background: white;
+  font-size: 16px;
   cursor: pointer;
+  font-family: "Jua", sans-serif;
+}
+.nav-btn.active {
+  background-color: #8e8efc;
+  color: white;
 }
 
-/* 요약 정보 한 줄 (수입, 지출) */
-.summary-line {
+/* 메인 보드 */
+.main-board {
+  flex: 1;
+  background-color: #eaedf7;
+  border: 12px solid white;
+  border-radius: 40px;
+  padding: 25px 30px;
   display: flex;
-  justify-content: space-between; /* 이름은 왼쪽, 금액은 오른쪽 */
-  margin-bottom: 12px;
-  padding: 10px;
-  border: 1px solid #ddd; /* 둥근 테두리 칸 */
+  flex-direction: column;
+}
+
+/* 📍 수정의 핵심: 길게 이어진 흰색 한 칸 */
+.header-single-bar {
+  background-color: white; /* 한 칸으로 이어지는 흰색 배경 */
+  border-radius: 25px;
+  padding: 12px 30px;
+  display: flex;
+  justify-content: space-between; /* 글자와 날짜를 양 끝으로 */
+  align-items: center;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.view-title {
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+  font-weight: normal;
+}
+
+.date-badge {
+  background-color: #8e8efc; /* 1번 시안의 진보라 */
+  color: white;
+  padding: 6px 25px;
   border-radius: 15px;
+  font-size: 15px;
 }
 
-/* 최종 잔액 줄 강조 */
-.summary-line.total {
-  border: 2px solid #ccc; /* 더 굵은 선 */
-  font-size: 18px; /* 글자 더 크게 */
-  margin-top: 15px;
-}
-
-/* 하단 페이지 번호 (1, 2, 3...) */
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 25px;
-}
-
-/* 페이지 번호 버튼 각각 */
-.pagination button {
-  width: 30px;
-  height: 30px;
-  border: none;
-  background: #e0e0e0;
-  border-radius: 5px;
-  cursor: pointer;
-  font-family: "Jua";
-}
-
-/* 현재 페이지 강조 */
-.pagination button.active {
-  background: #8e8efc; /* 현재 페이지 보라색 배경 */
-  color: white;
+.view-content {
+  flex: 1;
 }
