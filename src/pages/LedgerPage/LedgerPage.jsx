@@ -1,4 +1,3 @@
-// [Page] 가계부 상세 페이지
 import React, { useEffect, useState } from "react";
 import dataApi from "../../api/api";
 import "./LedgerPage.css";
@@ -9,69 +8,65 @@ const LedgerPage = () => {
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [txs, setTxs] = useState([]);
   const [filter, setFilter] = useState("ALL");
+  const [editingId, setEditingId] = useState(null);
 
-  // ✅ [수정] 백엔드 TxDTO 구조와 100% 일치시킴 (category, memo 추가)
   const [form, setForm] = useState({
     txDate: new Date().toISOString().split("T")[0],
     title: "",
-    category: "기타", // 백엔드 TxDTO의 category 필드 대응
-    memo: "", // 백엔드 TxDTO의 memo 필드 대응
+    category: "",
+    memo: "",
     amount: "",
-    type: "EXPENSE", // 백엔드 Enum 타입 (INCOME 또는 EXPENSE)
+    type: "EXPENSE",
   });
 
-  // [기능] 데이터 불러오기
   const fetchTx = () => {
     dataApi
       .get(`/api/tx?year=${year}&month=${month}`)
       .then((res) => setTxs(res.data || []))
-      .catch((err) => console.error("조회 실패:", err));
+      .catch((err) => console.error("데이터 로드 실패", err));
   };
 
   useEffect(() => {
     fetchTx();
   }, [year, month]);
 
-  /**
-   * ✅ [중요] 백엔드 TxController 주소에 맞게 수정
-   */
-  const handleAddTx = async (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-
-    if (!form.title || !form.amount) {
-      alert("내용과 금액을 입력해주세요!");
-      return;
-    }
-
-    // 백엔드 TxRequest record 형식에 맞게 데이터 가공
-    const sendData = {
-      txDate: form.txDate,
-      title: form.title,
-      category: form.category || "기타",
-      memo: form.memo || "",
-      amount: Number(form.amount), // long 타입 대응
-      type: form.type, // INCOME 혹은 EXPENSE
-    };
-
+    const sendData = { ...form, amount: Number(form.amount) };
     try {
-      // ✅ [주소 수정] /api/tx/add 가 아니라 /api/tx 로 보내야 함
-      await dataApi.post("/api/tx", sendData);
-      alert("성공적으로 기록되었습니다!");
-
-      setForm({ ...form, title: "", amount: "", memo: "" });
+      if (editingId) await dataApi.put(`/api/tx/${editingId}`, sendData);
+      else await dataApi.post("/api/tx", sendData);
+      resetForm();
       fetchTx();
-    } catch (error) {
-      console.error("추가 실패:", error.response?.data);
-      alert("저장에 실패했습니다. 데이터 형식을 확인해주세요.");
+    } catch (err) {
+      alert("저장 실패");
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+  const startEdit = (item) => {
+    setEditingId(item.id);
+    setForm({ ...item, memo: item.memo || "" });
   };
 
-  // ✅ [수정] 백엔드 필드명 t.type으로 합계 계산
+  const resetForm = () => {
+    setEditingId(null);
+    setForm({
+      txDate: new Date().toISOString().split("T")[0],
+      title: "",
+      category: "",
+      memo: "",
+      amount: "",
+      type: "EXPENSE",
+    });
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("삭제하시겠습니까?")) {
+      await dataApi.delete(`/api/tx/${id}`);
+      fetchTx();
+    }
+  };
+
   const income = txs
     .filter((t) => t.type === "INCOME")
     .reduce((s, t) => s + t.amount, 0);
@@ -83,76 +78,146 @@ const LedgerPage = () => {
   );
 
   return (
-    <div className="ledger-wrap">
-      <h2 className="ledger-title">💰 My Pocket Ledger</h2>
+    <div className="pocket-container">
+      {/* 1. 왼쪽 사이드바 */}
+      <aside className="pocket-sidebar">
+        <h3>포켓 라이프</h3>
+        <button className="side-btn">대시보드</button>
+        <button className="side-btn active">거래내역</button>
+      </aside>
 
-      {/* [상단] 입력 영역 (이미지 이름 반영) */}
-      <div className="ledger-input-box">
-        <form onSubmit={handleAddTx} className="ledger-form">
-          <input
-            type="date"
-            name="txDate"
-            value={form.txDate}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="title"
-            placeholder="항목(내용)"
-            value={form.title}
-            onChange={handleInputChange}
-          />
-          <input
-            type="text"
-            name="category"
-            placeholder="카테고리"
-            value={form.category}
-            onChange={handleInputChange}
-          />
+      {/* 2. 메인 거래내역 영역 */}
+      <main className="pocket-main">
+        <header className="main-header">
+          <span>가계부 거래내역</span>
+          <div className="month-badge">
+            {year}년 {month}월
+          </div>
+        </header>
+
+        <div className="filter-row">
+          <button
+            className={filter === "ALL" ? "active" : ""}
+            onClick={() => setFilter("ALL")}
+          >
+            전체
+          </button>
+          <button
+            className={filter === "INCOME" ? "active" : ""}
+            onClick={() => setFilter("INCOME")}
+          >
+            수입
+          </button>
+          <button
+            className={filter === "EXPENSE" ? "active" : ""}
+            onClick={() => setFilter("EXPENSE")}
+          >
+            지출
+          </button>
+        </div>
+
+        <table className="tx-table">
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>항목</th>
+              <th>카테고리</th>
+              <th>비고</th>
+              <th>금액</th>
+              <th>수정/삭제</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredTxs.map((t) => (
+              <tr key={t.id}>
+                <td>{t.txDate.substring(5)}</td>
+                <td>{t.title}</td>
+                <td>
+                  <span className="cate-tag">{t.category}</span>
+                </td>
+                <td>{t.memo || "-"}</td>
+                <td className={t.type === "INCOME" ? "txt-plus" : "txt-minus"}>
+                  {t.type === "INCOME" ? "+" : "-"}
+                  {t.amount.toLocaleString()}원
+                </td>
+                <td>
+                  <button className="btn-edit" onClick={() => startEdit(t)}>
+                    수정
+                  </button>
+                  <button
+                    className="btn-del"
+                    onClick={() => handleDelete(t.id)}
+                  >
+                    삭제
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </main>
+
+      {/* 3. 오른쪽 입력 및 요약 영역 */}
+      <aside className="pocket-right">
+        <div className="card-input">
+          <h4>거래내용</h4>
+          <div className="type-toggle">
+            <button
+              className={form.type === "INCOME" ? "active" : ""}
+              onClick={() => setForm({ ...form, type: "INCOME" })}
+            >
+              수입
+            </button>
+            <button
+              className={form.type === "EXPENSE" ? "active" : ""}
+              onClick={() => setForm({ ...form, type: "EXPENSE" })}
+            >
+              지출
+            </button>
+          </div>
           <input
             type="number"
-            name="amount"
             placeholder="금액"
             value={form.amount}
-            onChange={handleInputChange}
+            onChange={(e) => setForm({ ...form, amount: e.target.value })}
           />
-          <select name="type" value={form.type} onChange={handleInputChange}>
-            <option value="EXPENSE">지출</option>
-            <option value="INCOME">수입</option>
-          </select>
-          <button type="submit" className="pixel-btn">
-            저장(기록)
+          <input
+            type="text"
+            placeholder="카테고리"
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+          />
+          <input
+            type="date"
+            value={form.txDate}
+            onChange={(e) => setForm({ ...form, txDate: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="메모"
+            value={form.memo}
+            onChange={(e) => setForm({ ...form, memo: e.target.value })}
+          />
+          <button className="btn-save" onClick={handleSave}>
+            {editingId ? "수정하기" : "저장(기록)"}
           </button>
-        </form>
-      </div>
+        </div>
 
-      <div className="ledger-summary">
-        <span>
-          수입 <b className="plus">+{income.toLocaleString()}원</b>
-        </span>
-        <span>
-          지출 <b className="minus">-{expense.toLocaleString()}원</b>
-        </span>
-        <span>
-          합계 <b>{(income - expense).toLocaleString()}원</b>
-        </span>
-      </div>
-
-      {/* [하단] 상세 리스트 */}
-      <ul className="ledger-list">
-        {filteredTxs.map((t) => (
-          <li key={t.id} className={t.type === "INCOME" ? "in" : "out"}>
-            <div className="item-main">
-              <span className="date">{t.txDate}</span>
-              <span className="title">{t.title}</span>
-              <span className="cate">({t.category})</span>
-            </div>
-            <span className="amt">
-              {t.type === "INCOME" ? "+" : "-"} {t.amount.toLocaleString()}원
-            </span>
-          </li>
-        ))}
-      </ul>
+        <div className="card-summary">
+          <h4>요약</h4>
+          <div className="sum-item">
+            이번달 수입{" "}
+            <span className="txt-plus">+{income.toLocaleString()}원</span>
+          </div>
+          <div className="sum-item">
+            이번달 지출{" "}
+            <span className="txt-minus">-{expense.toLocaleString()}원</span>
+          </div>
+          <div className="sum-item total">
+            남은금액 <span>+{(income - expense).toLocaleString()}원</span>
+          </div>
+        </div>
+      </aside>
     </div>
   );
 };
