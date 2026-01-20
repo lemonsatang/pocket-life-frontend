@@ -20,10 +20,8 @@ const Header = ({ onLogout }) => {
       } catch (err) {
         console.error("토큰 해석 에러:", err);
       }
-    } else {
-      console.error("토큰 해석 에러:", err);
     }
-  });
+  }, []);
 
   return (
     <nav className="pixel-nav-container">
@@ -64,13 +62,6 @@ const Header = ({ onLogout }) => {
           >
             가계부
           </Link>
-          <div className="nav-divider"></div>
-          <Link
-            to="/stats"
-            className={`nav-tab ${path === "/stats" ? "active" : ""}`}
-          >
-            통계
-          </Link>
         </div>
 
         <div className="nav-user-actions">
@@ -87,3 +78,5 @@ const Header = ({ onLogout }) => {
 };
 
 export default Header;
+
+

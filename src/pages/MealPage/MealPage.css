@@ -4,13 +4,13 @@
   gap: 20px;
   align-items: center;
   justify-content: flex-start !important; /* 수직 중앙 정렬 방지 */
-  padding-top: 0px; /* 배너 공간 확보 (최소화) */
+  padding-top: 0px; /* [수정 2026-01-20] 누가: 안티그래비티, 무엇을: 패딩 롤백, 어디서: MealPage.css 7번째 줄, 어떻게: 45px -> 0px, 왜: 다른 요소들의 위치가 이동하면 안 된다는 사용자 요청 반영 */
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
   /* 스크롤 제거 */
-  height: calc(100vh - 100px); /* 헤더 높이만큼 뺌 */
-  overflow-y: hidden;
+  height: auto; /* [수정 2026-01-20] 누가: 안티그래비티, 무엇을: 높이 제한 해제, 어디서: MealPage.css 12번째 줄, 어떻게: fixed height -> auto, 왜: overflow: visible을 적용하여 상단 버튼 잘림을 방지하기 위해 */
+  overflow: visible; /* [수정 2026-01-20] 누가: 안티그래비티, 무엇을: overflow 해제, 어디서: MealPage.css 13-14번째 줄, 어떻게: overflow-y: auto -> visible, 왜: 상단 음수 마진 버튼이 잘리지 않고 헤더 영역 위로 표시되게 하기 위해 */
 }
 
 .meal-content-row {
@@ -19,6 +19,7 @@
   align-items: flex-start;
   justify-content: center;
   width: 100%;
+  overflow: visible; /* [추가 2026-01-19] 누가: 효민, 무엇을: 행의 overflow를 visible로 설정, 어디서: MealPage.css 22번째 줄, 어떻게: overflow: visible 추가, 왜: 버튼이 카드 영역 바깥에 위치해도 보이도록 하기 위해 */
 }
 
 .meal-card {

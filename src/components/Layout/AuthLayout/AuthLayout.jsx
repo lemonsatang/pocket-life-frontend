@@ -30,3 +30,5 @@ const AuthLayout = ({ view, onGoLogin, onGoSignup, onLoginSuccess }) => {
 };
 
 export default AuthLayout;
+
+

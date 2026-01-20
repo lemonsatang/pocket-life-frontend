@@ -8,14 +8,51 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow: visible; /* [추가 2026-01-19] 누가: 효민, 무엇을: 컨테이너의 overflow를 visible로 설정, 어디서: MealStats.css 11번째 줄, 어떻게: overflow: visible 추가, 왜: 버튼이 카드 영역 바깥에 위치해도 보이도록 하기 위해 */
+}
+
+/* 영양요약 카드 래퍼 (버튼 배치를 위한 컨테이너) */
+/* [추가 2026-01-19] 누가: 효민, 무엇을: 영양요약 카드를 감싸는 래퍼 추가, 어디서: MealStats.css 12-18번째 줄, 어떻게: position: relative로 설정하여 버튼 배치 기준점으로 사용, overflow: visible로 설정하고 z-index 설정, 왜: 상세보기 버튼을 카드 외부 오른쪽 위에 배치하고 확실히 보이게 하기 위해 */
+.meal-stats-card-wrapper {
+  position: relative;
+  overflow: visible; /* [추가 2026-01-19] 누가: 효민, 무엇을: 래퍼의 overflow를 visible로 설정, 어디서: MealStats.css 16번째 줄, 어떻게: overflow: visible 추가, 왜: 버튼이 카드 영역 바깥에 위치해도 보이도록 하기 위해 */
+  margin-top: 0px; /* [수정 2026-01-20] 누가: 안티그래비티, 무엇을: 상단 여백 제거, 어디서: MealStats.css 19번째 줄, 어떻게: 15px -> 0px, 왜: 왼쪽 '식단 기록' 섹션과 상단 높이를 맞추기 위해 */
+  z-index: 10; /* [추가 2026-01-19] 누가: 효민, 무엇을: 래퍼의 z-index 설정, 어디서: MealStats.css 18번째 줄, 어떻게: z-index: 10 추가, 왜: 버튼이 다른 요소들 위에 표시되도록 하기 위해 */
+}
+
+/* 2. 상세보기 이동 버튼 */
+/* [수정 2026-01-19] 누가: 효민, 무엇을: 영양요약 카드 외부 오른쪽 위에 상세보기 이동 버튼 스타일 수정, 어디서: MealStats.css 20-38번째 줄, 어떻게: 버튼을 absolute positioning으로 카드 외부 오른쪽 위에 확실히 배치하고 z-index를 높여 보이도록 설정, 왜: 사용자 요청에 따라 버튼을 카드 외부에 배치하고 확실히 보이게 하기 위해 */
+.meal-stats-detail-btn {
+  position: absolute;
+  top: -48px; /* [수정 2026-01-20] 누가: 안티그래비티, 무엇을: 버튼 위치 최종 상향, 어디서: MealStats.css 27번째 줄, 어떻게: -36px -> -48px, 왜: 사용자 요청(더 위로) 반영 */
+  right: 15px; /* [수정 2026-01-19] 누가: 효민, 무엇을: 버튼을 오른쪽에서 약간 안쪽에 배치, 어디서: MealStats.css 26번째 줄, 어떻게: right를 0px에서 15px로 변경, 왜: 버튼이 카드 가장자리에서 약간 안쪽에 위치하도록 하기 위해 */
+  padding: 6px 14px;
+  background-color: #5e72e4;
+  color: white;
+  text-decoration: none;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: all 0.2s;
+  z-index: 9999; /* [수정 2026-01-19] 누가: 효민, 무엇을: 버튼 z-index를 매우 높게 설정, 어디서: MealStats.css 35번째 줄, 어떻게: z-index를 100에서 1000으로 변경, 왜: 버튼이 모든 요소 위에 확실히 표시되도록 하기 위해 */
+  white-space: nowrap; /* [추가 2026-01-19] 누가: 효민, 무엇을: 버튼 텍스트 줄바꿈 방지, 어디서: MealStats.css 36번째 줄, 어떻게: white-space: nowrap 추가, 왜: 버튼 텍스트가 줄바꿈되지 않도록 하기 위해 */
+}
+
+.meal-stats-detail-btn:hover {
+  background-color: #4c63d2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(94, 114, 228, 0.3);
 }
 
 /* 2. 영양 요약 카드 */
 .meal-stats-card {
+  overflow: visible !important; /* [추가 2026-01-19] 누가: 효민, 무엇을: 카드의 overflow를 visible로 강제 설정, 어디서: MealStats.css 49번째 줄, 어떻게: overflow: visible !important 추가, 왜: 버튼이 카드 영역 바깥에 위치해도 보이도록 하기 위해 */
   padding: 20px;
   margin: 0;
   width: auto !important; /* 추가: 고정 너비 해제 */
   min-width: 0 !important; /* 추가: 최소 너비 해제 */
+  position: relative; /* [추가 2026-01-19] 누가: 효민, 무엇을: 카드에 position: relative 설정, 어디서: MealStats.css 55번째 줄, 어떻게: position: relative 추가, 왜: z-index 컨텍스트를 생성하여 버튼이 제대로 표시되도록 하기 위해 */
+  z-index: 1; /* [추가 2026-01-19] 누가: 효민, 무엇을: 카드의 z-index 설정, 어디서: MealStats.css 56번째 줄, 어떻게: z-index: 1 추가, 왜: 버튼이 카드보다 위에 표시되도록 하기 위해 */
 }
 
 .meal-stats-title {
@@ -165,7 +202,7 @@
   border-radius: 20px;
   cursor: pointer;
   font-size: 0.95rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
 }
 

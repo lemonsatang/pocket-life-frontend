@@ -6,7 +6,6 @@ import MealPage from "./pages/MealPage/MealPage";
 import Cart from "./pages/Cart";
 import SchedulePage from "./pages/SchedulePage/SchedulePage";
 import LedgerPage from "./pages/LedgerPage/LedgerPage";
-import StatsPage from "./pages/StatsPage/StatsPage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import Header from "./components/Layout/Header";
 import Footer from "./components/Layout/Footer";
@@ -70,11 +69,10 @@ export default function App() {
             <main className="main-content">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/meal" element={<MealPage />} />
+                <Route path="/meal" element={<MealPage onLogout={logout} />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/schedule" element={<SchedulePage />} />
                 <Route path="/ledger" element={<LedgerPage />} />
-                <Route path="/stats" element={<StatsPage />} />
                 {/* 이미 로그인 된 상태에서 리다이렉트 페이지 오면 홈으로 보냄 */}
                 <Route path="/oauth2/redirect" element={<Navigate to="/" />} />
                 <Route path="*" element={<NotFoundPage />} />
