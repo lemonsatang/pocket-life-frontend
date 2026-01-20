@@ -1,54 +1,55 @@
-/* LedgerPage.css */
 @import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
 
 .ledger-wrapper {
-  background-color: #f0f0ff;
+  background-color: transparent;
   min-height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-left: 40px;
   font-family: "Jua", sans-serif;
 }
 
 .ledger-container {
   display: flex;
-  width: 100%;
-  max-width: 1400px;
-  height: 850px;
-  gap: 20px;
+  width: auto;
+  height: auto;
+  gap: 35px;
+  margin-top: 10px;
 }
 
-/* 사이드바 */
 .sidebar {
-  width: 220px;
+  width: 210px;
   background-color: #b8b8ff;
-  border-radius: 40px;
-  padding: 50px 20px;
+  border-radius: 20px;
+  padding: 30px 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
   flex-shrink: 0;
+  /* 📍 사이드바 길이 절대 고정 */
+  min-height: 520px;
 }
 
 .brand-logo {
-  font-size: 24px;
+  font-size: 20px;
   color: #333;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
+  margin-top: 10px;
 }
 .side-nav {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
 }
 .nav-btn {
   width: 100%;
-  padding: 15px;
-  border-radius: 25px;
+  padding: 12px;
+  border-radius: 12px;
   border: none;
   background: white;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   font-family: "Jua", sans-serif;
 }
@@ -57,44 +58,40 @@
   color: white;
 }
 
-/* 메인 보드 */
 .main-board {
-  flex: 1;
+  /* 📍 대시보드 겉 박스 너비 절대 고정 */
+  flex: 0 0 880px;
   background-color: #eaedf7;
-  border: 12px solid white;
-  border-radius: 40px;
-  padding: 25px 30px;
+  border: 8px solid white;
+  border-radius: 25px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
+  height: fit-content;
+  /* 📍 하단 패딩 절대 고정 (여백 유지) */
+  padding-bottom: 120px;
 }
 
-/* 📍 수정의 핵심: 길게 이어진 흰색 한 칸 */
 .header-single-bar {
-  background-color: white; /* 한 칸으로 이어지는 흰색 배경 */
-  border-radius: 25px;
-  padding: 12px 30px;
+  background-color: white;
+  border-radius: 15px;
+  padding: 10px 25px;
   display: flex;
-  justify-content: space-between; /* 글자와 날짜를 양 끝으로 */
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  margin-bottom: 15px;
 }
 
 .view-title {
-  font-size: 18px;
+  font-size: 14px;
   color: #333;
   margin: 0;
-  font-weight: normal;
+  font-weight: bold;
 }
-
 .date-badge {
-  background-color: #8e8efc; /* 1번 시안의 진보라 */
+  background-color: #8e8efc;
   color: white;
-  padding: 6px 25px;
-  border-radius: 15px;
-  font-size: 15px;
-}
-
-.view-content {
-  flex: 1;
+  padding: 4px 15px;
+  border-radius: 10px;
+  font-size: 11px;
 }
