@@ -20,8 +20,6 @@ dataApi.interceptors.request.use((config) => {
     config.headers.Authorization = token.startsWith("Bearer ")
       ? token
       : `Bearer ${token}`;
-
-    console.log("DEBUG: Final Header:", config.headers.Authorization);
   }
   return config;
 });

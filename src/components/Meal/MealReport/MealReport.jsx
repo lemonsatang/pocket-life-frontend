@@ -265,12 +265,12 @@ const MealReport = () => {
       const prevEnd = formatDate(prevRange.endDate);
 
       // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 디버깅을 위한 로그 추가, 어디서: StatsPage.jsx 110-113번째 줄, 어떻게: 조회 기간과 날짜 범위를 콘솔에 출력, 왜: 식단 데이터가 통계에 반영되지 않는 문제를 디버깅하기 위해
-      console.log("DEBUG: 통계 조회 기간", {
-        periodType,
-        currentDate: formatDate(new Date(currentDate)),
-        currentRange: { start: currentStart, end: currentEnd },
-        prevRange: { start: prevStart, end: prevEnd },
-      });
+      // console.log("DEBUG: 통계 조회 기간", {
+      //   periodType,
+      //   currentDate: formatDate(new Date(currentDate)),
+      //   currentRange: { start: currentStart, end: currentEnd },
+      //   prevRange: { start: prevStart, end: prevEnd },
+      // });
 
       try {
         // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API 호출을 fallback 방식으로 변경, 어디서: StatsPage.jsx 115-145번째 줄, 어떻게: 신규 API 실패 시 기존 API로 여러 날짜 조회 후 프론트에서 집계, 왜: 백엔드 신규 API가 아직 구현되지 않아 404 에러가 발생하기 때문에
@@ -316,12 +316,12 @@ const MealReport = () => {
             ]);
 
           // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API 응답 디버깅 로그 추가, 어디서: StatsPage.jsx 130-135번째 줄, 어떻게: 각 API 응답을 콘솔에 출력, 왜: 데이터가 제대로 조회되는지 확인하기 위해
-          console.log("DEBUG: 신규 API 응답", {
-            meal: resMealCurrent?.data,
-            cart: resCartCurrent?.data,
-            todo: resTodoCurrent?.data,
-            category: resCategoryCurrent?.data,
-          });
+          // console.log("DEBUG: 신규 API 응답", {
+          //   meal: resMealCurrent?.data,
+          //   cart: resCartCurrent?.data,
+          //   todo: resTodoCurrent?.data,
+          //   category: resCategoryCurrent?.data,
+          // });
         } catch (e) {
           console.log("신규 API 실패, fallback 사용:", e);
         }
@@ -376,17 +376,17 @@ const MealReport = () => {
                   Number(meals.data.totalCalories) || 0;
                 resMealCurrent.data.targetCalories +=
                   Number(meals.data.targetCalories) || 2000;
-                console.log(
-                  `DEBUG: 날짜 ${dateStr} 식단 통계`,
-                  meals.data,
-                  "누적:",
-                  resMealCurrent.data
-                );
+                // console.log(
+                //   `DEBUG: 날짜 ${dateStr} 식단 통계`,
+                //   meals.data,
+                //   "누적:",
+                //   resMealCurrent.data
+                // );
               }
 
               // /api/stats/cart는 통계 객체 {purchaseRate, totalQuantity, purchasedQuantity}를 반환
               // [수정 2026-01-19] 누가: 효민, 무엇을: 장바구니 통계 데이터 조회 디버깅 로그 추가 및 데이터 누적 처리 개선, 어디서: StatsPage.jsx 314-321번째 줄, 어떻게: 각 날짜별 장바구니 데이터를 콘솔에 출력하고 누적 처리, 왜: 통계 페이지에서 장바구니 데이터가 제대로 표시되지 않는 문제 디버깅을 위해
-              console.log(`DEBUG: 날짜 ${dateStr} 장바구니 통계`, cart.data);
+              // console.log(`DEBUG: 날짜 ${dateStr} 장바구니 통계`, cart.data);
               if (cart.data && cart.data.totalQuantity !== undefined) {
                 if (!resCartCurrent?.data) {
                   resCartCurrent = {
