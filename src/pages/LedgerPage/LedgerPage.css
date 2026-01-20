@@ -92,7 +92,7 @@
   display: flex; /* 제목과 날짜를 양끝으로 배치하기 위해 사용 */
   justify-content: space-between; /* 제목은 왼쪽 끝, 날짜는 오른쪽 끝으로 배치 */
   align-items: center; /* 세로 높이 기준 정중앙 정렬 */
-  margin-bottom: 15px; /* 아래 대시보드 내용과의 간격 */
+  margin-bottom: 30px; /* 아래 대시보드 내용과의 간격 */
 }
 
 /* 페이지 제목 (가계부 대시보드) */
