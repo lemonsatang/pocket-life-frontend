@@ -1,11 +1,9 @@
-/* [전체 레이아웃] 칸 사이의 수직 간격을 73px로 유지하여 1번 이미지와 똑같이 만듭니다. */
 .dash-container {
   display: flex;
   flex-direction: column;
   gap: 70px;
 }
 
-/* [상단 카드 영역] */
 .stat-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -34,37 +32,33 @@
   color: #bbb;
 }
 
-/* [하단 영역 레이아웃] '칸 사이즈'를 결정하는 핵심 부분 (절대 수정 금지) */
 .bottom-content-area {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: 15px;
-  height: 270px; /* 📍 전체 높이 280px 고정 */
+  height: 270px; /* 전체 높이 고정 */
 }
 
 .outside-header {
   margin-bottom: 10px;
 }
 
-/* 📍 요청사항: 월간 지출 밑 서브텍스트 글자 크기 축소 */
 .header-subtitle {
-  font-size: 13px; /* 기존보다 줄여서 시안의 느낌을 살림 */
+  font-size: 13px;
   color: #888;
 }
 
-/* [핑크색 박스 디자인] */
 .inner-pink-box {
   flex: 1;
   background-color: #fde2e7;
   border-radius: 15px;
-  padding: 10px; /* 내부 그래프와 테두리 사이 여백 */
+  padding: 10px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* [최근 거래 테이블 디자인] */
 .content-card {
   background: white;
   border-radius: 15px;
@@ -79,6 +73,7 @@
   width: 100%;
   border-collapse: collapse;
 }
+
 .transaction-table td {
   padding: 12px 0;
   font-size: 14px;
@@ -86,7 +81,6 @@
   border-bottom: 1px solid #f9f9f9;
 }
 
-/* 수입/지출 태그 디자인 */
 .tag-in {
   background: #34a853;
   color: white;
@@ -94,6 +88,7 @@
   border-radius: 5px;
   font-size: 11px;
 }
+
 .tag-ex {
   background: #ea4335;
   color: white;
@@ -101,6 +96,7 @@
   border-radius: 5px;
   font-size: 11px;
 }
+
 .txt-bold {
   font-weight: bold;
   color: #000;
