@@ -31,8 +31,8 @@ const DashboardCard = ({
     isMeal &&
     list?.some((item) =>
       cheatMeals.some((cheat) =>
-        (item.text || item.menuName || "").includes(cheat.name)
-      )
+        (item.text || item.menuName || "").includes(cheat.name),
+      ),
     );
 
   // [Logic] 치팅 데이 조건: 칼로리 2000 초과 AND 치팅 식단 포함
@@ -104,8 +104,8 @@ const DashboardCard = ({
                           ? "✅ "
                           : "🛒 "
                         : item.isDone
-                        ? "✅ "
-                        : "• "}
+                          ? "✅ "
+                          : "• "}
                       {isMeal && item.mealType && (
                         <strong className="dashboard-card-list-item-meal-type">
                           [{item.mealType}]
