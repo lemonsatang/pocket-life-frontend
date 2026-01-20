@@ -8,24 +8,23 @@ const LedgerPage = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [transactions, setTransactions] = useState([]);
 
-  // [1. 서버에서 test1의 기록 불러오기]
+  // [1. 서버에서 거래 기록 불러오기]
   const fetchTransactions = async () => {
     try {
-      // 백엔드 컨트롤러의 @GetMapping("/api/tx")와 일치시킴
-      // 현재 날짜 기준 연/월 파라미터를 보낼 수도 있지만, 일단 전체 조회로 시작합니다.
+      // 백엔드 전체 조회 API 호출
       const response = await dataApi.get("/api/tx");
 
-      /* 백엔드 데이터(Tx)를 프론트엔드 UI용 데이터 형식으로 변환 */
+      /* 백엔드 데이터를 프론트엔드 UI 형식으로 변환 */
       const mappedData = response.data.map((t) => ({
         id: t.id,
         date: t.txDate.replace(/-/g, ".").slice(5), // "2026-01-25" -> "01.25"
-        item: t.title, // 백엔드의 title -> 프론트의 item
+        item: t.title,
         category: t.category,
         memo: t.memo,
         amount: t.amount,
-        type: t.type === "INCOME" ? "수입" : "지출", // 백엔드 Enum 대응
+        type: t.type === "INCOME" ? "수입" : "지출",
         isIn: t.type === "INCOME",
-        rawDate: t.txDate, // 원본 날짜 저장
+        rawDate: t.txDate,
       }));
 
       setTransactions(mappedData);
@@ -38,12 +37,11 @@ const LedgerPage = () => {
     fetchTransactions();
   }, []);
 
-  // [2. 새로운 내역 추가]
+  // [2. 새로운 내역 추가 함수]
   const handleAddTransaction = async (formData) => {
     try {
-      // 백엔드 TxDTO.TxRequest 형식에 맞게 데이터 가공
       const requestData = {
-        txDate: formData.date, // "YYYY-MM-DD" 형태여야 함
+        txDate: formData.date,
         title: formData.item,
         category: formData.category,
         memo: formData.memo || "",
@@ -52,15 +50,15 @@ const LedgerPage = () => {
       };
 
       await dataApi.post("/api/tx", requestData);
-      await fetchTransactions(); // 저장 후 새로고침
-      setActiveTab("dashboard");
+      await fetchTransactions(); // 저장 후 목록 새로고침
+      setActiveTab("dashboard"); // 저장 후 대시보드로 이동
     } catch (error) {
       console.error("저장 실패:", error);
       alert("데이터 저장에 실패했습니다.");
     }
   };
 
-  // [3. 내역 삭제]
+  // [3. 내역 삭제 함수]
   const handleDeleteTransaction = async (id) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
     try {
@@ -74,17 +72,22 @@ const LedgerPage = () => {
   return (
     <div className="ledger-wrapper">
       <div className="ledger-container">
+        {/* --- 왼쪽 사이드바 영역 --- */}
         <aside className="sidebar">
           <h2 className="brand-logo">Pocket Life</h2>
           <nav className="side-nav">
+            {/* [📍 스타일 수정 포인트] 
+               선택됨(active): 하얀 바탕 + 보라색 글자
+               선택 안됨: 보라색 바탕 + 하얀 글자 
+            */}
             <button
-              className={`nav-btn ${activeTab === "dashboard" ? "active" : ""}`}
+              className={`nav-btn ${activeTab === "dashboard" ? "active-white" : "inactive-purple"}`}
               onClick={() => setActiveTab("dashboard")}
             >
               대시보드
             </button>
             <button
-              className={`nav-btn ${activeTab === "transaction" ? "active" : ""}`}
+              className={`nav-btn ${activeTab === "transaction" ? "active-white" : "inactive-purple"}`}
               onClick={() => setActiveTab("transaction")}
             >
               거래내역
@@ -92,6 +95,7 @@ const LedgerPage = () => {
           </nav>
         </aside>
 
+        {/* --- 오른쪽 메인 콘텐츠 영역 --- */}
         <main className="main-board">
           <div className="header-single-bar">
             <h1 className="view-title">
