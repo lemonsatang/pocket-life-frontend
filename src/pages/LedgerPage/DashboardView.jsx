@@ -1,16 +1,15 @@
-import React from "react";
 import "./DashboardView.css";
 
-const DashboardView = () => {
-  /* [데이터 관리] 실제 테이블과 그래프에 표시될 거래 내역입니다. */
-  const transactions = [
-    { date: "01.10", item: "용돈", type: "수입", amount: 1575000, isIn: true },
-    { date: "01.15", item: "교통비", type: "지출", amount: 38000, isIn: false },
-    { date: "01.17", item: "식비", type: "지출", amount: 100000, isIn: false },
-    { date: "01.20", item: "편의점", type: "지출", amount: 20000, isIn: false },
-  ];
+/* 📍 부모(LedgerPage)가 보내주는 transactions 데이터를 받아옵니다. 
+  기존의 const DashboardView = () => { ... } 부분을 아래처럼 수정합니다.
+*/
+const DashboardView = ({ transactions }) => {
+  /* [중요!] 
+    기존에 이 안에 있던 const transactions = [...] 샘플 데이터 배열은 
+    이제 LedgerPage에서 관리하므로 여기서 지워주시면 됩니다. 
+  */
 
-  /* [금액 계산] 상단 카드에 들어갈 합산 수치들입니다. */
+  /* 아래의 모든 계산 로직과 SVG 그래프 코드는 이전과 100% 동일하게 유지됩니다. */
   const totalIncome = transactions
     .filter((t) => t.isIn)
     .reduce((sum, t) => sum + t.amount, 0);
@@ -19,7 +18,6 @@ const DashboardView = () => {
     .reduce((sum, t) => sum + t.amount, 0);
   const totalBalance = totalIncome - totalExpense;
 
-  /* [숫자 포맷] 세 자리마다 콤마를 찍어줍니다. */
   const formatNumber = (num) => num.toLocaleString();
 
   return (

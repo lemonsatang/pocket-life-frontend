@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./LedgerPage.css"; // 전체 레이아웃 스타일
-import DashboardView from "./DashboardView"; // 우리가 만든 예쁜 대시보드 화면
+import DashboardView from "./DashboardView"; // 대시보드 화면
 import TransactionView from "./TransactionView"; // 내역을 입력할 수 있는 새로운 화면
 
 const LedgerPage = () => {
