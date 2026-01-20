@@ -99,7 +99,7 @@ const DashboardView = ({ transactions }) => {
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="no-data">데이터가 없습니다.</div>
+                <div className="no-data">지출 내역이 없습니다.</div>
               )}
             </div>
           </div>
