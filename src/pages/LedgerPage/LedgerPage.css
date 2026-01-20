@@ -1,97 +1,114 @@
+/* 구글 폰트에서 'Jua' 서체를 불러옵니다. */
 @import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
 
+/* 1. 최상위 래퍼: 페이지 전체의 배경과 기본 정렬을 담당 */
 .ledger-wrapper {
-  background-color: transparent;
-  min-height: 100vh;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  padding-left: 40px;
-  font-family: "Jua", sans-serif;
+  background-color: transparent; /* 배경을 투명하게 설정 */
+  min-height: 100vh; /* 최소 높이를 브라우저 화면 꽉 차게 설정 */
+  display: flex; /* 내부 요소들을 가로로 배치하기 위해 플렉스 박스 사용 */
+  justify-content: flex-start; /* 가로 정렬을 왼쪽 시작점으로 설정 */
+  align-items: flex-start; /* 세로 정렬을 위쪽 시작점으로 설정 */
+  padding-left: 40px; /* 왼쪽 끝에서 40px만큼 여백을 줌 */
+  font-family: "Jua", sans-serif; /* 이 페이지 전체에 Jua 폰트 적용 */
 }
 
+/* 2. 컨테이너: 사이드바와 메인 보드를 감싸는 영역 */
 .ledger-container {
-  display: flex;
-  width: auto;
-  height: auto;
-  gap: 35px;
-  margin-top: 10px;
+  display: flex; /* 사이드바와 메인보드를 나란히 가로 배치 */
+  width: auto; /* 내용에 맞춰 너비 자동 조절 */
+  height: auto; /* 내용에 맞춰 높이 자동 조절 */
+  gap: 35px; /* 사이드바와 메인보드 사이의 간격 */
+  margin-top: 10px; /* 화면 상단에서 10px 내려오도록 설정 */
 }
 
+/* 3. 사이드바: 왼쪽 메뉴 영역 */
 .sidebar {
-  width: 210px;
-  background-color: #b8b8ff;
-  border-radius: 20px;
-  padding: 30px 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
+  width: 210px; /* 사이드바 너비를 210px로 고정 */
+  background-color: #b8b8ff; /* 연보라색 배경 */
+  border-radius: 20px; /* 모서리를 둥글게 */
+  padding: 30px 15px; /* 내부 위아래 30px, 좌우 15px 여백 */
+  display: flex; /* 로고와 버튼들을 세로로 정렬하기 위해 사용 */
+  flex-direction: column; /* 내부 요소들을 위에서 아래로 쌓음 */
+  align-items: center; /* 요소들을 가로 중앙에 배치 */
+  flex-shrink: 0; /* 화면이 좁아져도 사이드바 크기가 줄어들지 않게 함 */
   /* 📍 사이드바 길이 절대 고정 */
-  min-height: 520px;
+  min-height: 520px; /* 최소 높이를 520px로 유지 */
 }
 
+/* 사이드바 로고 텍스트 */
 .brand-logo {
-  font-size: 20px;
-  color: #333;
-  margin-bottom: 30px;
-  margin-top: 10px;
+  font-size: 20px; /* 글자 크기 */
+  color: #333; /* 짙은 회색 */
+  margin-bottom: 30px; /* 아래쪽 메뉴 버튼과의 간격 */
+  margin-top: 10px; /* 로고 위쪽 여백 */
 }
+
+/* 메뉴 버튼들을 감싸는 네비게이션 영역 */
 .side-nav {
-  width: 100%;
+  width: 100%; /* 사이드바 너비에 꽉 차게 설정 */
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 10px; /* 버튼 사이의 수직 간격 */
 }
+
+/* 기본 메뉴 버튼 스타일 */
 .nav-btn {
   width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
-  background: white;
-  font-size: 14px;
-  cursor: pointer;
+  padding: 12px; /* 버튼 안쪽 여백 */
+  border-radius: 12px; /* 버튼 모서리를 둥글게 */
+  border: none; /* 테두리 없음 */
+  background: white; /* 기본 배경 하얀색 */
+  font-size: 14px; /* 버튼 글자 크기 */
+  cursor: pointer; /* 마우스를 올리면 손가락 모양으로 변경 */
   font-family: "Jua", sans-serif;
 }
+
+/* 활성화된 버튼 (클릭된 상태) 스타일 */
 .nav-btn.active {
-  background-color: #8e8efc;
-  color: white;
+  background-color: #8e8efc; /* 좀 더 진한 보라색으로 변경 */
+  color: white; /* 글자색을 하얀색으로 변경 */
 }
 
+/* 4. 메인 보드: 오른쪽의 큰 대시보드 영역 */
 .main-board {
   /* 📍 대시보드 겉 박스 너비 절대 고정 */
-  flex: 0 0 880px;
-  background-color: #eaedf7;
-  border: 8px solid white;
-  border-radius: 25px;
-  padding: 20px;
+  flex: 0 0 880px; /* 너비를 880px로 딱 고정 (줄어들거나 늘어나지 않음) */
+  background-color: #eaedf7; /* 연한 푸른빛이 도는 배경색 */
+  border: 8px solid white; /* 8px 두께의 하얀색 테두리 */
+  border-radius: 25px; /* 메인보드 모서리를 25px만큼 둥글게 */
+  padding: 20px; /* 테두리 안쪽의 전체 여백 */
   display: flex;
-  flex-direction: column;
-  height: fit-content;
+  flex-direction: column; /* 내부 요소(헤더바, 컨텐츠)를 위아래로 배치 */
+  height: fit-content; /* 내용물의 높이에 맞춰 박스 높이가 조절됨 */
   /* 📍 하단 패딩 절대 고정 (여백 유지) */
-  padding-bottom: 120px;
+  padding-bottom: 120px; /* 맨 밑에 120px의 넉넉한 공간을 두어 답답하지 않게 함 */
 }
 
+/* 상단 타이틀 바 (가계부 대시보드 / 날짜가 들어있는 영역) */
 .header-single-bar {
-  background-color: white;
-  border-radius: 15px;
-  padding: 10px 25px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
+  background-color: white; /* 배경 하얀색 */
+  border-radius: 15px; /* 테두리 둥글게 */
+  padding: 10px 25px; /* 좌우로 긴 여백을 주어 텍스트 보호 */
+  display: flex; /* 제목과 날짜를 양끝으로 배치하기 위해 사용 */
+  justify-content: space-between; /* 제목은 왼쪽 끝, 날짜는 오른쪽 끝으로 배치 */
+  align-items: center; /* 세로 높이 기준 정중앙 정렬 */
+  margin-bottom: 15px; /* 아래 대시보드 내용과의 간격 */
 }
 
+/* 페이지 제목 (가계부 대시보드) */
 .view-title {
-  font-size: 14px;
+  font-size: 18px; /* 제목 폰트 크기 */
   color: #333;
   margin: 0;
-  font-weight: bold;
+  font-weight: bold; /* 두껍게 강조 */
 }
+
+/* 날짜 배지 (2026년 1월) */
 .date-badge {
-  background-color: #8e8efc;
-  color: white;
-  padding: 4px 15px;
-  border-radius: 10px;
-  font-size: 11px;
+  background-color: #8e8efc; /* 보라색 배경 */
+  color: white; /* 하얀색 글자 */
+  padding: 6px 20px; /* 배지 안 여백 (키워놓으신 사이즈) */
+  border-radius: 12px; /* 배지 모서리를 둥글게 */
+  font-size: 14px; /* 날짜 폰트 크기 */
+  font-weight: bold;
 }
