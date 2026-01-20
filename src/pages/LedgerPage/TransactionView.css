@@ -1,9 +1,13 @@
+/* [0. 📍 구글 폰트에서 'Jua' 서체를 불러옵니다. ] */
+@import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
+
 /* [1. 전체 레이아웃 구성] */
 .transaction-view-container {
   display: flex;
   gap: 20px;
   height: 100%;
-  font-family: "Noto Sans KR", sans-serif;
+  /* 📍 Noto Sans KR 대신 Jua 폰트로 변경 */
+  font-family: "Jua", sans-serif;
 }
 .left-transaction-panel {
   flex: 2.5;
@@ -41,6 +45,8 @@
   color: #666;
   outline: none;
   cursor: pointer;
+  /* 📍 폰트 적용 확인 */
+  font-family: "Jua", sans-serif;
 }
 
 /* 필터 버튼 그룹 스타일 */
@@ -60,6 +66,8 @@
   font-size: 13px;
   color: #777;
   transition: 0.2s;
+  /* 📍 폰트 적용 확인 */
+  font-family: "Jua", sans-serif;
 }
 .filter-btn.active {
   background: white;
@@ -108,6 +116,8 @@
   color: white;
   cursor: pointer;
   min-width: 42px;
+  /* 📍 버튼 내부 폰트 적용 */
+  font-family: "Jua", sans-serif;
 }
 .edit-pill {
   background-color: #34a853;
@@ -166,6 +176,8 @@
   cursor: pointer;
   color: #999;
   font-size: 13px;
+  /* 📍 폰트 적용 확인 */
+  font-family: "Jua", sans-serif;
 }
 .type-selector button.active {
   background: #b2b2ff;
@@ -186,6 +198,8 @@
   font-size: 13px;
   width: 100%;
   box-sizing: border-box;
+  /* 📍 입력 필드 폰트 적용 */
+  font-family: "Jua", sans-serif;
 }
 .submit-save-btn {
   width: 100%;
@@ -197,6 +211,8 @@
   margin-top: 10px;
   font-weight: bold;
   cursor: pointer;
+  /* 📍 폰트 적용 확인 */
+  font-family: "Jua", sans-serif;
 }
 
 /* [7. 요약 정보 및 페이징] */
@@ -231,6 +247,8 @@
   cursor: pointer;
   color: #888;
   font-size: 12px;
+  /* 📍 숫자 폰트도 Jua로 */
+  font-family: "Jua", sans-serif;
 }
 .page-num-btn.active {
   background-color: #b2b2ff;
