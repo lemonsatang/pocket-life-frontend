@@ -1,123 +1,169 @@
+/* 1. 대시보드 전체 컨테이너: 상단 카드 영역과 하단 영역을 감쌈 */
 .dash-container {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  flex-direction: column; /* 세로 방향으로 배치 */
+  gap: 73px; /* 📍 수입/지출/합계 카드와 하단 영역 사이의 수직 간격 (수동 수정본) */
 }
 
+/* 2. 상단 통계 카드 행: 수입, 지출, 합계를 가로로 3등분 배치 */
 .stat-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr); /* 1:1:1 비율로 3개의 컬럼 생성 */
+  gap: 12px; /* 카드 사이의 가로 간격 */
 }
 
-.stat-card-white {
+/* 3. 각 통계 컬럼: 상단 글자(수입 등)와 하얀 카드를 세로로 묶음 */
+.stat-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* '수입' 글자와 하얀 카드 사이의 간격 */
+}
+
+/* 카드 외부 상단 라벨 (수입, 지출, 합계 글자) */
+.stat-label-outside {
+  font-size: 18px;
+  font-weight: bold;
+  color: #111;
+  text-align: left; /* 왼쪽 정렬 */
+  padding-left: 5px; /* 미세한 왼쪽 여백 */
+}
+
+/* 통계 데이터가 들어가는 하얀색 카드 박스 */
+.stat-card {
   background: white;
-  border-radius: 25px;
-  padding: 40px 20px;
+  border-radius: 15px; /* 모서리 곡률 */
+  padding: 50px 20px 60px 20px; /* 📍 카드의 내부 여백 (상 50, 좌우 20, 하 60 - 수동 수정본) */
   text-align: center;
-  position: relative;
+  position: relative; /* 하단 '이번달' 라벨 배치를 위한 기준점 */
 }
 
-.card-tag-top {
+/* 카드 오른쪽 하단에 붙는 작은 보조 라벨 (이번달, 남은금액 등) */
+.card-sub-label {
   position: absolute;
-  top: 18px;
-  left: 25px;
-  font-size: 13px;
-  color: #888;
-  font-weight: bold;
-}
-.card-tag-bottom {
-  position: absolute;
-  bottom: 18px;
-  right: 25px;
+  bottom: 12px;
+  right: 15px;
   font-size: 11px;
-  color: #ccc;
+  color: #bbb;
 }
-.card-amount-black {
-  font-size: 22px;
-  font-weight: bold;
+
+/* 카드 중앙에 표시되는 큰 금액 수치 */
+.card-value {
+  font-size: 26px;
+  font-weight: 800;
   color: #000;
 }
 
-.bottom-row {
+/* 4. 하단 컨텐츠 영역: 월간 지출(그래프)과 최근 거래(표)를 배치 */
+.bottom-content-area {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 20px;
-  height: 320px;
+  grid-template-columns: 1.2fr 1fr; /* 월간 지출 영역을 조금 더 넓게 설정 */
+  gap: 15px;
+  height: 280px; /* 영역 전체 높이 고정 */
 }
 
-.bottom-white-box {
-  background-color: white;
-  border-radius: 30px;
-  padding: 25px; /* 여백을 조금 더 줌 */
+/* 하단 각 구역의 기둥 역할을 하는 컨테이너 */
+.content-column {
   display: flex;
   flex-direction: column;
 }
 
-/* 📍 텍스트 영역 정렬 */
-.section-header-text {
-  margin-bottom: 15px;
+/* 하단 영역의 카드 밖 헤더 부분 */
+.outside-header {
+  margin-bottom: 20px; /* 제목과 아래 하얀 카드 사이의 간격 */
+}
+
+/* 월간 지출 헤더 (왼쪽 정렬) */
+.header-left {
   text-align: left;
+  height: 33px; /* 📍 제목 영역의 높이 (수동 수정본) */
 }
 
-.section-title {
-  font-size: 17px;
-  color: #333;
-  margin: 0;
+/* 구역 메인 제목 (월간 지출, 최근 거래 등) */
+.header-title {
+  font-size: 18px;
   font-weight: bold;
+  color: #111;
+  margin: 0;
 }
 
-.section-sub {
+/* 제목 아래 보조 설명 글자 */
+.header-subtitle {
   font-size: 12px;
-  color: #999;
-  margin: 5px 0 0 0;
+  color: #888;
+  margin: 4px 0 0 0;
 }
 
-.section-title-center {
-  font-size: 17px;
-  color: #333;
+/* 하단에 놓이는 하얀색 컨텐츠 카드 */
+.content-card {
+  background: white;
+  border-radius: 15px;
+  padding: 15px;
+  flex: 1; /* 부모 컨테이너의 남은 높이를 가득 채움 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 최근 거래 제목을 카드 내부 중앙에 배치하기 위한 헤더 */
+.inner-card-header {
   text-align: center;
-  margin-bottom: 20px;
-}
-
-.inner-red-box {
-  flex: 1;
-  background-color: #ffdae0;
-  border-radius: 20px;
-}
-
-.recent-table {
+  margin-bottom: 15px;
   width: 100%;
-  border-collapse: collapse;
 }
-.recent-table th {
-  font-size: 12px;
-  color: #bbb;
-  border-bottom: 1px solid #f5f5f5;
-  padding-bottom: 8px;
+
+/* 그래프 등이 들어갈 핑크색 내부 박스 */
+.inner-pink-box {
+  flex: 1;
+  background-color: #fde2e7;
+  border-radius: 12px;
 }
-.recent-table td {
-  padding: 10px 5px;
-  text-align: center;
+
+/* 5. 최근 거래 내역 테이블(표) 스타일 */
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse; /* 테두리 사이 간격 제거 */
+}
+
+/* 테이블 제목 행 (날짜, 항목 등) */
+.transaction-table th {
   font-size: 13px;
-  color: #333;
+  color: #777;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f2f2f2; /* 구분선 */
 }
-.row-amount-black {
+
+/* 테이블 데이터 셀 (각 줄의 내용) */
+.transaction-table td {
+  padding: 12px 0; /* 📍 4줄이 보기 좋게 들어가는 상하 간격 */
+  font-size: 14px;
+  text-align: center;
+  border-bottom: 1px solid #f9f9f9;
+}
+
+/* 마지막 줄은 구분선이 보이지 않도록 제거 */
+.transaction-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* 글자 굵게 강조 */
+.txt-bold {
   font-weight: bold;
   color: #000;
 }
 
-.badge-in {
-  background: #28a745;
+/* 수입 태그 (초록색 배경) */
+.tag-in {
+  background: #34a853;
   color: white;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 11px;
 }
-.badge-ex {
-  background: #dc3545;
+
+/* 지출 태그 (빨간색 배경) */
+.tag-ex {
+  background: #ea4335;
   color: white;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 11px;
 }
