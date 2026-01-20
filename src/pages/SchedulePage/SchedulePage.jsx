@@ -46,13 +46,13 @@ const SchedulePage = () => {
   // 이전달로 이동
   const prevMonth = () =>
     setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1),
     );
 
   // 다음달로 이동
   const nextMonth = () =>
     setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1),
     );
 
   // 캘린더 생성
@@ -256,7 +256,9 @@ const SchedulePage = () => {
           <button onClick={prevMonth} className="nav-btn">
             {"<"}
           </button>
-          {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
+          <span className="calendar-title-text">
+            {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
+          </span>
           <button onClick={nextMonth} className="nav-btn">
             {">"}
           </button>
@@ -304,7 +306,7 @@ const SchedulePage = () => {
             {selectedDate}일
             {(() => {
               const h = holidays.find(
-                (h) => Number(h.locdate) % 100 === selectedDate
+                (h) => Number(h.locdate) % 100 === selectedDate,
               );
               return h ? (
                 <span className="holiday-text-inline"> {h.dateName}</span>
