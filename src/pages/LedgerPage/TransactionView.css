@@ -1,173 +1,250 @@
-/* 레이아웃: 목록(2.5) : 입력/요약(1.2) */
-.tx-flex-row {
+/* [1. 전체 레이아웃 구성] */
+.transaction-view-container {
   display: flex;
-  gap: 25px;
-  align-items: flex-start;
+  gap: 20px;
+  height: 100%;
+  font-family: "Noto Sans KR", sans-serif;
 }
-
-.list-section {
+.left-transaction-panel {
   flex: 2.5;
-  min-height: 800px;
   display: flex;
   flex-direction: column;
+  gap: 15px;
 }
-
-/* 필터 탭 (전체/수입/지출) */
-.list-header-row {
+.right-input-panel {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.filter-tabs button {
-  padding: 10px 22px;
-  border-radius: 25px;
-  border: none;
-  background: #f1f3f9;
+/* [2. 📍 상단 컨트롤 바 스타일 (정렬 드롭다운과 필터 버튼을 한 줄에 배치)] */
+.table-top-bar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.top-controls-left-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+} /* 정렬창과 버튼 그룹 사이 간격 */
+
+/* 정렬 드롭다운 스타일 */
+.top-sort-select {
+  padding: 6px 10px;
+  border-radius: 15px;
+  border: 1px solid #ddd;
+  background-color: white;
+  font-size: 13px;
+  color: #666;
+  outline: none;
   cursor: pointer;
-  font-size: 16px;
-  margin-right: 8px;
-  color: #888;
 }
 
-.filter-tabs button.active {
-  background-color: #8e8efc;
-  color: white;
+/* 필터 버튼 그룹 스타일 */
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+  background: #f0f0f0;
+  padding: 5px;
+  border-radius: 20px;
+}
+.filter-btn {
+  border: none;
+  background: none;
+  padding: 6px 18px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #777;
+  transition: 0.2s;
+}
+.filter-btn.active {
+  background: white;
+  color: #333;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* 거래 목록 테이블 */
-.main-table {
+/* [3. 리스트 테이블 디자인] */
+.transaction-list-card {
+  background: white;
+  border-radius: 20px;
+  padding: 10px 20px;
+  flex: 1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.transaction-table {
   width: 100%;
   border-collapse: collapse;
-}
-
-.main-table th {
-  padding: 15px;
-  border-bottom: 2px solid #f8faff;
-  color: #aaa;
-  font-size: 16px;
-  font-weight: normal;
-}
-
-.main-table td {
-  padding: 20px 10px;
   text-align: center;
-  border-bottom: 1px solid #f2f5ff;
-  font-size: 18px;
 }
-
-/* 카테고리 뱃지 */
-.badge {
-  background: #f0f4ff;
-  color: #5c62d6;
-  padding: 5px 12px;
-  border-radius: 12px;
+.transaction-table th {
+  padding: 12px;
+  border-bottom: 2px solid #f0f0f0;
+  color: #777;
+  font-size: 14px;
+}
+.transaction-table td.td-narrow {
+  padding: 8px 5px;
+  border-bottom: 1px solid #f9f9f9;
   font-size: 14px;
 }
 
-/* 🔢 하단 페이징: 시안의 보라색 원형 */
-.pagination-wrapper {
+/* [4. 알약 버튼 스타일 (수정/삭제)] */
+.action-button-group {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-top: auto;
-  padding-top: 30px;
+  gap: 4px;
 }
-
-.page-num-btn {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
+.pill-btn {
   border: none;
-  background: #eaedf7;
-  color: #777;
-  cursor: pointer;
-}
-
-.page-num-btn.active {
-  background-color: #8e8efc;
-  color: white;
-}
-
-/* ✍️ 오른쪽 사이드 섹션 */
-.side-section {
-  flex: 1.2;
-}
-
-/* 입력 필드 스택 */
-.type-toggle {
-  display: flex;
-  background: #f2f4f8;
-  padding: 6px;
-  border-radius: 18px;
-  margin-bottom: 20px;
-}
-
-.type-toggle button {
-  flex: 1;
-  padding: 14px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  border-radius: 14px;
-}
-
-.type-toggle button.active {
-  background-color: #8e8efc;
-  color: white;
-}
-
-.input-stack input,
-.input-stack textarea {
-  width: 100%;
-  padding: 18px;
-  margin-bottom: 12px;
-  border: 1.5px solid #f0f2f9;
+  padding: 4px 10px;
   border-radius: 20px;
-  background: #fafbff;
-  outline: none;
-}
-
-.main-save-btn {
-  width: 100%;
-  padding: 20px;
-  border-radius: 20px;
-  border: none;
-  background: #b8b8ff;
+  font-size: 11px;
+  font-weight: bold;
   color: white;
-  font-size: 22px;
   cursor: pointer;
+  min-width: 42px;
+}
+.edit-pill {
+  background-color: #34a853;
+}
+.delete-pill {
+  background-color: #ff0000;
 }
 
-/* 📊 요약 점선 디자인 (시안의 핵심) */
-.sum-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px 0;
-  border-bottom: 1px solid #f9faff;
+/* [5. 텍스트 및 카테고리 뱃지] */
+.category-badge {
+  background: #eeeeee;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  color: #555;
 }
-
-.total-row {
-  border-top: 2px dashed #eee; /* 시안의 그 가로 점선 */
-  margin-top: 15px;
-  padding-top: 20px;
+.plus-color {
+  color: #34a853;
 }
-
-.balance-text {
-  font-size: 28px;
+.minus-color {
+  color: #ff0000;
+}
+.text-bold {
   font-weight: bold;
 }
-
-.text-plus {
-  color: #2ecc71;
-}
-.text-minus {
-  color: #e74c3c;
+.text-memo {
+  color: #999;
+  font-size: 12px;
 }
 
-.row-action-btn {
-  padding: 6px 12px;
+/* [6. 오른쪽 사이드 카드 및 입력폼] */
+.side-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.card-header-title {
+  text-align: center;
+  font-size: 15px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  color: #333;
+}
+.type-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+.type-selector button {
+  flex: 1;
+  padding: 10px;
   border-radius: 10px;
   border: 1px solid #eee;
+  background: white;
   cursor: pointer;
+  color: #999;
+  font-size: 13px;
+}
+.type-selector button.active {
+  background: #b2b2ff;
+  color: white;
+  border-color: #b2b2ff;
+  font-weight: bold;
+}
+.input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.input-form input {
+  padding: 11px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  outline: none;
+  font-size: 13px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.submit-save-btn {
+  width: 100%;
+  padding: 13px;
+  background: #b2b2ff;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  margin-top: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* [7. 요약 정보 및 페이징] */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  font-size: 13px;
+}
+.summary-divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 10px 0;
+}
+.total-row {
+  font-size: 15px;
+  color: #333;
+}
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 15px;
+}
+.page-num-btn {
+  border: none;
+  background: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #888;
+  font-size: 12px;
+}
+.page-num-btn.active {
+  background-color: #b2b2ff;
+  color: white;
+  font-weight: bold;
+}
+.page-nav-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #b2b2ff;
+  font-weight: bold;
+}
+.page-nav-btn:disabled {
+  color: #ddd;
 }
