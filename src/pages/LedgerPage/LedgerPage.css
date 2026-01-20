@@ -63,13 +63,13 @@
   transition: all 0.3s ease; /* 색상 변경 시 부드럽게 전환 */
 }
 
-/* 📍 [수정] 활성화된 버튼 (클릭된 상태): 하얀 바탕 + 보라색 글자 */
+/* 📍 활성화된 버튼 (클릭된 상태): 하얀 바탕 + 보라색 글자 */
 .nav-btn.active-white {
   background-color: white !important; /* 배경을 하얀색으로 고정 */
   color: #8e8efc !important; /* 글자색을 보라색으로 설정 */
 }
 
-/* 📍 [수정] 비활성화된 버튼 (클릭 안 된 상태): 보라색 바탕 + 하얀 글자 */
+/* 📍 비활성화된 버튼 (클릭 안 된 상태): 보라색 바탕 + 하얀 글자 */
 .nav-btn.inactive-purple {
   background-color: #8e8efc !important; /* 배경을 진한 보라색으로 설정 */
   color: white !important; /* 글자색을 하얀색으로 설정 */
@@ -109,12 +109,23 @@
   font-weight: bold; /* 두껍게 강조 */
 }
 
-/* 날짜 배지 (2026년 1월) */
+/* 📍 날짜 배지 (2026년 1월) - 클릭 가능하도록 수정 */
 .date-badge {
   background-color: #8e8efc; /* 보라색 배경 */
   color: white; /* 하얀색 글자 */
-  padding: 6px 20px; /* 배지 안 여백 (키워놓으신 사이즈) */
+  padding: 6px 20px; /* 배지 안 여백 */
   border-radius: 12px; /* 배지 모서리를 둥글게 */
   font-size: 14px; /* 날짜 폰트 크기 */
   font-weight: bold;
+  cursor: pointer; /* 마우스 올리면 클릭 모양으로 변경 */
+  transition: background 0.2s;
+}
+
+.date-badge:hover {
+  background-color: #7a7afc; /* 마우스 올리면 색상 살짝 진하게 */
+}
+
+/* 📍 날짜 선택 팝업이 사이드바에 가려지지 않게 설정 */
+.react-datepicker-popper {
+  z-index: 100 !important;
 }

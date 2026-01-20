@@ -2,22 +2,28 @@ import React, { useState, useEffect } from "react";
 import "./LedgerPage.css";
 import DashboardView from "./DashboardView";
 import TransactionView from "./TransactionView";
-import dataApi from "../../api/api"; // 경로 확인 필요
+import dataApi from "../../api/api";
+// 📍 월 선택을 위한 DatePicker 라이브러리 추가 (이미 설치되어 있는 것 활용)
+import DatePicker, { registerLocale } from "react-datepicker";
+import { ko } from "date-fns/locale";
+import "react-datepicker/dist/react-datepicker.css";
+
+registerLocale("ko", ko);
 
 const LedgerPage = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [transactions, setTransactions] = useState([]);
+  // 📍 [추가] 현재 보고 있는 기준 월 상태 (기본값: 오늘 날짜의 월)
+  const [viewDate, setViewDate] = useState(new Date());
 
   // [1. 서버에서 거래 기록 불러오기]
   const fetchTransactions = async () => {
     try {
-      // 백엔드 전체 조회 API 호출
       const response = await dataApi.get("/api/tx");
 
-      /* 백엔드 데이터를 프론트엔드 UI 형식으로 변환 */
       const mappedData = response.data.map((t) => ({
         id: t.id,
-        date: t.txDate.replace(/-/g, ".").slice(5), // "2026-01-25" -> "01.25"
+        date: t.txDate.replace(/-/g, ".").slice(5),
         item: t.title,
         category: t.category,
         memo: t.memo,
@@ -50,8 +56,8 @@ const LedgerPage = () => {
       };
 
       await dataApi.post("/api/tx", requestData);
-      await fetchTransactions(); // 저장 후 목록 새로고침
-      setActiveTab("dashboard"); // 저장 후 대시보드로 이동
+      await fetchTransactions();
+      setActiveTab("dashboard");
     } catch (error) {
       console.error("저장 실패:", error);
       alert("데이터 저장에 실패했습니다.");
@@ -69,17 +75,19 @@ const LedgerPage = () => {
     }
   };
 
+  // 📍 [4. 필터링 로직] 현재 선택된 월(viewDate)에 해당하는 데이터만 추출
+  const currentMonthStr = viewDate.toISOString().substring(0, 7); // "2026-01" 형식
+  const monthlyTransactions = transactions.filter((t) =>
+    t.rawDate.startsWith(currentMonthStr),
+  );
+
   return (
     <div className="ledger-wrapper">
       <div className="ledger-container">
-        {/* --- 왼쪽 사이드바 영역 --- */}
+        {/* 사이드바 영역 */}
         <aside className="sidebar">
           <h2 className="brand-logo">Pocket Life</h2>
           <nav className="side-nav">
-            {/* [📍 스타일 수정 포인트] 
-               선택됨(active): 하얀 바탕 + 보라색 글자
-               선택 안됨: 보라색 바탕 + 하얀 글자 
-            */}
             <button
               className={`nav-btn ${activeTab === "dashboard" ? "active-white" : "inactive-purple"}`}
               onClick={() => setActiveTab("dashboard")}
@@ -95,21 +103,37 @@ const LedgerPage = () => {
           </nav>
         </aside>
 
-        {/* --- 오른쪽 메인 콘텐츠 영역 --- */}
+        {/* 메인 콘텐츠 영역 */}
         <main className="main-board">
           <div className="header-single-bar">
             <h1 className="view-title">
               {activeTab === "dashboard" ? "가계부 대시보드" : "거래내역 기록"}
             </h1>
-            <div className="date-badge">2026년 1월</div>
+
+            {/* 📍 [수정] 날짜 배지를 클릭하면 월을 선택할 수 있는 기능 추가 */}
+            <div className="date-badge-wrapper">
+              <DatePicker
+                selected={viewDate}
+                onChange={(date) => setViewDate(date)}
+                dateFormat="yyyy년 MM월"
+                showMonthYearPicker // 월/년 선택 모드 활성화
+                locale="ko"
+                customInput={
+                  <div className="date-badge" style={{ cursor: "pointer" }}>
+                    {viewDate.getFullYear()}년 {viewDate.getMonth() + 1}월 ▾
+                  </div>
+                }
+              />
+            </div>
           </div>
 
           <div className="view-content">
             {activeTab === "dashboard" ? (
-              <DashboardView transactions={transactions} />
+              // 📍 필터링된 월간 데이터를 하위 컴포넌트에 전달
+              <DashboardView transactions={monthlyTransactions} />
             ) : (
               <TransactionView
-                transactions={transactions}
+                transactions={monthlyTransactions}
                 onAddTransaction={handleAddTransaction}
                 onDeleteTransaction={handleDeleteTransaction}
               />
