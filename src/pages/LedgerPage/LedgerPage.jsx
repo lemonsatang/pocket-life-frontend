@@ -1,60 +1,88 @@
-import React, { useState } from "react";
-import "./LedgerPage.css"; // 전체 레이아웃 스타일
-import DashboardView from "./DashboardView"; // 대시보드 화면
-import TransactionView from "./TransactionView"; // 내역을 입력할 수 있는 새로운 화면
+import React, { useState, useEffect } from "react";
+import "./LedgerPage.css";
+import DashboardView from "./DashboardView";
+import TransactionView from "./TransactionView";
+import dataApi from "../../api/api"; // 경로 확인 필요
 
 const LedgerPage = () => {
-  /* [1. 화면 전환 상태 관리] 
-    - activeTab이 'dashboard'이면 대시보드 화면을 보여줍니다.
-    - activeTab이 'transaction'이면 거래내역 입력 화면을 보여줍니다.
-  */
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [transactions, setTransactions] = useState([]);
 
-  /* [2. 전체 가계부 데이터 저장소] 
-    - 이 데이터가 대시보드와 입력창 양쪽으로 전달됩니다.
-    - 여기서 데이터를 관리해야 입력창에서 저장한 데이터가 대시보드에 바로 반영됩니다.
-  */
-  const [transactions, setTransactions] = useState([
-    { date: "01.10", item: "용돈", type: "수입", amount: 1575000, isIn: true },
-    { date: "01.15", item: "교통비", type: "지출", amount: 38000, isIn: false },
-    { date: "01.17", item: "식비", type: "지출", amount: 100000, isIn: false },
-    { date: "01.20", item: "편의점", type: "지출", amount: 20000, isIn: false },
-  ]);
+  // [1. 서버에서 test1의 기록 불러오기]
+  const fetchTransactions = async () => {
+    try {
+      // 백엔드 컨트롤러의 @GetMapping("/api/tx")와 일치시킴
+      // 현재 날짜 기준 연/월 파라미터를 보낼 수도 있지만, 일단 전체 조회로 시작합니다.
+      const response = await dataApi.get("/api/tx");
 
-  /* [3. 새로운 내역 추가 함수] 
-    - TransactionView(입력창)에서 '저장'을 누르면 실행되는 함수입니다.
-    - newData: 사용자가 입력한 새로운 수입/지출 정보
-  */
-  const handleAddTransaction = (newData) => {
-    // 1. 기존 데이터(transactions) 앞에 새로운 데이터(newData)를 붙여서 업데이트합니다.
-    setTransactions([newData, ...transactions]);
+      /* 백엔드 데이터(Tx)를 프론트엔드 UI용 데이터 형식으로 변환 */
+      const mappedData = response.data.map((t) => ({
+        id: t.id,
+        date: t.txDate.replace(/-/g, ".").slice(5), // "2026-01-25" -> "01.25"
+        item: t.title, // 백엔드의 title -> 프론트의 item
+        category: t.category,
+        memo: t.memo,
+        amount: t.amount,
+        type: t.type === "INCOME" ? "수입" : "지출", // 백엔드 Enum 대응
+        isIn: t.type === "INCOME",
+        rawDate: t.txDate, // 원본 날짜 저장
+      }));
 
-    // 2. 저장이 완료되면 사용자가 결과를 바로 볼 수 있게 '대시보드' 화면으로 강제 이동시킵니다.
-    setActiveTab("dashboard");
+      setTransactions(mappedData);
+    } catch (error) {
+      console.error("기록 로드 실패:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  // [2. 새로운 내역 추가]
+  const handleAddTransaction = async (formData) => {
+    try {
+      // 백엔드 TxDTO.TxRequest 형식에 맞게 데이터 가공
+      const requestData = {
+        txDate: formData.date, // "YYYY-MM-DD" 형태여야 함
+        title: formData.item,
+        category: formData.category,
+        memo: formData.memo || "",
+        amount: parseInt(formData.amount),
+        type: formData.type === "수입" ? "INCOME" : "EXPENSE",
+      };
+
+      await dataApi.post("/api/tx", requestData);
+      await fetchTransactions(); // 저장 후 새로고침
+      setActiveTab("dashboard");
+    } catch (error) {
+      console.error("저장 실패:", error);
+      alert("데이터 저장에 실패했습니다.");
+    }
+  };
+
+  // [3. 내역 삭제]
+  const handleDeleteTransaction = async (id) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      await dataApi.delete(`/api/tx/${id}`);
+      await fetchTransactions();
+    } catch (error) {
+      console.error("삭제 실패:", error);
+    }
   };
 
   return (
     <div className="ledger-wrapper">
       <div className="ledger-container">
-        {/* --- 왼쪽 사이드바 영역 (메뉴 선택) --- */}
         <aside className="sidebar">
           <h2 className="brand-logo">Pocket Life</h2>
-
           <nav className="side-nav">
-            {/* [대시보드 버튼] 
-              - 현재 activeTab이 'dashboard'라면 'active' 클래스를 붙여서 보라색으로 강조합니다.
-              - 클릭하면 화면 모드를 'dashboard'로 바꿉니다.
-            */}
             <button
               className={`nav-btn ${activeTab === "dashboard" ? "active" : ""}`}
               onClick={() => setActiveTab("dashboard")}
             >
               대시보드
             </button>
-
-            {/* [거래내역 버튼] 
-              - 클릭하면 화면 모드를 'transaction'으로 바꿉니다.
-            */}
             <button
               className={`nav-btn ${activeTab === "transaction" ? "active" : ""}`}
               onClick={() => setActiveTab("transaction")}
@@ -64,9 +92,7 @@ const LedgerPage = () => {
           </nav>
         </aside>
 
-        {/* --- 오른쪽 메인 보드 영역 (내용 표시) --- */}
         <main className="main-board">
-          {/* 상단 타이틀 바: 현재 어떤 화면인지 제목을 보여줍니다. */}
           <div className="header-single-bar">
             <h1 className="view-title">
               {activeTab === "dashboard" ? "가계부 대시보드" : "거래내역 기록"}
@@ -74,19 +100,15 @@ const LedgerPage = () => {
             <div className="date-badge">2026년 1월</div>
           </div>
 
-          {/* 메인 뷰 내용 영역: activeTab 값에 따라 보여주는 컴포넌트가 달라집니다. */}
           <div className="view-content">
             {activeTab === "dashboard" ? (
-              /* [대시보드 모드] 
-                - 위에서 만든 'transactions' 데이터를 props로 전달합니다. 
-                - 대시보드는 이 데이터를 받아서 합계와 그래프를 그립니다.
-              */
               <DashboardView transactions={transactions} />
             ) : (
-              /* [거래내역 모드] 
-                - 데이터를 추가할 수 있는 'handleAddTransaction' 함수를 전달합니다.
-              */
-              <TransactionView onAddTransaction={handleAddTransaction} />
+              <TransactionView
+                transactions={transactions}
+                onAddTransaction={handleAddTransaction}
+                onDeleteTransaction={handleDeleteTransaction}
+              />
             )}
           </div>
         </main>
