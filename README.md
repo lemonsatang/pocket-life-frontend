@@ -58,7 +58,7 @@ Pocket Life는
 
 ---
 
-### 3-2. 주요 화면 스크린샷 (자동 슬라이드용 5장)
+### 3-2. 주요 화면 스크린샷
 
 <p align="center">
   <img src="./src/image/DashBorad.png" alt="대시보드 화면" width="260" />
