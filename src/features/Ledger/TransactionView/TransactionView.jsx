@@ -521,61 +521,9 @@ const TransactionView = ({
                 nextMonthButtonDisabled,
               }) => (
                 <div className="react-datepicker__header" style={{ position: "relative", textAlign: "center" }}>
-                  <button
-                    type="button"
-                    onClick={decreaseMonth}
-                    disabled={prevMonthButtonDisabled}
-                    className="react-datepicker__navigation react-datepicker__navigation--previous"
-                    aria-label="이전 달"
-                    style={{
-                      position: "absolute",
-                      left: "10px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      zIndex: 1,
-                      width: "32px",
-                      height: "32px",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: 0,
-                      outline: "none",
-                      color: "#5e72e4",
-                      fontSize: "1.2rem",
-                      opacity: prevMonthButtonDisabled ? 0.3 : 1
-                    }}
-                  >
-                    ◀
-                  </button>
                   <h2 className="react-datepicker__current-month">
                     {date.getFullYear()}년 {String(date.getMonth() + 1).padStart(2, "0")}월
                   </h2>
-                  <button
-                    type="button"
-                    onClick={increaseMonth}
-                    disabled={nextMonthButtonDisabled}
-                    className="react-datepicker__navigation react-datepicker__navigation--next"
-                    aria-label="다음 달"
-                    style={{
-                      position: "absolute",
-                      right: "10px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      zIndex: 1,
-                      width: "32px",
-                      height: "32px",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: 0,
-                      outline: "none",
-                      color: "#5e72e4",
-                      fontSize: "1.2rem",
-                      opacity: nextMonthButtonDisabled ? 0.3 : 1
-                    }}
-                  >
-                    ▶
-                  </button>
                 </div>
               )}
             />

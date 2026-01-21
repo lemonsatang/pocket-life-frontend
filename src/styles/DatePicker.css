@@ -17,6 +17,8 @@
 .react-datepicker__header {
   background-color: #ffffff !important;
   border-bottom: none !important;
+  position: relative !important;
+  overflow: visible !important;
 }
 
 .react-datepicker__current-month {

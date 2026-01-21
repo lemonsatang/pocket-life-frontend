@@ -23,6 +23,8 @@
   justify-content: center;
   gap: 15px;
   margin-bottom: 20px;
+  position: relative;
+  width: 100%;
 }
 
 .cart-main-date-btn {
@@ -35,6 +37,11 @@
   font-weight: bold;
   cursor: pointer;
   color: #4a5568;
+  white-space: nowrap;
+  display: inline-block;
+  width: 200px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 /* 3. 입력 그룹 */

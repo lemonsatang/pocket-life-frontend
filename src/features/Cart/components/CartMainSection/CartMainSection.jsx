@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import CartItem from "../CartItem/CartItem";
 import "./CartMainSection.css";
 
 const CartMainSection = (props) => {
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false); // 달력 열림/닫힘 상태
   const {
     currentDate,
     onDateChange,
@@ -47,16 +48,103 @@ const CartMainSection = (props) => {
         >
           ◀
         </button>
-        <DatePicker
-          selected={currentDate}
-          onChange={onDatePickerChange}
-          dateFormat="yyyy년 MM월 dd일 eeee"
-          customInput={
-            <span className="cart-main-date-input">
-              {getDateStr(currentDate)} 📅
-            </span>
-          }
-        />
+        <div style={{ width: "200px", display: "flex", justifyContent: "center" }}>
+          <DatePicker
+            selected={currentDate}
+            onChange={(date) => {
+              onDatePickerChange(date);
+              setIsDatePickerOpen(false);
+            }}
+            open={isDatePickerOpen}
+            onInputClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+            onClickOutside={() => setIsDatePickerOpen(false)}
+            dateFormat="yyyy년 MM월 dd일 eeee"
+            customInput={
+              <span 
+                className="cart-main-date-input"
+                onClick={(e) => {
+                  setIsDatePickerOpen(!isDatePickerOpen);
+                  if (e) e.stopPropagation();
+                }}
+              >
+                {getDateStr(currentDate)} 📅
+              </span>
+            }
+            renderCustomHeader={({
+              date,
+              decreaseMonth,
+              increaseMonth,
+              prevMonthButtonDisabled,
+              nextMonthButtonDisabled,
+            }) => (
+              <div className="react-datepicker__header" style={{ position: "relative", textAlign: "center", output: "visible" }}>
+                <button
+                  type="button"
+                  onClick={decreaseMonth}
+                  disabled={prevMonthButtonDisabled}
+                  className="date-nav-btn"
+                  aria-label="이전 달"
+                  style={{
+                    position: "absolute",
+                    left: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    zIndex: 10,
+                    width: "32px",
+                    height: "32px",
+                    background: "none",
+                    border: "none",
+                    cursor: prevMonthButtonDisabled ? "not-allowed" : "pointer",
+                    padding: 0,
+                    outline: "none",
+                    color: prevMonthButtonDisabled ? "#cbd5e0" : "#5e72e4",
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    lineHeight: 1,
+                  }}
+                >
+                  ◀
+                </button>
+                <h2 className="react-datepicker__current-month" style={{ margin: 0 }}>
+                  {date.getFullYear()}년 {String(date.getMonth() + 1).padStart(2, "0")}월
+                </h2>
+                <button
+                  type="button"
+                  onClick={increaseMonth}
+                  disabled={nextMonthButtonDisabled}
+                  className="date-nav-btn"
+                  aria-label="다음 달"
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    zIndex: 10,
+                    width: "32px",
+                    height: "32px",
+                    background: "none",
+                    border: "none",
+                    cursor: nextMonthButtonDisabled ? "not-allowed" : "pointer",
+                    padding: 0,
+                    outline: "none",
+                    color: nextMonthButtonDisabled ? "#cbd5e0" : "#5e72e4",
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    lineHeight: 1,
+                  }}
+                >
+                  ▶
+                </button>
+              </div>
+            )}
+          />
+        </div>
         <button
           className="cart-main-date-btn"
           onClick={() => onDateChange(1)}

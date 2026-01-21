@@ -131,6 +131,79 @@ const Home = () => {
             onChange={(date) => setCurrentDate(date)}
             dateFormat="yyyy년 MM월 dd일 eeee"
             customInput={<CustomInput />}
+            renderCustomHeader={({
+              date,
+              decreaseMonth,
+              increaseMonth,
+              prevMonthButtonDisabled,
+              nextMonthButtonDisabled,
+            }) => (
+              <div className="react-datepicker__header" style={{ position: "relative", textAlign: "center", output: "visible" }}>
+                <button
+                  type="button"
+                  onClick={decreaseMonth}
+                  disabled={prevMonthButtonDisabled}
+                  className="date-nav-btn"
+                  aria-label="이전 달"
+                  style={{
+                    position: "absolute",
+                    left: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    zIndex: 10,
+                    width: "32px",
+                    height: "32px",
+                    background: "none",
+                    border: "none",
+                    cursor: prevMonthButtonDisabled ? "not-allowed" : "pointer",
+                    padding: 0,
+                    outline: "none",
+                    color: prevMonthButtonDisabled ? "#cbd5e0" : "#5e72e4",
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    lineHeight: 1,
+                  }}
+                >
+                  ◀
+                </button>
+                <h2 className="react-datepicker__current-month" style={{ margin: 0 }}>
+                  {date.getFullYear()}년 {String(date.getMonth() + 1).padStart(2, "0")}월
+                </h2>
+                <button
+                  type="button"
+                  onClick={increaseMonth}
+                  disabled={nextMonthButtonDisabled}
+                  className="date-nav-btn"
+                  aria-label="다음 달"
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    zIndex: 10,
+                    width: "32px",
+                    height: "32px",
+                    background: "none",
+                    border: "none",
+                    cursor: nextMonthButtonDisabled ? "not-allowed" : "pointer",
+                    padding: 0,
+                    outline: "none",
+                    color: nextMonthButtonDisabled ? "#cbd5e0" : "#5e72e4",
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    lineHeight: 1,
+                  }}
+                >
+                  ▶
+                </button>
+              </div>
+            )}
           />
           <button
             onClick={() => {

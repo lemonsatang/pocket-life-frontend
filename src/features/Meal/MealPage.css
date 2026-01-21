@@ -35,6 +35,8 @@
   justify-content: center;
   gap: 20px;
   margin-bottom: 25px;
+  position: relative;
+  width: 100%;
 }
 
 .meal-date-input {
@@ -42,6 +44,12 @@
   color: #4a5568;
   cursor: pointer;
   font-size: 1.1rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-block;
+  width: 200px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .meal-type-buttons {
