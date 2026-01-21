@@ -4,11 +4,13 @@ import React, { useState } from "react";
 import Modal from "../../components/Modal/Modal";
 import axios from "axios";
 import "./LoginPage.css";
+import IdSearchModal from "../../components/Modal/IdSearchModal"; // 아이디찾기 모달
 
 export default function LoginPage({ onGoSignup, onLoginSuccess }) {
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
   const [showPw, setShowPw] = useState(false);
+  const [isIdModalOpen, setIsIdModalOpen] = useState(false); // 아이디찾기 모달 열기 여부
 
   const [m, setM] = useState({
     open: false,
@@ -25,25 +27,6 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
 
   // [Logic] 모달 닫기
   const close = () => setM((s) => ({ ...s, open: false }));
-
-  // [Logic] 회원가입 안내 모달
-  const openAskSignup = () => {
-    setM({
-      open: true,
-      title: "로그인 실패",
-      msg: "아이디/비밀번호가 없거나 맞지 않습니다.\n회원이 아니시라면 가입 하시겠습니까?",
-      showCancel: true,
-      confirmText: "회원가입",
-      cancelText: "취소",
-      // [수정 2026-01-15 09:40] 로그인 실패는 경고성 메시지로 처리 (빨강)
-      type: "warning",
-      onConfirm: () => {
-        close();
-        onGoSignup?.();
-      },
-      onCancel: close,
-    });
-  };
 
   // [Logic] 확인 모달 (기본값 warning -> 실패/경고가 많으므로, 성공일때만 success 명시)
   const openOk = (msg, after, type = "warning") => {
@@ -76,7 +59,7 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
       // 서버에 로그인 요청
       const response = await axios.post(
         "http://localhost:8080/login",
-        formData
+        formData,
       );
       console.log(response);
 
@@ -99,7 +82,7 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
             setPw("");
             onLoginSuccess?.();
           },
-          "success"
+          "success",
         );
       }
     } catch (e) {
@@ -117,15 +100,6 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
 
     // 백엔드 시큐리티가 기다리고 있는 인증 주소로 이동!
     window.location.href = `http://localhost:8080/oauth2/authorization/${lowerProvider}`;
-
-    // [수정 2026-01-15 09:40] 로그인 성공 -> success (초록)
-    // openOk(
-    //   `${provider} 계정으로 로그인되었습니다.`,
-    //   () => {
-    //     onLoginSuccess?.();
-    //   },
-    //   "success"
-    // );
   };
 
   return (
@@ -182,13 +156,17 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
         </button>
 
         <div className="miniLinks">
-          <button type="button" className="miniLink">
+          <button
+            type="button"
+            className="miniLink"
+            onClick={() => setIsIdModalOpen(true)}
+          >
             아이디 찾기
           </button>
-          <span className="dot" />
+          {/* <span className="dot" />
           <button type="button" className="miniLink">
             비밀번호 찾기
-          </button>
+          </button> */}
           <span className="dot" />
           <button type="button" className="miniLink" onClick={onGoSignup}>
             회원가입
@@ -236,6 +214,10 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
         onConfirm={m.onConfirm}
         onCancel={m.onCancel}
       />
+      {/* 아이디 찾기 모달 (조건부 렌더링) */}
+      {isIdModalOpen && (
+        <IdSearchModal onClose={() => setIsIdModalOpen(false)} />
+      )}
     </>
   );
 }
