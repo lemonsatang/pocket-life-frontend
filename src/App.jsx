@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home/Home";
-import MealPage from "./pages/MealPage/MealPage";
-import Cart from "./pages/Cart";
+import MealPage from "./features/Meal/MealPage";
+import Cart from "./features/Cart/CartPage";
 import SchedulePage from "./pages/SchedulePage/SchedulePage";
 import LedgerPage from "./pages/LedgerPage/LedgerPage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
@@ -16,7 +16,7 @@ import OAuth2RedirectHandler from "./api/OAuth2RedirectHandler";
 import "./styles/Common.css";
 import "./styles/DatePicker.css";
 
-import { MealProvider } from "./context/MealContext.jsx"; // [New]
+import { MealProvider } from "./features/Meal/context/MealContext.jsx"; // [New]
 
 // [Logic] 메인 App 컴포넌트
 export default function App() {

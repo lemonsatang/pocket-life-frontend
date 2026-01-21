@@ -1,14 +1,17 @@
-// [Layout] 통계 페이지 - 4분할 파이 차트 및 주/월 단위 통계
-// [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 통계 페이지를 4개 차트로 변경하고 주/월 단위 선택 기능 추가, 어디서: StatsPage.jsx, 어떻게: 기존 3개 차트를 4개로 변경하고 기간 선택 토글 추가, 왜: 사용자 요구사항 반영 (식단, 소비율, 장바구니, 일정 각각 별도 차트)
+// [Layout] 식단 상세 리포트 페이지 - 식단관리 차트 및 주/월 단위 통계
 import React, { useState, useEffect, useMemo } from "react";
-import { useMealContext } from "../../../context/MealContext.jsx";
-import dataApi from "../../../api/api";
+import { useMealContext } from "../../context/MealContext.jsx";
+import dataApi from "../../../../api/api";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ko } from "date-fns/locale";
 import "./MealReport.css";
+import { formatDate, getPeriodRange, getWeekRange, getWeeksList } from "./utils/dateUtils";
+import { calculateDietMealRate, calculateChangeRate } from "./utils/dietCalculationUtils";
+import { createDietPieData } from "./utils/chartDataUtils";
+import { dietPieOptions } from "./constants/chartConfig";
 
 // [Locale] DatePicker 한국어 설정
 registerLocale("ko", ko);
@@ -162,8 +165,7 @@ const MealReport = () => {
   // [추가 2026-01-19] 누가: 효민, 무엇을: 주 목록에서 필터링할 월 state 추가, 어디서: StatsPage.jsx 156번째 줄, 어떻게: useState로 선택된 월(0-11) 관리, null이면 전체 표시, 왜: 월별로 주를 필터링하고 해당 월의 주로 이동하기 위해
   const [selectedMonth, setSelectedMonth] = useState(null);
 
-  // [State] 현재 기간 데이터
-  // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 현재 기간의 4개 차트 데이터 state 추가, 어디서: StatsPage.jsx 28-32번째 줄, 어떻게: 식단, 소비율, 장바구니, 일정 점수를 각각 state로 관리, 왜: 각 차트별로 독립적인 데이터 관리 및 이전 기간과 비교하기 위해
+  // [State] 현재 기간 데이터 - 식단관리만
   const [currentDietScore, setCurrentDietScore] = useState(0); // 식단관리 점수
   const [currentDietDetail, setCurrentDietDetail] = useState({
     normalDays: 0,
@@ -171,13 +173,9 @@ const MealReport = () => {
     underDays: 0,
     totalPeriodDays: 0,
     dateStatusMap: { normal: [], over: [], under: [], noRecord: [] },
-  }); // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: dateStatusMap에 noRecord 추가, 어디서: StatsPage.jsx 154번째 줄, 어떻게: dateStatusMap 초기값에 noRecord 배열 추가, 왜: 기록없음 날짜를 표시하기 위해
-  const [currentConsumptionData, setCurrentConsumptionData] = useState([]); // 소비율: 카테고리별 지출 데이터
-  const [currentCartScore, setCurrentCartScore] = useState(0); // 장바구니 완료율
-  const [currentScheduleScore, setCurrentScheduleScore] = useState(0); // 일정 달성률
+  });
 
-  // [State] 이전 기간 데이터 (증감 비교용)
-  // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 이전 기간 데이터 state 추가, 어디서: StatsPage.jsx 35-39번째 줄, 어떻게: 현재 기간과 동일한 구조의 state 생성, 왜: 이전 기간 대비 증감률을 계산하여 표시하기 위해
+  // [State] 이전 기간 데이터 (증감 비교용) - 식단관리만
   const [prevDietScore, setPrevDietScore] = useState(0);
   const [prevDietDetail, setPrevDietDetail] = useState({
     normalDays: 0,
@@ -185,60 +183,12 @@ const MealReport = () => {
     underDays: 0,
     totalPeriodDays: 0,
     dateStatusMap: { normal: [], over: [], under: [], noRecord: [] },
-  }); // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: dateStatusMap에 noRecord 추가, 어디서: StatsPage.jsx 162번째 줄, 어떻게: dateStatusMap 초기값에 noRecord 배열 추가, 왜: 기록없음 날짜를 표시하기 위해
-  const [prevConsumptionData, setPrevConsumptionData] = useState([]);
-  const [prevCartScore, setPrevCartScore] = useState(0);
-  const [prevScheduleScore, setPrevScheduleScore] = useState(0);
+  });
 
   const [hasData, setHasData] = useState(false);
 
   // [Context] 실시간 업데이트 감지
   const { updateKey } = useMealContext();
-
-  // [Logic] 기간 계산 함수
-  // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 주 단위/월 단위 기간 계산 함수 추가, 어디서: StatsPage.jsx 45-80번째 줄, 어떻게: periodType에 따라 주 단위(월~일) 또는 월 단위(1일~말일) 계산, 왜: 선택한 기간 단위에 맞는 시작일/종료일을 계산하기 위해
-  const getPeriodRange = (date, type) => {
-    // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 날짜 객체 직접 수정 문제 해결, 어디서: StatsPage.jsx 52-75번째 줄, 어떻게: date 객체를 복사하여 사용, 왜: 원본 date 객체가 변경되지 않도록 하기 위해
-    const dateCopy = new Date(date);
-    if (type === "week") {
-      // 주 단위: 해당 날짜가 속한 주의 월요일~일요일
-      const day = dateCopy.getDay();
-      const diff = dateCopy.getDate() - day + (day === 0 ? -6 : 1); // 월요일로 조정
-      const monday = new Date(dateCopy);
-      monday.setDate(diff);
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
-      return {
-        startDate: new Date(
-          monday.getFullYear(),
-          monday.getMonth(),
-          monday.getDate()
-        ),
-        endDate: new Date(
-          sunday.getFullYear(),
-          sunday.getMonth(),
-          sunday.getDate()
-        ),
-      };
-    } else {
-      // 월 단위: 해당 월의 1일~말일
-      const year = dateCopy.getFullYear();
-      const month = dateCopy.getMonth();
-      return {
-        startDate: new Date(year, month, 1),
-        endDate: new Date(year, month + 1, 0),
-      };
-    }
-  };
-
-  // [Logic] 날짜를 YYYY-MM-DD 형식으로 변환
-  // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: Date 객체를 문자열로 변환하는 함수 추가, 어디서: StatsPage.jsx 82-86번째 줄, 어떻게: getFullYear, getMonth+1, getDate를 사용하여 포맷팅, 왜: API 호출 시 날짜 파라미터를 문자열 형식으로 전달하기 위해
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
 
   // [Logic] 실제 데이터 가져오기 (updateKey 변경 시 재조회)
   // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 기간 단위에 따른 데이터 조회 로직으로 변경, 어디서: StatsPage.jsx 88번째 줄부터, 어떻게: 주/월 단위에 따라 기간 범위 계산 후 API 호출, 왜: 주 단위와 월 단위 통계를 모두 지원하기 위해
@@ -274,33 +224,19 @@ const MealReport = () => {
 
       try {
         // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API 호출을 fallback 방식으로 변경, 어디서: StatsPage.jsx 115-145번째 줄, 어떻게: 신규 API 실패 시 기존 API로 여러 날짜 조회 후 프론트에서 집계, 왜: 백엔드 신규 API가 아직 구현되지 않아 404 에러가 발생하기 때문에
-        // 현재 기간 데이터 조회 (신규 API 시도 후 실패 시 fallback)
-        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니/일정 API 호출 제거, 어디서: MealReport.jsx, 어떻게: resCartCurrent, resTodoCurrent를 null로 초기화하고 Promise.all에서 해당 API 호출 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
-        let resMealCurrent, resCategoryCurrent;
-        let resCartCurrent = null; // 제거된 API
-        let resTodoCurrent = null; // 제거된 API
+        // 현재 기간 데이터 조회 (신규 API 시도 후 실패 시 fallback) - 식단관리만
+        let resMealCurrent;
 
         try {
           // 신규 API 시도
-          [resMealCurrent, resCategoryCurrent] =
-            await Promise.all([
-              dataApi
-                .get(`/api/stats/meal/range`, {
-                  params: { startDate: currentStart, endDate: currentEnd },
-                })
-                .catch((e) => {
-                  console.error("식단 통계 API 실패:", e);
-                  return { data: null };
-                }),
-              dataApi
-                .get(`/api/tx/category-stats`, {
-                  params: { startDate: currentStart, endDate: currentEnd },
-                })
-                .catch((e) => {
-                  console.error("카테고리 통계 API 실패:", e);
-                  return { data: { categories: [], totalExpense: 0 } };
-                }),
-            ]);
+          resMealCurrent = await dataApi
+            .get(`/api/stats/meal/range`, {
+              params: { startDate: currentStart, endDate: currentEnd },
+            })
+            .catch((e) => {
+              console.error("식단 통계 API 실패:", e);
+              return { data: null };
+            });
 
           // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API 응답 디버깅 로그 추가, 어디서: StatsPage.jsx 130-135번째 줄, 어떻게: 각 API 응답을 콘솔에 출력, 왜: 데이터가 제대로 조회되는지 확인하기 위해
           // console.log("DEBUG: 신규 API 응답", {
@@ -313,33 +249,20 @@ const MealReport = () => {
           console.log("신규 API 실패, fallback 사용:", e);
         }
 
-        // Fallback: 기존 API로 기간 내 모든 날짜 데이터 조회
-        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니 API 호출 제거 및 조건문 수정, 어디서: MealReport.jsx, 어떻게: cart API 호출 제거하고 조건문에서 cart/todo 체크 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
+        // Fallback: 기존 API로 기간 내 모든 날짜 데이터 조회 - 식단관리만
         if (!resMealCurrent?.data) {
           const start = new Date(currentRange.startDate);
           const end = new Date(currentRange.endDate);
-          const mealList = [];
-          const txList = [];
 
           // 기간 내 모든 날짜 순회
           for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
             const dateStr = formatDate(d);
             try {
-              const [meals, txs] = await Promise.all([
-                // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단 API 엔드포인트 수정, 어디서: StatsPage.jsx 140번째 줄, 어떻게: /api/meals → /api/stats/meal?date=...로 변경, 왜: 백엔드 응답에 따르면 /api/meals는 존재하지 않고 /api/stats/meal을 사용해야 하기 때문에
-                dataApi
-                  .get(`/api/stats/meal`, { params: { date: dateStr } })
-                  .catch(() => ({ data: null })),
-                dataApi
-                  .get(`/api/tx`, {
-                    params: { year: d.getFullYear(), month: d.getMonth() + 1 },
-                  })
-                  .catch(() => ({ data: [] })),
-              ]);
+              const meals = await dataApi
+                .get(`/api/stats/meal`, { params: { date: dateStr } })
+                .catch(() => ({ data: null }));
 
-              // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API 응답 구조에 맞게 데이터 처리 수정, 어디서: StatsPage.jsx 145-165번째 줄, 어떻게: /api/stats/meal은 통계 객체를 반환하므로 직접 사용, 왜: 백엔드 API 응답 구조가 배열이 아닌 통계 객체이기 때문에
-              // /api/stats/meal은 통계 객체 {totalCalories, targetCalories, ...}를 반환
-              // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단 통계 데이터 처리 로직 수정, 어디서: StatsPage.jsx 155-162번째 줄, 어떻게: resMealCurrent가 없을 때 초기화하고, 각 날짜의 통계를 누적, 왜: 기간 내 모든 날짜의 식단 데이터를 집계하기 위해
+              // 식단 통계 데이터 처리
               if (meals.data && meals.data.totalCalories !== undefined) {
                 if (!resMealCurrent || !resMealCurrent.data) {
                   resMealCurrent = {
@@ -351,102 +274,36 @@ const MealReport = () => {
                 resMealCurrent.data.targetCalories +=
                   Number(meals.data.targetCalories) || 2000;
               }
-
-              if (txs.data) {
-                const filtered = Array.isArray(txs.data)
-                  ? txs.data.filter((tx) => {
-                      const txDate = tx.txDate || tx.date;
-                      return txDate && txDate.startsWith(dateStr);
-                    })
-                  : [];
-                txList.push(...filtered);
-              }
             } catch (e) {
               console.error(`날짜 ${dateStr} 데이터 조회 실패:`, e);
             }
           }
-
-          // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니/일정 통계 계산 로직 제거, 어디서: MealReport.jsx, 어떻게: 장바구니 구매율 및 일정 달성률 계산 코드 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
-
-          // 카테고리별 지출 통계 계산
-          if (
-            !resCategoryCurrent?.data?.categories ||
-            resCategoryCurrent.data.categories.length === 0
-          ) {
-            const categoryExpenses = {};
-            const totalExpense = txList
-              .filter((tx) => tx.type === "EXPENSE")
-              .reduce((acc, tx) => {
-                const amount = Math.abs(Number(tx.amount) || 0);
-                const category = tx.category || "기타";
-                if (!categoryExpenses[category]) {
-                  categoryExpenses[category] = 0;
-                }
-                categoryExpenses[category] += amount;
-                return acc + amount;
-              }, 0);
-
-            if (totalExpense > 0) {
-              const categories = Object.entries(categoryExpenses)
-                .map(([category, amount]) => ({
-                  category,
-                  amount,
-                  percentage: Math.floor((amount / totalExpense) * 100),
-                }))
-                .sort((a, b) => b.amount - a.amount);
-              resCategoryCurrent = { data: { categories, totalExpense } };
-            } else {
-              resCategoryCurrent = {
-                data: { categories: [], totalExpense: 0 },
-              };
-            }
-          }
         }
 
-        // 이전 기간 데이터 조회 (동일한 fallback 로직 적용)
-        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니/일정 API 호출 제거, 어디서: MealReport.jsx, 어떻게: resCartPrev, resTodoPrev를 null로 초기화하고 Promise.all에서 해당 API 호출 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
-        let resMealPrev, resCategoryPrev;
-        let resCartPrev = null; // 제거된 API
-        let resTodoPrev = null; // 제거된 API
+        // 이전 기간 데이터 조회 (동일한 fallback 로직 적용) - 식단관리만
+        let resMealPrev;
 
         try {
-          [resMealPrev, resCategoryPrev] =
-            await Promise.all([
-              dataApi
-                .get(`/api/stats/meal/range`, {
-                  params: { startDate: prevStart, endDate: prevEnd },
-                })
-                .catch(() => ({ data: null })),
-              dataApi
-                .get(`/api/tx/category-stats`, {
-                  params: { startDate: prevStart, endDate: prevEnd },
-                })
-                .catch(() => ({ data: { categories: [], totalExpense: 0 } })),
-            ]);
+          resMealPrev = await dataApi
+            .get(`/api/stats/meal/range`, {
+              params: { startDate: prevStart, endDate: prevEnd },
+            })
+            .catch(() => ({ data: null }));
         } catch (e) {
           console.log("이전 기간 신규 API 실패, fallback 사용:", e);
         }
 
         // 이전 기간 fallback
-        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니 API 호출 제거 및 조건문 수정, 어디서: MealReport.jsx, 어떻게: cart API 호출 제거하고 조건문에서 cart/todo 체크 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
         if (!resMealPrev?.data) {
           const start = new Date(prevRange.startDate);
           const end = new Date(prevRange.endDate);
-          const txList = [];
 
           for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
             const dateStr = formatDate(d);
             try {
-              const [meals, txs] = await Promise.all([
-                dataApi
-                  .get(`/api/stats/meal`, { params: { date: dateStr } })
-                  .catch(() => ({ data: null })),
-                dataApi
-                  .get(`/api/tx`, {
-                    params: { year: d.getFullYear(), month: d.getMonth() + 1 },
-                  })
-                  .catch(() => ({ data: [] })),
-              ]);
+              const meals = await dataApi
+                .get(`/api/stats/meal`, { params: { date: dateStr } })
+                .catch(() => ({ data: null }));
 
               if (meals.data && meals.data.totalCalories !== undefined) {
                 if (!resMealPrev?.data) {
@@ -459,160 +316,13 @@ const MealReport = () => {
                 resMealPrev.data.targetCalories +=
                   Number(meals.data.targetCalories) || 2000;
               }
-
-              if (txs.data) {
-                const filtered = Array.isArray(txs.data)
-                  ? txs.data.filter((tx) => {
-                      const txDate = tx.txDate || tx.date;
-                      return txDate && txDate.startsWith(dateStr);
-                    })
-                  : [];
-                txList.push(...filtered);
-              }
             } catch (e) {
               console.error(`이전 기간 날짜 ${dateStr} 데이터 조회 실패:`, e);
-            }
-          }
-
-          // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니/일정 통계 계산 로직 제거, 어디서: MealReport.jsx, 어떻게: 장바구니 구매율 및 일정 달성률 계산 코드 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
-
-          if (
-            !resCategoryPrev?.data?.categories ||
-            resCategoryPrev.data.categories.length === 0
-          ) {
-            const categoryExpenses = {};
-            const totalExpense = txList
-              .filter((tx) => tx.type === "EXPENSE")
-              .reduce((acc, tx) => {
-                const amount = Math.abs(Number(tx.amount) || 0);
-                const category = tx.category || "기타";
-                if (!categoryExpenses[category]) {
-                  categoryExpenses[category] = 0;
-                }
-                categoryExpenses[category] += amount;
-                return acc + amount;
-              }, 0);
-
-            if (totalExpense > 0) {
-              const categories = Object.entries(categoryExpenses)
-                .map(([category, amount]) => ({
-                  category,
-                  amount,
-                  percentage: Math.floor((amount / totalExpense) * 100),
-                }))
-                .sort((a, b) => b.amount - a.amount);
-              resCategoryPrev = { data: { categories, totalExpense } };
-            } else {
-              resCategoryPrev = { data: { categories: [], totalExpense: 0 } };
             }
           }
         }
 
         // (1) 식단 관리 계산: 끼니 단위 달성률 + 칼로리 초과/정상/미달성 정보
-        // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단 점수 계산 방식을 끼니 단위 달성률로 변경하고 칼로리 초과/정상/미달성 정보 추가, 어디서: StatsPage.jsx 358-420번째 줄, 어떻게: 기간 내 기록이 있는 날의 이상적 끼니 수와 실제 먹은 끼니 수를 비교하고, 각 날짜별 칼로리 초과 여부 확인, 왜: 사용자 요청에 따라 끼니 단위 통계와 칼로리 초과 정보를 함께 표시하기 위해
-        // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 끼니 단위 달성률과 칼로리 초과 정보를 함께 계산하는 함수 추가, 어디서: StatsPage.jsx 365-420번째 줄, 어떻게: 기간 내 각 날짜별로 /api/meals와 /api/stats/meal 조회하여 끼니 수와 칼로리 초과 여부 확인, 왜: 끼니 달성률과 칼로리 초과 정보를 함께 제공하기 위해
-        const calculateDietMealRate = async (startDate, endDate) => {
-          const start = new Date(startDate);
-          const end = new Date(endDate);
-          let totalPeriodDays = 0; // 전체 기간 일수 (기록 유무와 관계없이)
-          let recordedDays = 0; // 기록이 있는 날 수
-          let totalMeals = 0; // 실제 먹은 끼니 수 (아침, 점심, 저녁만)
-          let normalDays = 0; // 정상 범위 날 수 (목표 칼로리 달성)
-          let overDays = 0; // 초과 날 수 (권장 칼로리 넘음)
-          let underDays = 0; // 미달성 날 수 (목표 칼로리 미달)
-          // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 각 날짜별 상태 정보를 저장하는 배열 추가, 어디서: StatsPage.jsx 371번째 줄, 어떻게: 날짜와 상태를 매핑하는 배열 생성, 왜: 차트 호버 시 날짜 정보를 표시하기 위해
-          const dateStatusMap = {
-            normal: [],
-            over: [],
-            under: [],
-            noRecord: [],
-          }; // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 기록없음 날짜도 저장하도록 dateStatusMap에 noRecord 추가, 어디서: StatsPage.jsx 493번째 줄, 어떻게: dateStatusMap에 noRecord 배열 추가, 왜: 기록없음 항목에도 날짜를 표시하기 위해
-
-          for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-            totalPeriodDays++; // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 전체 기간 일수 카운트, 어디서: StatsPage.jsx 375번째 줄, 어떻게: 모든 날짜에 대해 카운트 증가, 왜: 기록이 없는 날도 포함하여 전체 기간 일수를 계산하기 위해
-            const dateStr = formatDate(d);
-            let hasRecord = false; // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 기록 여부 확인 변수 추가, 어디서: StatsPage.jsx 497번째 줄, 어떻게: hasRecord 변수 선언, 왜: 기록이 없는 날짜를 추적하기 위해
-            try {
-              // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단 목록과 통계 API를 함께 조회하여 끼니 수와 칼로리 정보 확인, 어디서: StatsPage.jsx 375-395번째 줄, 어떻게: /api/meals와 /api/stats/meal을 함께 조회, 왜: 끼니별 기록 수와 칼로리 초과 여부를 모두 확인하기 위해
-              const [mealRes, statsRes] = await Promise.all([
-                dataApi
-                  .get(`/api/meals`, { params: { date: dateStr } })
-                  .catch(() => ({ data: [] })),
-                dataApi
-                  .get(`/api/stats/meal`, { params: { date: dateStr } })
-                  .catch(() => ({ data: null })),
-              ]);
-
-              if (
-                mealRes.data &&
-                Array.isArray(mealRes.data) &&
-                mealRes.data.length > 0
-              ) {
-                hasRecord = true; // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 기록 있음으로 표시, 어디서: StatsPage.jsx 507번째 줄, 어떻게: hasRecord를 true로 설정, 왜: 기록이 있는 날짜를 추적하기 위해
-                recordedDays++;
-                // 아침, 점심, 저녁만 카운트 (간식 제외)
-                const mealTypes = mealRes.data
-                  .filter(
-                    (meal) =>
-                      meal.mealType === "아침" ||
-                      meal.mealType === "점심" ||
-                      meal.mealType === "저녁"
-                  )
-                  .map((meal) => meal.mealType);
-                // 중복 제거 (같은 끼니에 여러 번 기록한 경우 1번만 카운트)
-                const uniqueMealTypes = [...new Set(mealTypes)];
-                totalMeals += uniqueMealTypes.length;
-
-                // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 칼로리 초과/정상/미달성 기준을 명확한 퍼센트 범위로 변경하고 날짜 정보 저장, 어디서: StatsPage.jsx 391-410번째 줄, 어떻게: 목표 칼로리 대비 비율로 계산하여 0~50% 미달성, 51~100% 정상, 100% 초과로 구분하고 날짜를 배열에 저장, 왜: 사용자 요청에 따라 더 명확하고 현실적인 기준으로 구분하고 차트 호버 시 날짜 정보를 표시하기 위해
-                if (
-                  statsRes.data &&
-                  statsRes.data.totalCalories !== undefined
-                ) {
-                  const totalCalories =
-                    Number(statsRes.data.totalCalories) || 0;
-                  const targetCalories =
-                    Number(statsRes.data.targetCalories) || 2500;
-                  const caloriePercent = (totalCalories / targetCalories) * 100; // 목표 대비 비율
-
-                  // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 칼로리 기준을 퍼센트 범위로 구분하고 날짜 저장, 어디서: StatsPage.jsx 397-407번째 줄, 어떻게: 0~50% 미달성, 51~100% 정상, 100% 초과로 분류하고 각 상태별 날짜 배열에 추가, 왜: 사용자 요청에 따라 더 명확한 기준 적용하고 차트 호버 시 날짜 정보 표시하기 위해
-                  if (caloriePercent > 100) {
-                    overDays++; // 초과 (100% 초과)
-                    dateStatusMap.over.push(dateStr);
-                  } else if (caloriePercent >= 51) {
-                    normalDays++; // 정상 범위 (51%~100%)
-                    dateStatusMap.normal.push(dateStr);
-                  } else {
-                    underDays++; // 미달성 (0~50%)
-                    dateStatusMap.under.push(dateStr);
-                  }
-                }
-              }
-
-              // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 기록이 없는 날짜를 dateStatusMap.noRecord에 추가, 어디서: StatsPage.jsx 537-540번째 줄, 어떻게: hasRecord가 false인 경우 noRecord 배열에 날짜 추가, 왜: 기록없음 항목에도 날짜를 표시하기 위해
-              if (!hasRecord) {
-                dateStatusMap.noRecord.push(dateStr);
-              }
-            } catch (e) {
-              console.error(`날짜 ${dateStr} 식단 조회 실패:`, e);
-              // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 조회 실패한 날짜도 기록없음으로 처리, 어디서: StatsPage.jsx 544번째 줄, 어떻게: catch 블록에서도 noRecord 배열에 날짜 추가, 왜: 에러 발생 시에도 기록없음으로 표시하기 위해
-              dateStatusMap.noRecord.push(dateStr);
-            }
-          }
-
-          // 이상적 끼니 수 = 기록이 있는 날 수 × 3끼 (아침, 점심, 저녁)
-          const idealMeals = recordedDays * 3;
-          const mealRate =
-            idealMeals > 0 ? Math.floor((totalMeals / idealMeals) * 100) : 0;
-
-          return {
-            mealRate,
-            normalDays,
-            overDays,
-            underDays,
-            totalPeriodDays, // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 전체 기간 일수 반환, 어디서: StatsPage.jsx 424번째 줄, 어떻게: totalPeriodDays를 반환 객체에 추가, 왜: 기록이 없는 날도 표시하기 위해
-            dateStatusMap, // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 날짜별 상태 정보 반환, 어디서: StatsPage.jsx 420번째 줄, 어떻게: dateStatusMap을 반환 객체에 추가, 왜: 차트 호버 시 날짜 정보를 표시하기 위해
-          };
-        };
 
         let currentDietResult = {
           mealRate: 0,
@@ -642,44 +352,10 @@ const MealReport = () => {
         const currentDietValue = currentDietResult.mealRate;
         const prevDietValue = prevDietResult.mealRate;
 
-        // (2) 소비율 계산: 카테고리별 지출 비율 (백엔드 API 사용)
-        // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 카테고리별 지출 통계를 백엔드 신규 API로 변경, 어디서: StatsPage.jsx 151-165번째 줄, 어떻게: /api/tx/category-stats API 응답의 categories 배열 사용, 왜: 백엔드에서 이미 카테고리별 집계 및 비율 계산을 제공하기 때문에
-        let currentConsumptionList = [];
-        let prevConsumptionList = [];
-
-        if (resCategoryCurrent.data && resCategoryCurrent.data.categories) {
-          currentConsumptionList = resCategoryCurrent.data.categories.map(
-            (item) => ({
-              category: item.category,
-              amount: item.amount,
-              percentage: item.percentage,
-            })
-          );
-        }
-
-        if (resCategoryPrev.data && resCategoryPrev.data.categories) {
-          prevConsumptionList = resCategoryPrev.data.categories.map((item) => ({
-            category: item.category,
-            amount: item.amount,
-            percentage: item.percentage,
-          }));
-        }
-
-        // (3) 장바구니 완료율 계산: (구매 완료 항목 수 / 전체 등록 항목 수) × 100
-        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니 API로 인해 0으로 처리, 어디서: MealReport.jsx, 어떻게: 장바구니 값들을 0으로 설정, 왜: 백엔드에서 해당 API를 제거했기 때문에
-        let currentCartValue = 0;
-        let prevCartValue = 0;
-
-        // (4) 일정 달성률 계산: (완료된 일정 수 / 전체 일정 수) × 100
-        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 일정 API로 인해 0으로 처리, 어디서: MealReport.jsx, 어떻게: 일정 달성률 값들을 0으로 설정, 왜: 백엔드에서 해당 API를 제거했기 때문에
-        let currentScheduleValue = 0;
-        let prevScheduleValue = 0;
-
-        // State 업데이트
+        // State 업데이트 - 식단관리만
         // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: state 업데이트 로직 변경, 어디서: StatsPage.jsx 223-230번째 줄, 어떻게: 현재 기간과 이전 기간 데이터를 각각 state에 저장, 왜: 이전 기간 대비 증감률 계산 및 표시를 위해
         setCurrentDietScore(currentDietValue);
         setPrevDietScore(prevDietValue);
-        // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단관리 상세 정보 state 설정에 날짜 정보 및 전체 기간 일수 추가, 어디서: StatsPage.jsx 486-487번째 줄, 어떻게: currentDietResult와 prevDietResult의 normalDays, overDays, underDays, totalPeriodDays, dateStatusMap 설정, 왜: 차트에 정상/초과/미달성 정보와 날짜 정보, 기록 없는 날을 표시하기 위해
         setCurrentDietDetail({
           normalDays: currentDietResult.normalDays,
           overDays: currentDietResult.overDays,
@@ -691,7 +367,7 @@ const MealReport = () => {
             under: [],
             noRecord: [],
           },
-        }); // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: dateStatusMap에 noRecord 추가, 어디서: StatsPage.jsx 617번째 줄, 어떻게: dateStatusMap 초기값에 noRecord 배열 추가, 왜: 기록없음 날짜를 표시하기 위해
+        });
         setPrevDietDetail({
           normalDays: prevDietResult.normalDays,
           overDays: prevDietResult.overDays,
@@ -703,13 +379,7 @@ const MealReport = () => {
             under: [],
             noRecord: [],
           },
-        }); // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: dateStatusMap에 noRecord 추가, 어디서: StatsPage.jsx 618번째 줄, 어떻게: dateStatusMap 초기값에 noRecord 배열 추가, 왜: 기록없음 날짜를 표시하기 위해
-        setCurrentConsumptionData(currentConsumptionList);
-        setPrevConsumptionData(prevConsumptionList);
-        setCurrentCartScore(currentCartValue);
-        setPrevCartScore(prevCartValue);
-        setCurrentScheduleScore(currentScheduleValue);
-        setPrevScheduleScore(prevScheduleValue);
+        });
         setHasData(true);
       } catch (e) {
         console.error("통계 데이터 로드 실패", e);
@@ -721,20 +391,14 @@ const MealReport = () => {
           underDays: 0,
           totalPeriodDays: 0,
           dateStatusMap: { normal: [], over: [], under: [], noRecord: [] },
-        }); // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: dateStatusMap에 noRecord 추가, 어디서: StatsPage.jsx 631번째 줄, 어떻게: dateStatusMap 초기값에 noRecord 배열 추가, 왜: 기록없음 날짜를 표시하기 위해
+        });
         setPrevDietDetail({
           normalDays: 0,
           overDays: 0,
           underDays: 0,
           totalPeriodDays: 0,
           dateStatusMap: { normal: [], over: [], under: [], noRecord: [] },
-        }); // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: dateStatusMap에 noRecord 추가, 어디서: StatsPage.jsx 632번째 줄, 어떻게: dateStatusMap 초기값에 noRecord 배열 추가, 왜: 기록없음 날짜를 표시하기 위해
-        setCurrentConsumptionData([]);
-        setPrevConsumptionData([]);
-        setCurrentCartScore(0);
-        setPrevCartScore(0);
-        setCurrentScheduleScore(0);
-        setPrevScheduleScore(0);
+        });
         setHasData(false);
       }
     };
@@ -742,203 +406,13 @@ const MealReport = () => {
     fetchData();
   }, [currentDate, periodType, updateKey]);
 
-  // [Logic] 증감률 계산 함수
-  // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 이전 기간 대비 증감률 계산 방식을 절대 증가(percentage point)로 변경, 어디서: StatsPage.jsx 483-486번째 줄, 어떻게: (현재값 - 이전값)으로 절대 차이 계산, 왜: 사용자 요청에 따라 상대 증가율이 아닌 절대 증가(퍼센트 포인트)로 표시하기 위해
-  const calculateChangeRate = (current, prev) => {
-    return Math.round(current - prev);
-  };
-
-  // [Data] 파이 차트 데이터 생성 함수 (단일 값용)
-  // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 단일 값 파이 차트 데이터 생성 함수 수정, 어디서: StatsPage.jsx 243-254번째 줄, 어떻게: 값과 나머지(100-값)로 구성된 파이 차트 데이터 생성, 왜: 식단, 장바구니, 일정 차트는 단일 비율을 표시하기 위해
-  const createSinglePieData = (value, label, colors) => {
-    const percentage = Math.min(value, 100);
-    const remaining = 100 - percentage;
-
-    return {
-      labels: [label, ""],
-      datasets: [
-        {
-          data: [percentage, remaining],
-          backgroundColor: colors,
-          borderWidth: 0,
-        },
-      ],
-    };
-  };
-
-  // [Data] 식단관리 3개 영역 파이 차트 데이터 생성 함수
-  // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단관리 차트 데이터 생성 함수 수정 - 0인 항목 제외, 어디서: StatsPage.jsx 545-580번째 줄, 어떻게: normalDays, overDays, underDays가 0보다 큰 항목만 차트에 포함, 왜: 사용자 요청에 따라 해당 색깔 영역이 없으면 차트에서 제외하기 위해
-  const createDietPieData = (
-    normalDays,
-    overDays,
-    underDays,
-    dateStatusMap = { normal: [], over: [], under: [] }
-  ) => {
-    const totalDays = normalDays + overDays + underDays;
-    if (totalDays === 0) {
-      return {
-        labels: ["데이터 없음"],
-        datasets: [
-          {
-            data: [100],
-            backgroundColor: ["#e2e8f0"],
-            borderWidth: 0,
-          },
-        ],
-      };
-    }
-
-    // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 0인 항목 제외하고 차트 데이터 생성 및 순서 정보 저장, 어디서: StatsPage.jsx 655-685번째 줄, 어떻게: 각 항목이 0보다 클 때만 배열에 추가하고 순서 정보도 함께 저장, 왜: 해당 색깔 영역이 없으면 차트에서 제외하고 라벨 위치 계산에 순서 정보 사용하기 위해
-    const labels = [];
-    const data = [];
-    const colors = [];
-    const dates = [];
-    const order = []; // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 각 항목의 순서 정보 저장, 어디서: StatsPage.jsx 662번째 줄, 어떻게: 각 항목의 타입('normal', 'over', 'under') 저장, 왜: 라벨 위치 계산 시 순서 정보 사용하기 위해
-
-    if (normalDays > 0) {
-      labels.push("정상"); // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 라벨 문구 변경 '정상 범위' -> '정상', 어디서: StatsPage.jsx 691번째 줄, 어떻게: '정상 범위'를 '정상'으로 변경, 왜: 사용자 요청에 따라 라벨 문구 간소화하기 위해
-      data.push(Math.round((normalDays / totalDays) * 100));
-      colors.push("#4caf50");
-      dates.push(dateStatusMap.normal || []);
-      order.push("normal");
-    }
-    if (overDays > 0) {
-      labels.push("초과"); // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 라벨 문구 변경 '칼로리 초과' -> '초과', 어디서: StatsPage.jsx 698번째 줄, 어떻게: '칼로리 초과'를 '초과'로 변경, 왜: 사용자 요청에 따라 라벨 문구 간소화하기 위해
-      data.push(Math.round((overDays / totalDays) * 100));
-      colors.push("#f44336");
-      dates.push(dateStatusMap.over || []);
-      order.push("over");
-    }
-    if (underDays > 0) {
-      labels.push("미달성");
-      data.push(Math.round((underDays / totalDays) * 100));
-      colors.push("#ff9800");
-      dates.push(dateStatusMap.under || []);
-      order.push("under");
-    }
-
-    return {
-      labels,
-      datasets: [
-        {
-          data,
-          backgroundColor: colors,
-          borderWidth: 0,
-          dates,
-          order, // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 순서 정보를 데이터셋에 포함, 어디서: StatsPage.jsx 686번째 줄, 어떻게: order 배열을 데이터셋에 추가, 왜: 라벨 위치 계산 시 순서 정보 사용하기 위해
-        },
-      ],
-    };
-  };
-
-  // [Data] 파이 차트 데이터 생성 함수 (카테고리별 소비율용)
-  // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 카테고리별 소비율 파이 차트 데이터 생성 함수 추가, 어디서: StatsPage.jsx 257-275번째 줄, 어떻게: 카테고리별 지출 데이터를 파이 차트 형식으로 변환, 왜: 소비율 차트에 카테고리별 지출 비율을 표시하기 위해
-  const createConsumptionPieData = (consumptionData) => {
-    if (!consumptionData || consumptionData.length === 0) {
-      return {
-        labels: ["데이터 없음"],
-        datasets: [
-          {
-            data: [100],
-            backgroundColor: ["#e2e8f0"],
-            borderWidth: 0,
-          },
-        ],
-      };
-    }
-
-    const colors = [
-      "#2196f3",
-      "#4caf50",
-      "#ff9800",
-      "#9c27b0",
-      "#f44336",
-      "#00bcd4",
-      "#ffc107",
-    ];
-    return {
-      labels: consumptionData.map((item) => item.category),
-      datasets: [
-        {
-          data: consumptionData.map((item) => item.percentage),
-          backgroundColor: consumptionData.map(
-            (_, index) => colors[index % colors.length]
-          ),
-          borderWidth: 0,
-        },
-      ],
-    };
-  };
-
-  // [Config] 파이 차트 옵션 (범례 및 툴팁 포함)
-  // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단관리 차트 범례를 숨기고 차트 위에 라벨 표시, 어디서: StatsPage.jsx 595-625번째 줄, 어떻게: legend.display를 false로 설정, 왜: 사용자 요청에 따라 범례를 제거하고 차트 위에 라벨로 표시하기 위해
-  const pieOptions = {
-    plugins: {
-      legend: {
-        display: false, // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단관리 차트 범례 숨김, 어디서: StatsPage.jsx 599번째 줄, 어떻게: display를 false로 변경, 왜: 차트 위에 라벨로 표시하기 위해
-        position: "bottom",
-        labels: {
-          font: {
-            family: "'Pretendard', sans-serif",
-            size: 12,
-          },
-          padding: 10,
-          usePointStyle: true,
-        },
-      },
-      tooltip: {
-        enabled: true,
-        // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 툴팁 z-index 조정하여 라벨과 겹치지 않도록, 어디서: StatsPage.jsx 732번째 줄, 어떻게: zIndex 옵션 추가, 왜: 마우스 호버 시 툴팁이 라벨과 겹치지 않도록 하기 위해
-        zIndex: 10, // 라벨보다 위에 표시
-        // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 툴팁이 차트 영역 밖으로 나가도 표시되도록 position 설정, 어디서: StatsPage.jsx 770번째 줄, 어떻게: position을 'nearest'로 설정하고 intersect를 false로 설정, 왜: 툴팁이 잘리지 않도록 하기 위해
-        position: "nearest",
-        intersect: false,
-        // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 툴팁이 차트 영역을 벗어나도 표시되도록 설정, 어디서: StatsPage.jsx 773번째 줄, 어떻게: padding과 displayColors 설정, 왜: 툴팁이 잘리지 않고 완전히 표시되도록 하기 위해
-        padding: 12,
-        displayColors: true,
-        callbacks: {
-          label: function (context) {
-            const label = context.label || "";
-            const value = context.parsed || 0;
-            // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 툴팁에서 날짜 정보 제거, 어디서: StatsPage.jsx 776-779번째 줄, 어떻게: 날짜 관련 코드 제거하고 퍼센트만 표시, 왜: 사용자 요청에 따라 툴팁 날짜를 제거하고 아래 상세 정보에 표시하기 위해
-            return [`${label}: ${value}%`];
-          },
-        },
-      },
-    },
-    maintainAspectRatio: false,
-  };
-
-  // 각 차트 데이터
-  // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단관리 차트 데이터 생성에 날짜 정보 추가, 어디서: StatsPage.jsx 645번째 줄, 어떻게: createDietPieData 함수에 dateStatusMap 전달, 왜: 차트 호버 시 날짜 정보를 표시하기 위해
+  // 식단관리 차트 데이터
   const chart01Data = createDietPieData(
     currentDietDetail.normalDays,
     currentDietDetail.overDays,
     currentDietDetail.underDays,
     currentDietDetail.dateStatusMap
   );
-  const chart02Data = createConsumptionPieData(currentConsumptionData);
-  const chart03Data = createSinglePieData(currentCartScore, "장바구니 완료율", [
-    "#ff9800",
-    "#fff3e0",
-  ]);
-  const chart04Data = createSinglePieData(currentScheduleScore, "일정 달성률", [
-    "#9c27b0",
-    "#f3e5f5",
-  ]);
-
-  // [Config] 식단관리 차트 전용 옵션 (범례 숨김)
-  // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단관리 차트 전용 옵션 생성, 어디서: StatsPage.jsx 650-652번째 줄, 어떻게: pieOptions를 복사하여 legend.display를 false로 설정, 왜: 식단관리 차트만 범례를 숨기고 다른 차트는 범례를 유지하기 위해
-  const dietPieOptions = {
-    ...pieOptions,
-    plugins: {
-      ...pieOptions.plugins,
-      legend: {
-        ...pieOptions.plugins.legend,
-        display: false, // 식단관리 차트만 범례 숨김
-      },
-    },
-  };
 
   // [Logic] 기간 표시 텍스트 생성
   // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 기간 표시 텍스트 생성 함수 추가, 어디서: StatsPage.jsx 305-315번째 줄, 어떻게: periodType에 따라 주 단위 또는 월 단위로 표시, 왜: 사용자에게 현재 조회 중인 기간을 명확히 표시하기 위해
@@ -972,60 +446,6 @@ const MealReport = () => {
     setCurrentDate(newDate);
   };
 
-  // [Logic] 주 단위 범위 계산 함수
-  // [추가 2026-01-19] 누가: 효민, 무엇을: 선택한 날짜가 포함된 주의 시작일과 종료일을 계산하는 함수 추가, 어디서: StatsPage.jsx 1117-1130번째 줄, 어떻게: getPeriodRange 함수를 사용하여 주 단위 범위 계산, 왜: DatePicker에서 주 단위 범위 선택을 표시하기 위해
-  const getWeekRange = (date) => {
-    return getPeriodRange(date, "week");
-  };
-
-  // [Logic] 2026년 전체 주 목록 생성
-  // [수정 2026-01-19] 누가: 효민, 무엇을: 2026년 첫 주부터 마지막 주까지 전체 주 목록 생성, 어디서: StatsPage.jsx 1131-1164번째 줄, 어떻게: 2026년 1월 1일부터 12월 31일까지의 모든 주를 계산, 왜: 사용자가 2026년 전체 주를 선택할 수 있도록 하기 위해
-  const getWeeksList = () => {
-    const weeks = [];
-    const year = 2026;
-
-    // 2026년 첫 날
-    const firstDay = new Date(year, 0, 1);
-    // 2026년 마지막 날
-    const lastDay = new Date(year, 11, 31);
-
-    // 첫날이 속한 주의 월요일 찾기
-    const firstDayOfWeek = firstDay.getDay();
-    const mondayOffset = firstDayOfWeek === 0 ? -6 : 1 - firstDayOfWeek;
-    let currentMonday = new Date(year, 0, 1 + mondayOffset);
-
-    // 마지막날이 속한 주의 일요일 찾기
-    const lastDayOfWeek = lastDay.getDay();
-    const sundayOffset = lastDayOfWeek === 0 ? 0 : 7 - lastDayOfWeek;
-    const lastSunday = new Date(year, 11, lastDay.getDate() + sundayOffset);
-
-    // 각 주를 생성
-    while (currentMonday <= lastSunday) {
-      const weekStart = new Date(currentMonday);
-      const weekEnd = new Date(currentMonday);
-      weekEnd.setDate(weekStart.getDate() + 6);
-
-      // 2026년에 포함된 주만 추가
-      if (weekStart.getFullYear() === year || weekEnd.getFullYear() === year) {
-        weeks.push({
-          startDate: new Date(weekStart),
-          endDate: new Date(weekEnd),
-        });
-      }
-
-      currentMonday.setDate(currentMonday.getDate() + 7);
-    }
-
-    // 월 필터링
-    if (selectedMonth !== null) {
-      return weeks.filter((week) => {
-        const weekMonth = week.startDate.getMonth();
-        return weekMonth === selectedMonth;
-      });
-    }
-
-    return weeks;
-  };
 
   // [Logic] 주 단위 목록에서 주 선택 핸들러
   // [추가 2026-01-19] 누가: 효민, 무엇을: 주 단위 목록에서 주를 선택하면 해당 주로 이동하는 핸들러 추가, 어디서: StatsPage.jsx 1167-1171번째 줄, 어떻게: 선택한 주의 시작일(월요일)로 currentDate 설정하고 목록 닫기, 왜: 사용자가 주 단위 목록에서 주를 선택하여 해당 주로 이동할 수 있도록 하기 위해
@@ -1157,7 +577,7 @@ const MealReport = () => {
 
                   {/* 주 목록 */}
                   <div className="stats-week-items-container">
-                    {getWeeksList().map((week, index) => {
+                    {getWeeksList(selectedMonth).map((week, index) => {
                       const weekStartStr = formatDate(week.startDate);
                       const weekEndStr = formatDate(week.endDate);
                       const isSelected =
@@ -1207,8 +627,7 @@ const MealReport = () => {
       </div>
 
       <div className="stats-main-content">
-        {/* 파이 차트 영역 */}
-        {/* [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 차트 3개를 4개로 변경, 어디서: StatsPage.jsx 372-430번째 줄, 어떻게: 식단, 소비율, 장바구니, 일정 4개 차트 렌더링, 왜: 요구사항에 맞게 4개 차트로 변경하기 위해 */}
+        {/* 파이 차트 영역 - 식단관리만 */}
         <div className="stats-pie-charts-container">
           {/* CHART 01: 식단관리 */}
           {/* [수정 2026-01-19] 누가: 효민, 무엇을: 차트와 텍스트 정보를 좌우로 분리하여 배치, 어디서: StatsPage.jsx 910번째 줄, 어떻게: 차트 아이템을 flex-row로 변경하고 왼쪽에 차트, 오른쪽에 텍스트 정보 배치, 왜: 사용자가 요청한 이미지 레이아웃대로 배치하기 위해 */}
@@ -1364,8 +783,6 @@ const MealReport = () => {
               </div>
             </div>
           </div>
-
-
         </div>
       </div>
     </div>

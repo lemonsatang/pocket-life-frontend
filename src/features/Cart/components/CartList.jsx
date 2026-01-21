@@ -1,10 +1,10 @@
 // [Logic] 장바구니 리스트 컨테이너 - 상태 관리 및 API 호출
 import React, { useState, useEffect } from "react";
 import CartView from "./CartView/CartView";
-import Modal from "../Modal/Modal";
-import dataApi from "../../api/api";
+import Modal from "../../../components/Modal/Modal";
+import dataApi from "../../../api/api";
 // import txApi from "../../api/txapi"; // [Deleted]
-import { useMealContext } from "../../context/MealContext.jsx"; // [New]
+import { useMealContext } from "../../Meal/context/MealContext.jsx"; // [New]
 
 // [수정 2026-01-14 12:50] 403 에러 해결:
 // 이유: fetch 사용 시 토큰이 누락되어 403 Forbidden 에러 및 JSON 파싱 에러 발생.

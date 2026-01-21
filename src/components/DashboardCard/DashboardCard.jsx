@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./DashboardCard.css";
 // [Data] 치팅 식단 데이터 가져오기 (치팅 여부 판단용)
-import { cheatMeals } from "../../data/recommendedMeals";
+import { cheatMeals } from "../../features/Meal/data/recommendedMeals";
 
 const DashboardCard = ({
   title,
