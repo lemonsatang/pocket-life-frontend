@@ -1,16 +1,198 @@
-# React + Vite
+# Pocket Life (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 1. 프로젝트 소개
 
-Currently, two official plugins are available:
+**지갑, 식단, 일정을 한 화면에서 정리하는 올인원 라이프 플래너, Pocket Life.**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Pocket Life는  
+- 하루의 **일정**, **식단**, **장바구니**, **가계부**를 하나의 대시보드에서 한눈에 정리하고  
+- 필요한 화면으로 바로 이동해 **기록·수정·삭제·분석**까지 할 수 있는  
+프론트엔드 기반 라이프 매니지먼트 웹 애플리케이션이야.
 
-## React Compiler
+> 이 README는 오직 **프론트엔드** 구현만 다루며, 백엔드 내용은 포함하지 않아.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 2. 미리보기 (Screenshots & Demo)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 2-1. 대표 대시보드
+
+<p align="center">
+  <img src="./image/DashBorad.png" alt="Pocket Life 대시보드" width="900" />
+</p>
+
+대시보드에서는 오늘의  
+- 일정  
+- 식단 요약 및 칼로리  
+- 장바구니 상태  
+- 가계부 요약  
+을 한 화면에서 확인할 수 있어.
+
+---
+
+### 2-2. 주요 화면 스크린샷 (자동 슬라이드용 5장)
+
+아래 이미지는 실제 서비스에서는 **자동 슬라이드(캐러셀)**로 넘겨 보이게 구성할 수 있고,  
+README에서는 정적인 스크린샷으로 제공해.
+
+<p align="center">
+  <img src="./image/DashBorad.png" alt="대시보드 화면" width="260" />
+  <img src="./image/LedgerMoney.png" alt="가계부 화면" width="260" />
+  <img src="./image/LikeCart.png" alt="장바구니 & 즐겨찾기 화면" width="260" />
+</p>
+<p align="center">
+  <img src="./image/MealFree.png" alt="식단 관리 & 영양 요약 화면" width="260" />
+  <img src="./image/ScheduleFunny.png" alt="일정 캘린더 화면" width="260" />
+</p>
+
+---
+
+### 2-3. 데모 GIF & 영상 (예정)
+
+- **데모 GIF**  
+  - 앱의 전체 플로우(로그인 → 대시보드 → 식단 기록 → 장바구니 → 가계부 → 일정)를 10~20초 분량으로 녹화한 GIF를 추천해.  
+  - 예) `./image/demo-flow.gif`
+
+- **시연 영상 (YouTube 등)**  
+  - 화면 흐름과 사용 시나리오를 설명하는 **1~2분 길이의 짧은 영상**을 추천해.  
+  - 예) `데모 영상: https://youtu.be/your-pocket-life-demo-link`  
+
+> GIF / 영상이 준비되면 이 섹션에 실제 파일 경로나 링크만 교체해 주면 돼.
+
+---
+
+## 3. 주요 기능
+
+### 3-1. 대시보드
+
+- 오늘의 일정, 식단, 장바구니, 가계부 요약을 한 화면에서 확인  
+- 각 카드에서 **상세 페이지로 바로 이동** 가능  
+- 오늘 날짜 기준으로 핵심 정보만 깔끔하게 정리
+
+### 3-2. 가계부
+
+- 일자별 수입/지출 내역 기록 및 수정/삭제  
+- 카테고리(예: 식비, 생활, 쇼핑 등) 별 정리  
+- 월 단위 합계, 오늘 기준 요약 정보 제공  
+- 직관적인 컬러(지출은 빨간색 등)로 빠르게 파악 가능
+
+### 3-3. 장바구니 & 즐겨찾기
+
+- 오늘의 장바구니 목록 조회 및 추가/삭제  
+- 자주 사는 품목은 **즐겨찾기**로 관리해서 빠르게 추가  
+- 구매 완료 상태 표시로 실제 쇼핑 체크리스트처럼 사용 가능
+
+### 3-4. 식단 관리 & 영양 리포트
+
+- 아침/점심/저녁/간식 단위로 음식과 칼로리 기록  
+- 하루 섭취 칼로리 합계 및 간단한 영양 요약 제공  
+- 추천 식단 영역에서 오늘의 추천 메뉴 제안  
+- 시각적인 차트/그래프 기반 리포트 제공
+
+### 3-5. 일정 관리 (캘린더)
+
+- 월간 캘린더에서 한눈에 일정 확인  
+- 특정 날짜 선택 후 할 일 추가/수정/삭제  
+- 완료된 일정은 체크 표시로 상태를 바로 확인
+
+---
+
+## 4. 기술 스택 (Frontend Only)
+
+> 아래는 프론트엔드 구현에 사용된 주요 라이브러리들이야.  
+> **CSS 관련 내용은 별도 기술 스택으로 기재하지 않았어.**
+
+- **Framework / Bundler**
+  - React
+  - Vite
+
+- **Routing**
+  - React Router DOM
+
+- **HTTP 통신**
+  - Axios
+
+- **차트 및 데이터 시각화**
+  - Chart.js  
+  - Recharts  
+  - React-Chartjs-2  
+
+- **날짜 선택**
+  - React DatePicker
+
+- **기타**
+  - jwt-decode
+
+---
+
+## 5. 폴더 구조 (요약)
+
+src
+├─ api
+│  ├─ api.js                  # API 관련 유틸 (요청 래퍼 등)
+│  └─ OAuth2RedirectHandler.jsx
+├─ components
+│  ├─ DashboardCard           # 대시보드 카드 UI
+│  └─ Layout                  # 헤더/푸터/레이아웃 공통 컴포넌트
+├─ features
+│  ├─ Cart                    # 장바구니 도메인
+│  ├─ Ledger                  # 가계부 도메인
+│  ├─ Meal                    # 식단 관리 도메인
+│  └─ Schedule                # 일정 관리 도메인
+├─ pages                      # 라우팅 기준 페이지
+└─ styles                     # 공통 스타일각 도메인(`Cart`, `Ledger`, `Meal`, `Schedule`)은  
+- **Page 컴포넌트**  
+- **View/Section 컴포넌트**  
+- **hooks / context / utils**  
+등으로 나뉘어 있어, 기능별로 구조가 잘 분리되도록 구성했어.
+
+---
+
+## 6. 화면 흐름 & 라우팅
+
+> 실제 라우팅 구조는 `App.jsx` / `main.jsx` 에 정의되어 있으며, 아래는 개략적인 흐름이야.
+
+- `/` : 홈 또는 대시보드로 이동  
+- `/login` : 로그인 페이지  
+- `/signup` : 회원가입 페이지  
+- `/dashboard` : 메인 대시보드  
+- `/meal` : 식단 관리 페이지  
+- `/cart` : 장바구니 페이지  
+- `/ledger` : 가계부 페이지  
+- `/schedule` : 일정 관리 페이지  
+
+사용자는 상단 내비게이션을 통해 각 기능 페이지로 빠르게 이동할 수 있어.
+
+---
+
+## 7. 설치 및 실행 방법
+
+### 7-1. 사전 준비
+
+- Node.js (권장: LTS 버전) 설치
+
+### 7-2. 의존성 설치
+
+npm install### 7-3. 개발 서버 실행
+
+npm run dev- 기본적으로 `http://localhost:5173` (또는 터미널에 표시되는 주소)에서 확인 가능해.
+
+### 7-4. 프로덕션 빌드
+
+npm run build
+npm run preview---
+
+## 8. 프로젝트 목표 & 향후 개선
+
+### 8-1. 목표
+
+- 일상에서 자주 사용하는 **가계부, 식단, 장바구니, 일정 관리**를 하나의 앱으로 통합  
+- 데이터를 시각적으로 표현해 사용자가 **오늘의 상태를 한 번에 이해**할 수 있도록 지원  
+- PC 환경에서 사용하기 편한 **심플하고 부드러운 인터페이스** 제공
+
+### 8-2. 향후 개선 아이디어
+
+- 반응형 레이아웃 확장(태블릿/모바일 대응)  
+- 그래프/차트 종류 확장 및 필터링 기능 강화  
+- 사용자 맞춤 추천(예: 소비 패턴, 식단 패턴 기반) 로직 고도화  
+- 접근성(키보드 네비게이션, 스크린 리더 지원 등) 개선
