@@ -275,11 +275,14 @@ const MealReport = () => {
       try {
         // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API 호출을 fallback 방식으로 변경, 어디서: StatsPage.jsx 115-145번째 줄, 어떻게: 신규 API 실패 시 기존 API로 여러 날짜 조회 후 프론트에서 집계, 왜: 백엔드 신규 API가 아직 구현되지 않아 404 에러가 발생하기 때문에
         // 현재 기간 데이터 조회 (신규 API 시도 후 실패 시 fallback)
-        let resMealCurrent, resCartCurrent, resTodoCurrent, resCategoryCurrent;
+        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니/일정 API 호출 제거, 어디서: MealReport.jsx, 어떻게: resCartCurrent, resTodoCurrent를 null로 초기화하고 Promise.all에서 해당 API 호출 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
+        let resMealCurrent, resCategoryCurrent;
+        let resCartCurrent = null; // 제거된 API
+        let resTodoCurrent = null; // 제거된 API
 
         try {
           // 신규 API 시도
-          [resMealCurrent, resCartCurrent, resTodoCurrent, resCategoryCurrent] =
+          [resMealCurrent, resCategoryCurrent] =
             await Promise.all([
               dataApi
                 .get(`/api/stats/meal/range`, {
@@ -287,22 +290,6 @@ const MealReport = () => {
                 })
                 .catch((e) => {
                   console.error("식단 통계 API 실패:", e);
-                  return { data: null };
-                }),
-              dataApi
-                .get(`/api/stats/cart/range`, {
-                  params: { startDate: currentStart, endDate: currentEnd },
-                })
-                .catch((e) => {
-                  console.error("장바구니 통계 API 실패:", e);
-                  return { data: null };
-                }),
-              dataApi
-                .get(`/api/todo/stats`, {
-                  params: { startDate: currentStart, endDate: currentEnd },
-                })
-                .catch((e) => {
-                  console.error("일정 통계 API 실패:", e);
                   return { data: null };
                 }),
               dataApi
@@ -327,35 +314,22 @@ const MealReport = () => {
         }
 
         // Fallback: 기존 API로 기간 내 모든 날짜 데이터 조회
-        // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: fallback 로직의 API 엔드포인트 수정, 어디서: StatsPage.jsx 125-145번째 줄, 어떻게: /api/meals → /api/stats/meal, /api/cart → /api/stats/cart로 변경, 왜: 백엔드 응답에 따르면 /api/meals, /api/cart 엔드포인트가 존재하지 않기 때문에
-        if (
-          !resMealCurrent?.data ||
-          !resCartCurrent?.data ||
-          !resTodoCurrent?.data
-        ) {
+        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니 API 호출 제거 및 조건문 수정, 어디서: MealReport.jsx, 어떻게: cart API 호출 제거하고 조건문에서 cart/todo 체크 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
+        if (!resMealCurrent?.data) {
           const start = new Date(currentRange.startDate);
           const end = new Date(currentRange.endDate);
           const mealList = [];
-          const cartList = [];
-          const todoList = [];
           const txList = [];
 
           // 기간 내 모든 날짜 순회
           for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
             const dateStr = formatDate(d);
             try {
-              const [meals, cart, todos, txs] = await Promise.all([
+              const [meals, txs] = await Promise.all([
                 // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단 API 엔드포인트 수정, 어디서: StatsPage.jsx 140번째 줄, 어떻게: /api/meals → /api/stats/meal?date=...로 변경, 왜: 백엔드 응답에 따르면 /api/meals는 존재하지 않고 /api/stats/meal을 사용해야 하기 때문에
                 dataApi
                   .get(`/api/stats/meal`, { params: { date: dateStr } })
                   .catch(() => ({ data: null })),
-                // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 장바구니 API 엔드포인트 수정, 어디서: StatsPage.jsx 141번째 줄, 어떻게: /api/cart → /api/stats/cart?date=...로 변경, 왜: 백엔드 응답에 따르면 /api/cart는 존재하지 않고 /api/stats/cart를 사용해야 하기 때문에
-                dataApi
-                  .get(`/api/stats/cart`, { params: { date: dateStr } })
-                  .catch(() => ({ data: null })),
-                dataApi
-                  .get(`/api/todo/getList`, { params: { date: dateStr } })
-                  .catch(() => ({ data: [] })),
                 dataApi
                   .get(`/api/tx`, {
                     params: { year: d.getFullYear(), month: d.getMonth() + 1 },
@@ -363,7 +337,7 @@ const MealReport = () => {
                   .catch(() => ({ data: [] })),
               ]);
 
-              // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API 응답 구조에 맞게 데이터 처리 수정, 어디서: StatsPage.jsx 145-165번째 줄, 어떻게: /api/stats/meal은 통계 객체를 반환하므로 직접 사용, /api/stats/cart도 통계 객체를 반환하므로 직접 사용, 왜: 백엔드 API 응답 구조가 배열이 아닌 통계 객체이기 때문에
+              // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API 응답 구조에 맞게 데이터 처리 수정, 어디서: StatsPage.jsx 145-165번째 줄, 어떻게: /api/stats/meal은 통계 객체를 반환하므로 직접 사용, 왜: 백엔드 API 응답 구조가 배열이 아닌 통계 객체이기 때문에
               // /api/stats/meal은 통계 객체 {totalCalories, targetCalories, ...}를 반환
               // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 식단 통계 데이터 처리 로직 수정, 어디서: StatsPage.jsx 155-162번째 줄, 어떻게: resMealCurrent가 없을 때 초기화하고, 각 날짜의 통계를 누적, 왜: 기간 내 모든 날짜의 식단 데이터를 집계하기 위해
               if (meals.data && meals.data.totalCalories !== undefined) {
@@ -376,43 +350,8 @@ const MealReport = () => {
                   Number(meals.data.totalCalories) || 0;
                 resMealCurrent.data.targetCalories +=
                   Number(meals.data.targetCalories) || 2000;
-                // console.log(
-                //   `DEBUG: 날짜 ${dateStr} 식단 통계`,
-                //   meals.data,
-                //   "누적:",
-                //   resMealCurrent.data
-                // );
               }
 
-              // /api/stats/cart는 통계 객체 {purchaseRate, totalQuantity, purchasedQuantity}를 반환
-              // [수정 2026-01-19] 누가: 효민, 무엇을: 장바구니 통계 데이터 조회 디버깅 로그 추가 및 데이터 누적 처리 개선, 어디서: StatsPage.jsx 314-321번째 줄, 어떻게: 각 날짜별 장바구니 데이터를 콘솔에 출력하고 누적 처리, 왜: 통계 페이지에서 장바구니 데이터가 제대로 표시되지 않는 문제 디버깅을 위해
-              // console.log(`DEBUG: 날짜 ${dateStr} 장바구니 통계`, cart.data);
-              if (cart.data && cart.data.totalQuantity !== undefined) {
-                if (!resCartCurrent?.data) {
-                  resCartCurrent = {
-                    data: {
-                      purchaseRate: 0,
-                      totalQuantity: 0,
-                      purchasedQuantity: 0,
-                    },
-                  };
-                }
-                resCartCurrent.data.totalQuantity +=
-                  Number(cart.data.totalQuantity) || 0;
-                resCartCurrent.data.purchasedQuantity +=
-                  Number(cart.data.purchasedQuantity) || 0;
-                console.log(
-                  `DEBUG: 날짜 ${dateStr} 장바구니 누적`,
-                  resCartCurrent.data
-                );
-              } else {
-                console.log(
-                  `DEBUG: 날짜 ${dateStr} 장바구니 데이터 없음 또는 totalQuantity 없음`
-                );
-              }
-
-              if (todos.data)
-                todoList.push(...(Array.isArray(todos.data) ? todos.data : []));
               if (txs.data) {
                 const filtered = Array.isArray(txs.data)
                   ? txs.data.filter((tx) => {
@@ -427,30 +366,7 @@ const MealReport = () => {
             }
           }
 
-          // 장바구니 구매율 계산
-          // [수정 2026-01-19] 누가: 효민, 무엇을: 장바구니 구매율 계산 로직의 조건문 오류 수정, 어디서: StatsPage.jsx 336-340번째 줄, 어떻게: !resCartCurrent?.data를 resCartCurrent?.data로 수정하고 totalQuantity > 0 조건 추가, 왜: 기존 조건문이 논리적으로 실행되지 않아 purchaseRate가 계산되지 않는 문제 해결
-          if (resCartCurrent?.data && resCartCurrent.data.totalQuantity > 0) {
-            resCartCurrent.data.purchaseRate =
-              (resCartCurrent.data.purchasedQuantity /
-                resCartCurrent.data.totalQuantity) *
-              100;
-            console.log(
-              "DEBUG: 장바구니 구매율 계산 완료",
-              resCartCurrent.data
-            );
-          }
-
-          if (!resTodoCurrent?.data && todoList.length > 0) {
-            const totalTodos = todoList.length;
-            const doneTodos = todoList.filter(
-              (todo) => todo.isDone || todo.is_done
-            ).length;
-            const completionRate =
-              totalTodos > 0 ? (doneTodos / totalTodos) * 100 : 0;
-            resTodoCurrent = {
-              data: { totalTodos, completedTodos: doneTodos, completionRate },
-            };
-          }
+          // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니/일정 통계 계산 로직 제거, 어디서: MealReport.jsx, 어떻게: 장바구니 구매율 및 일정 달성률 계산 코드 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
 
           // 카테고리별 지출 통계 계산
           if (
@@ -488,24 +404,16 @@ const MealReport = () => {
         }
 
         // 이전 기간 데이터 조회 (동일한 fallback 로직 적용)
-        // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 이전 기간 데이터 조회도 fallback 방식으로 변경, 어디서: StatsPage.jsx 147-220번째 줄, 어떻게: 신규 API 실패 시 기존 API로 조회 후 집계, 왜: 백엔드 API가 준비되지 않았을 때도 이전 기간 데이터를 조회하기 위해
-        let resMealPrev, resCartPrev, resTodoPrev, resCategoryPrev;
+        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니/일정 API 호출 제거, 어디서: MealReport.jsx, 어떻게: resCartPrev, resTodoPrev를 null로 초기화하고 Promise.all에서 해당 API 호출 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
+        let resMealPrev, resCategoryPrev;
+        let resCartPrev = null; // 제거된 API
+        let resTodoPrev = null; // 제거된 API
 
         try {
-          [resMealPrev, resCartPrev, resTodoPrev, resCategoryPrev] =
+          [resMealPrev, resCategoryPrev] =
             await Promise.all([
               dataApi
                 .get(`/api/stats/meal/range`, {
-                  params: { startDate: prevStart, endDate: prevEnd },
-                })
-                .catch(() => ({ data: null })),
-              dataApi
-                .get(`/api/stats/cart/range`, {
-                  params: { startDate: prevStart, endDate: prevEnd },
-                })
-                .catch(() => ({ data: null })),
-              dataApi
-                .get(`/api/todo/stats`, {
                   params: { startDate: prevStart, endDate: prevEnd },
                 })
                 .catch(() => ({ data: null })),
@@ -520,26 +428,19 @@ const MealReport = () => {
         }
 
         // 이전 기간 fallback
-        // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 이전 기간 fallback 로직도 동일하게 수정, 어디서: StatsPage.jsx 200-240번째 줄, 어떻게: /api/meals → /api/stats/meal, /api/cart → /api/stats/cart로 변경하고 응답 구조에 맞게 처리, 왜: 백엔드 API 엔드포인트와 응답 구조에 맞게 수정하기 위해
-        if (!resMealPrev?.data || !resCartPrev?.data || !resTodoPrev?.data) {
+        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니 API 호출 제거 및 조건문 수정, 어디서: MealReport.jsx, 어떻게: cart API 호출 제거하고 조건문에서 cart/todo 체크 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
+        if (!resMealPrev?.data) {
           const start = new Date(prevRange.startDate);
           const end = new Date(prevRange.endDate);
-          const todoList = [];
           const txList = [];
 
           for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
             const dateStr = formatDate(d);
             try {
-              const [meals, cart, todos, txs] = await Promise.all([
+              const [meals, txs] = await Promise.all([
                 dataApi
                   .get(`/api/stats/meal`, { params: { date: dateStr } })
                   .catch(() => ({ data: null })),
-                dataApi
-                  .get(`/api/stats/cart`, { params: { date: dateStr } })
-                  .catch(() => ({ data: null })),
-                dataApi
-                  .get(`/api/todo/getList`, { params: { date: dateStr } })
-                  .catch(() => ({ data: [] })),
                 dataApi
                   .get(`/api/tx`, {
                     params: { year: d.getFullYear(), month: d.getMonth() + 1 },
@@ -559,25 +460,6 @@ const MealReport = () => {
                   Number(meals.data.targetCalories) || 2000;
               }
 
-              // [수정 2026-01-19] 누가: 효민, 무엇을: 이전 기간 장바구니 통계 데이터 조회 디버깅 로그 추가, 어디서: StatsPage.jsx 426-432번째 줄, 어떻게: 각 날짜별 장바구니 데이터를 콘솔에 출력하고 누적 처리, 왜: 통계 페이지에서 장바구니 데이터가 제대로 표시되지 않는 문제 디버깅을 위해
-              if (cart.data && cart.data.totalQuantity !== undefined) {
-                if (!resCartPrev?.data) {
-                  resCartPrev = {
-                    data: {
-                      purchaseRate: 0,
-                      totalQuantity: 0,
-                      purchasedQuantity: 0,
-                    },
-                  };
-                }
-                resCartPrev.data.totalQuantity +=
-                  Number(cart.data.totalQuantity) || 0;
-                resCartPrev.data.purchasedQuantity +=
-                  Number(cart.data.purchasedQuantity) || 0;
-              }
-
-              if (todos.data)
-                todoList.push(...(Array.isArray(todos.data) ? todos.data : []));
               if (txs.data) {
                 const filtered = Array.isArray(txs.data)
                   ? txs.data.filter((tx) => {
@@ -592,25 +474,7 @@ const MealReport = () => {
             }
           }
 
-          // [수정 2026-01-19] 누가: 효민, 무엇을: 이전 기간 장바구니 구매율 계산 로직의 조건문 오류 수정, 어디서: StatsPage.jsx 447-449번째 줄, 어떻게: !resCartPrev?.data를 resCartPrev?.data로 수정하고 totalQuantity > 0 조건 추가, 왜: 기존 조건문이 논리적으로 실행되지 않아 purchaseRate가 계산되지 않는 문제 해결
-          if (resCartPrev?.data && resCartPrev.data.totalQuantity > 0) {
-            resCartPrev.data.purchaseRate =
-              (resCartPrev.data.purchasedQuantity /
-                resCartPrev.data.totalQuantity) *
-              100;
-          }
-
-          if (!resTodoPrev?.data && todoList.length > 0) {
-            const totalTodos = todoList.length;
-            const doneTodos = todoList.filter(
-              (todo) => todo.isDone || todo.is_done
-            ).length;
-            const completionRate =
-              totalTodos > 0 ? (doneTodos / totalTodos) * 100 : 0;
-            resTodoPrev = {
-              data: { totalTodos, completedTodos: doneTodos, completionRate },
-            };
-          }
+          // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니/일정 통계 계산 로직 제거, 어디서: MealReport.jsx, 어떻게: 장바구니 구매율 및 일정 달성률 계산 코드 제거, 왜: 백엔드에서 해당 API를 제거했기 때문에
 
           if (
             !resCategoryPrev?.data?.categories ||
@@ -802,32 +666,14 @@ const MealReport = () => {
         }
 
         // (3) 장바구니 완료율 계산: (구매 완료 항목 수 / 전체 등록 항목 수) × 100
-        // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 장바구니 완료율을 백엔드 API 응답에서 직접 사용, 어디서: StatsPage.jsx 168-178번째 줄, 어떻게: /api/stats/cart/range 응답의 purchaseRate 사용, 왜: 백엔드에서 이미 구매율을 계산하여 제공하기 때문에
+        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 장바구니 API로 인해 0으로 처리, 어디서: MealReport.jsx, 어떻게: 장바구니 값들을 0으로 설정, 왜: 백엔드에서 해당 API를 제거했기 때문에
         let currentCartValue = 0;
         let prevCartValue = 0;
 
-        if (resCartCurrent.data) {
-          currentCartValue = Math.floor(resCartCurrent.data.purchaseRate || 0);
-        }
-
-        if (resCartPrev.data) {
-          prevCartValue = Math.floor(resCartPrev.data.purchaseRate || 0);
-        }
-
         // (4) 일정 달성률 계산: (완료된 일정 수 / 전체 일정 수) × 100
-        // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: 일정 달성률을 백엔드 API 응답에서 직접 사용, 어디서: StatsPage.jsx 181-191번째 줄, 어떻게: /api/todo/stats 응답의 completionRate 사용, 왜: 백엔드에서 이미 완료율을 계산하여 제공하기 때문에
+        // [수정 2026-01-XX] 누가: 효민, 무엇을: 제거된 일정 API로 인해 0으로 처리, 어디서: MealReport.jsx, 어떻게: 일정 달성률 값들을 0으로 설정, 왜: 백엔드에서 해당 API를 제거했기 때문에
         let currentScheduleValue = 0;
         let prevScheduleValue = 0;
-
-        if (resTodoCurrent.data) {
-          currentScheduleValue = Math.floor(
-            resTodoCurrent.data.completionRate || 0
-          );
-        }
-
-        if (resTodoPrev.data) {
-          prevScheduleValue = Math.floor(resTodoPrev.data.completionRate || 0);
-        }
 
         // State 업데이트
         // [수정 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: state 업데이트 로직 변경, 어디서: StatsPage.jsx 223-230번째 줄, 어떻게: 현재 기간과 이전 기간 데이터를 각각 state에 저장, 왜: 이전 기간 대비 증감률 계산 및 표시를 위해
