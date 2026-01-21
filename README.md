@@ -18,7 +18,7 @@ Pocket Life는
 ### 2-1. 대표 대시보드
 
 <p align="center">
-  <img src="./image/DashBorad.png" alt="Pocket Life 대시보드" width="900" />
+  <img src="./src/image/DashBorad.png" alt="Pocket Life 대시보드" width="900" />
 </p>
 
 대시보드에서는 오늘의  
@@ -36,13 +36,13 @@ Pocket Life는
 README에서는 정적인 스크린샷으로 제공합니다.
 
 <p align="center">
-  <img src="./image/DashBorad.png" alt="대시보드 화면" width="260" />
-  <img src="./image/LedgerMoney.png" alt="가계부 화면" width="260" />
-  <img src="./image/LikeCart.png" alt="장바구니 & 즐겨찾기 화면" width="260" />
+  <img src="./src/image/DashBorad.png" alt="대시보드 화면" width="260" />
+  <img src="./src/image/LedgerMoney.png" alt="가계부 화면" width="260" />
+  <img src="./src/image/LikeCart.png" alt="장바구니 & 즐겨찾기 화면" width="260" />
 </p>
 <p align="center">
-  <img src="./image/MealFree.png" alt="식단 관리 & 영양 요약 화면" width="260" />
-  <img src="./image/ScheduleFunny.png" alt="일정 캘린더 화면" width="260" />
+  <img src="./src/image/MealFree.png" alt="식단 관리 & 영양 요약 화면" width="260" />
+  <img src="./src/image/ScheduleFunny.png" alt="일정 캘린더 화면" width="260" />
 </p>
 
 ---
@@ -51,7 +51,7 @@ README에서는 정적인 스크린샷으로 제공합니다.
 
 - **데모 GIF**  
   - 앱의 전체 플로우(로그인 → 대시보드 → 식단 기록 → 장바구니 → 가계부 → 일정)를 10~20초 분량으로 녹화한 GIF를 사용하는 것을 추천드립니다.  
-  - 예) `./image/demo-flow.gif`
+  - 예) `./src/image/demo-flow.gif`
 
 - **시연 영상 (YouTube 등)**  
   - 화면 흐름과 사용 시나리오를 설명하는 **1~2분 길이의 짧은 영상**을 추천드립니다.  
