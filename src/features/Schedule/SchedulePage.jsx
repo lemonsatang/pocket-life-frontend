@@ -1,6 +1,5 @@
 // [Layout] 일정 페이지 컴포넌트
 import React, { useEffect, useState } from "react";
-import PlaceholderPage from "../PlaceholderPage/PlaceholderPage";
 import Modal from "../../components/Modal/Modal";
 import "./SchedulePage.css";
 import axios from "axios";

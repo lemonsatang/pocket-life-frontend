@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./LedgerPage.css";
-import DashboardView from "./DashboardView";
-import TransactionView from "./TransactionView";
+import DashboardView from "./DashboardView/DashboardView";
+import TransactionView from "./TransactionView/TransactionView";
 import dataApi from "../../api/api";
 // 📍 월 선택을 위한 DatePicker 라이브러리 추가 (이미 설치되어 있는 것 활용)
 import DatePicker, { registerLocale } from "react-datepicker";

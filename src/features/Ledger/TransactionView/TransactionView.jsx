@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./TransactionView.css";
-import dataApi from "../../api/api";
+import dataApi from "../../../api/api";
 
 const TransactionView = ({
   transactions,

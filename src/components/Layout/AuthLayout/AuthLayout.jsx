@@ -2,7 +2,7 @@
 import React from "react";
 import LoginPage from "../../../pages/LoginPage/LoginPage";
 import SignupPage from "../../../pages/SignupPage/SignupPage";
-import "../../../styles/Auth.css";
+import "./Auth.css";
 
 const AuthLayout = ({ view, onGoLogin, onGoSignup, onLoginSuccess }) => {
   return (
