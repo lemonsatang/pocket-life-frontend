@@ -21,6 +21,7 @@ const TransactionView = ({
   const [editingId, setEditingId] = useState(null); // 수정 중인 항목 ID (null이면 신규 입력)
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
   const itemsPerPage = 10; // 한 페이지에 보여줄 내역 수
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false); // 정렬 드롭다운 열림/닫힘 상태
 
   // [모달 상태 관리]
   const [modalState, setModalState] = useState({
@@ -77,6 +78,23 @@ const TransactionView = ({
       }));
     }
   }, [viewDate]);
+
+  // 드롭다운 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isSortDropdownOpen && !event.target.closest('.custom-dropdown-wrapper')) {
+        setIsSortDropdownOpen(false);
+      }
+    };
+
+    if (isSortDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSortDropdownOpen]);
 
   // 날짜 포맷팅 함수: "2026년 01월 21일 수요일" 형식으로 변환
   const formatDateWithDay = (date) => {
@@ -312,14 +330,40 @@ const TransactionView = ({
       <div className="left-transaction-panel">
         <div className="table-top-bar">
           <div className="top-controls-left-group">
-            <select
-              className="top-sort-select"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            >
-              <option value="latest">최신순</option>
-              <option value="oldest">과거순</option>
-            </select>
+            <div className="custom-dropdown-wrapper">
+              <button
+                className="custom-dropdown-button"
+                onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                type="button"
+              >
+                <span>{sortOrder === "latest" ? "최신순" : "과거순"}</span>
+                <span className="dropdown-arrow">▾</span>
+              </button>
+              {isSortDropdownOpen && (
+                <div className="custom-dropdown-menu">
+                  <button
+                    className={`custom-dropdown-option ${sortOrder === "latest" ? "selected" : ""}`}
+                    onClick={() => {
+                      setSortOrder("latest");
+                      setIsSortDropdownOpen(false);
+                    }}
+                    type="button"
+                  >
+                    최신순
+                  </button>
+                  <button
+                    className={`custom-dropdown-option ${sortOrder === "oldest" ? "selected" : ""}`}
+                    onClick={() => {
+                      setSortOrder("oldest");
+                      setIsSortDropdownOpen(false);
+                    }}
+                    type="button"
+                  >
+                    과거순
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="filter-buttons">
               {["전체", "수입", "지출"].map((f) => (
                 <button
