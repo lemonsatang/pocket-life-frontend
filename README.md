@@ -31,10 +31,6 @@ Pocket Life는
 ---
 
 ### 2-2. 주요 화면 스크린샷 (자동 슬라이드용 5장)
-
-아래 이미지는 실제 서비스에서는 **자동 슬라이드(캐러셀)**로 넘겨 보이게 구성할 수 있고,  
-README에서는 정적인 스크린샷으로 제공합니다.
-
 <p align="center">
   <img src="./src/image/DashBorad.png" alt="대시보드 화면" width="260" />
   <img src="./src/image/LedgerMoney.png" alt="가계부 화면" width="260" />
