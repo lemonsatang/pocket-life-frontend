@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./TransactionView.css";
 import dataApi from "../../../api/api";
+import Modal from "../../../components/Modal/Modal";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { ko } from "date-fns/locale";
+import "react-datepicker/dist/react-datepicker.css";
+import "../../../styles/DatePicker.css";
+
+registerLocale("ko", ko);
 
 const TransactionView = ({
   transactions,
   onAddTransaction,
   onDeleteTransaction,
+  viewDate,
 }) => {
   // [1. 상태 관리]
   const [filter, setFilter] = useState("전체"); // 필터 상태 (전체/수입/지출)
@@ -14,21 +22,206 @@ const TransactionView = ({
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
   const itemsPerPage = 10; // 한 페이지에 보여줄 내역 수
 
+  // [모달 상태 관리]
+  const [modalState, setModalState] = useState({
+    open: false,
+    title: "",
+    message: "",
+    type: "success",
+    onConfirm: null,
+  });
+
+  const closeModal = () => {
+    setModalState((prev) => ({ ...prev, open: false }));
+  };
+
+  const openAlert = (message, type = "warning") => {
+    setModalState({
+      open: true,
+      title: "알림",
+      message,
+      type: type,
+      onConfirm: closeModal,
+      confirmText: "확인",
+    });
+  };
+
   // 입력 폼 상태 (이미지 UI에 맞춰 필드 구성)
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split("T")[0],
+    date: new Date(), // Date 객체로 변경
     item: "",
     category: "",
     amount: "",
     type: "지출", // 기본은 '지출' 버튼 활성화
     memo: "",
   });
+  
+  // 📍 달력 열림/닫힘 상태
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+
+  // [월 선택 동기화] 위에서 월을 선택하면 아래 날짜도 같은 월의 1일로 설정
+  useEffect(() => {
+    if (viewDate) {
+      const year = viewDate.getFullYear();
+      const month = viewDate.getMonth();
+      const today = new Date();
+      const isSameMonth =
+        today.getFullYear() === year && today.getMonth() === month;
+      const targetDate = isSameMonth
+        ? new Date(today.getFullYear(), today.getMonth(), today.getDate())
+        : new Date(year, month, 1);
+
+      setFormData((prev) => ({
+        ...prev,
+        date: targetDate,
+      }));
+    }
+  }, [viewDate]);
+
+  // 날짜 포맷팅 함수: "2026년 01월 21일 수요일" 형식으로 변환
+  const formatDateWithDay = (date) => {
+    if (!date) return "날짜 선택";
+    
+    try {
+      const dateObj = date instanceof Date ? date : new Date(date);
+      if (isNaN(dateObj.getTime())) return "날짜 선택";
+      
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const day = String(dateObj.getDate()).padStart(2, "0");
+      const dayNames = [
+        "일요일",
+        "월요일",
+        "화요일",
+        "수요일",
+        "목요일",
+        "금요일",
+        "토요일",
+      ];
+      const dayName = dayNames[dateObj.getDay()];
+      
+      return `${year}년 ${month}월 ${day}일 ${dayName}`;
+    } catch (e) {
+      return "날짜 선택";
+    }
+  };
+
+  // 날짜 변경 핸들러
+  const handleDateChange = (days) => {
+    const newDate = new Date(formData.date);
+    newDate.setDate(newDate.getDate() + days);
+    setFormData({ ...formData, date: newDate });
+  };
+
+  // DatePicker 커스텀 입력 컴포넌트
+  const CustomDateInput = React.forwardRef(({ value, onClick }, ref) => {
+    return (
+      <div
+        ref={ref}
+        onClick={(e) => {
+          if (e.target.tagName !== 'BUTTON') {
+            setIsDatePickerOpen(!isDatePickerOpen);
+            onClick(e);
+          }
+        }}
+        style={{
+          cursor: "pointer",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "4px",
+          padding: "10px 8px",
+          border: "1px solid #e2e8f0",
+          borderRadius: "10px",
+          background: "#fff",
+          fontSize: "14px",
+          color: "#2d3748",
+          lineHeight: 1.2,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+        }}
+      >
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDateChange(-1);
+          }}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "16px",
+            color: "#6f76a1",
+            cursor: "pointer",
+            padding: "2px 6px",
+            outline: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          ‹
+        </button>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            cursor: "pointer",
+            flex: 1,
+            justifyContent: "center",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            minWidth: 0,
+          }}
+        >
+          <span role="img" aria-label="calendar" style={{ flexShrink: 0 }}>
+            📅
+          </span>
+          <span 
+            style={{ 
+              whiteSpace: "nowrap",
+              display: "inline-block",
+              width: "145px",
+              textAlign: "center",
+            }}
+          >
+            {formatDateWithDay(formData.date)}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDateChange(1);
+          }}
+          style={{
+            background: "none",
+            border: "none",
+            fontSize: "16px",
+            color: "#6f76a1",
+            cursor: "pointer",
+            padding: "2px 6px",
+            outline: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          ›
+        </button>
+      </div>
+    );
+  });
 
   // [2. 수정 버튼 클릭 시 실행: 선택한 데이터를 폼으로 가져오기]
   const handleEditClick = (tx) => {
     setEditingId(tx.id); // 수정 모드 전환
     setFormData({
-      date: tx.rawDate, // YYYY-MM-DD 원본 날짜
+      date: new Date(tx.rawDate), // Date 객체로 변환
       item: tx.item,
       category: tx.category,
       amount: tx.amount.toString(),
@@ -47,15 +240,20 @@ const TransactionView = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.item || !formData.amount) {
-      alert("항목과 금액을 입력해주세요.");
+      openAlert("항목과 금액을 입력해주세요.", "warning");
       return;
     }
 
     try {
+      // 날짜를 YYYY-MM-DD 형식으로 변환
+      const dateStr = formData.date instanceof Date 
+        ? formData.date.toISOString().split("T")[0] 
+        : formData.date;
+
       if (editingId) {
         // --- 📍 수정 모드일 때 (PUT 요청) ---
         const updateData = {
-          txDate: formData.date,
+          txDate: dateStr,
           title: formData.item,
           category: formData.category,
           memo: formData.memo,
@@ -63,16 +261,16 @@ const TransactionView = ({
           type: formData.type === "수입" ? "INCOME" : "EXPENSE",
         };
         await dataApi.put(`/api/tx/${editingId}`, updateData);
-        alert("수정이 완료되었습니다.");
+        openAlert("수정이 완료되었습니다.", "success");
         setEditingId(null);
         window.location.reload(); // 데이터 갱신을 위해 새로고침
       } else {
         // --- 📍 신규 입력 모드일 때 ---
-        await onAddTransaction(formData);
+        await onAddTransaction({ ...formData, date: dateStr });
       }
       // 폼 초기화
       setFormData({
-        date: new Date().toISOString().split("T")[0],
+        date: new Date(),
         item: "",
         category: "",
         amount: "",
@@ -81,7 +279,7 @@ const TransactionView = ({
       });
     } catch (error) {
       console.error("저장 실패:", error);
-      alert("저장에 실패했습니다.");
+      openAlert("저장에 실패했습니다.", "warning");
     }
   };
 
@@ -259,11 +457,83 @@ const TransactionView = ({
               value={formData.category}
               onChange={handleInputChange}
             />
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
+            <DatePicker
+              selected={formData.date}
+              onChange={(date) => {
+                setFormData({ ...formData, date });
+                setIsDatePickerOpen(false);
+              }}
+              open={isDatePickerOpen}
+              onCalendarOpen={() => setIsDatePickerOpen(true)}
+              onCalendarClose={() => setIsDatePickerOpen(false)}
+              dateFormat="yyyy년 M월 d일"
+              locale="ko"
+              customInput={<CustomDateInput />}
+              renderCustomHeader={({
+                date,
+                decreaseMonth,
+                increaseMonth,
+                prevMonthButtonDisabled,
+                nextMonthButtonDisabled,
+              }) => (
+                <div className="react-datepicker__header" style={{ position: "relative", textAlign: "center" }}>
+                  <button
+                    type="button"
+                    onClick={decreaseMonth}
+                    disabled={prevMonthButtonDisabled}
+                    className="react-datepicker__navigation react-datepicker__navigation--previous"
+                    aria-label="이전 달"
+                    style={{
+                      position: "absolute",
+                      left: "10px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      zIndex: 1,
+                      width: "32px",
+                      height: "32px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
+                      outline: "none",
+                      color: "#5e72e4",
+                      fontSize: "1.2rem",
+                      opacity: prevMonthButtonDisabled ? 0.3 : 1
+                    }}
+                  >
+                    ◀
+                  </button>
+                  <h2 className="react-datepicker__current-month">
+                    {date.getFullYear()}년 {String(date.getMonth() + 1).padStart(2, "0")}월
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={increaseMonth}
+                    disabled={nextMonthButtonDisabled}
+                    className="react-datepicker__navigation react-datepicker__navigation--next"
+                    aria-label="다음 달"
+                    style={{
+                      position: "absolute",
+                      right: "10px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      zIndex: 1,
+                      width: "32px",
+                      height: "32px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
+                      outline: "none",
+                      color: "#5e72e4",
+                      fontSize: "1.2rem",
+                      opacity: nextMonthButtonDisabled ? 0.3 : 1
+                    }}
+                  >
+                    ▶
+                  </button>
+                </div>
+              )}
             />
             <input
               type="text"
@@ -283,7 +553,7 @@ const TransactionView = ({
                 onClick={() => {
                   setEditingId(null);
                   setFormData({
-                    date: new Date().toISOString().split("T")[0],
+                    date: new Date(),
                     item: "",
                     category: "",
                     amount: "",
@@ -320,6 +590,14 @@ const TransactionView = ({
           </div>
         </div>
       </div>
+      <Modal
+        open={modalState.open}
+        title={modalState.title}
+        message={modalState.message}
+        type={modalState.type}
+        onConfirm={modalState.onConfirm}
+        confirmText={modalState.confirmText || "확인"}
+      />
     </div>
   );
 };

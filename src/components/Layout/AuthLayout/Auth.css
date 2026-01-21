@@ -48,554 +48,334 @@
   color: #6f76a1;
   font-weight: 700;
   cursor: pointer;
-  font-family: "Jua", sans-serif;
-  transition: 0.2s;
+  font-family: "Jua", sans-serif !important;
 }
 
-.logoutBtn:hover {
-  background: #d4dbff;
+.logoutBtn:focus,
+.logoutBtn:active {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* 5. 인증 카드 */
 .auth-card {
-  background: white;
-  border-radius: 20px;
-  padding: 40px 30px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px rgba(50, 60, 120, 0.1) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
   position: relative;
-  overflow: hidden;
+  border: none !important;
 }
 
-.auth-card::before {
+.auth-card::before,
+.auth-card::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* 6. 배너 */
+.banner {
+  height: 50px;
+  width: 100%;
+  background: linear-gradient(135deg, #8fb8ff, #c8b8ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  position: relative;
+  z-index: 1;
+}
+
+.banner:before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-}
-
-/* 6. 배너 영역 */
-.banner {
-  margin-bottom: 20px;
+  inset: -40px;
+  opacity: 0.22;
+  background: radial-gradient(circle at 20% 80%, #fff 0 40%, transparent 41%),
+    radial-gradient(circle at 60% 30%, #fff 0 35%, transparent 36%),
+    radial-gradient(circle at 90% 70%, #fff 0 28%, transparent 29%);
 }
 
 .drop {
-  width: 64px;
-  height: 64px;
-  fill: #667eea;
-  filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3));
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.08));
 }
 
-/* 7. 패널 영역 */
+.drop path {
+  fill: #eef4ff;
+}
+
+/* 7. 패널 */
 .panel {
-  width: 100%;
-}
-
-/* 8. 로그인/회원가입 폼 공통 스타일 */
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.auth-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: left;
-}
-
-.auth-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #4a5568;
-  font-family: "Jua", sans-serif;
-}
-
-.auth-input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 16px;
-  font-family: "Jua", sans-serif;
-  transition: all 0.2s;
-  outline: none;
-}
-
-.auth-input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.auth-input::placeholder {
-  color: #a0aec0;
-}
-
-/* 9. 비밀번호 입력 그룹 */
-.auth-password-group {
+  background: transparent !important;
+  box-shadow: none !important;
+  margin-top: 0 !important;
+  padding: 24px 45px 30px !important;
+  border-radius: 0 !important;
   position: relative;
 }
 
-.auth-password-toggle {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #718096;
-  font-size: 18px;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-password-toggle:hover {
-  color: #4a5568;
-}
-
-/* 10. 버튼 스타일 */
-.auth-button {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 10px;
+.panelTitle {
+  font-weight: 800;
+  color: #6f76a1;
+  margin: 0 0 10px;
   font-size: 16px;
-  font-weight: 700;
-  font-family: "Jua", sans-serif;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  text-align: center;
+  border: 0 !important;
+  font-family: "Jua", sans-serif !important;
 }
 
-.auth-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-}
-
-.auth-button:active {
-  transform: translateY(0);
-}
-
-.auth-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* 11. 링크 및 텍스트 */
-.auth-link {
-  color: #667eea;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: "Jua", sans-serif;
-  transition: color 0.2s;
-}
-
-.auth-link:hover {
-  color: #764ba2;
-  text-decoration: underline;
-}
-
-.auth-text {
-  color: #718096;
-  font-size: 14px;
-  font-family: "Jua", sans-serif;
-  margin: 0;
-}
-
-.auth-divider {
+/* 8. 폼 */
+.form {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 20px 0;
-  color: #a0aec0;
-  font-size: 14px;
-  font-family: "Jua", sans-serif;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.auth-divider::before,
-.auth-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: #e2e8f0;
-}
-
-/* 12. 소셜 로그인 버튼 */
-.auth-social-button {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  background: white;
-  color: #4a5568;
-  font-size: 15px;
-  font-weight: 600;
-  font-family: "Jua", sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.auth-social-button:hover {
-  border-color: #667eea;
-  background: #f7fafc;
-  color: #667eea;
-}
-
-/* 13. 에러 메시지 */
-.auth-error {
-  color: #e53e3e;
-  font-size: 13px;
-  font-family: "Jua", sans-serif;
-  margin-top: 4px;
-}
-
-/* 14. 체크박스 및 라벨 */
-.auth-checkbox-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-align: left;
-}
-
-.auth-checkbox {
+/* 9. 아이콘 */
+.icon {
   width: 18px;
   height: 18px;
-  cursor: pointer;
-  accent-color: #667eea;
-}
-
-.auth-checkbox-label {
-  font-size: 14px;
-  color: #4a5568;
-  font-family: "Jua", sans-serif;
-  cursor: pointer;
-}
-
-/* 15. 반응형 디자인 */
-@media (max-width: 480px) {
-  .authWrap {
-    width: 100%;
-    padding: 0 20px;
-  }
-
-  .auth-card {
-    padding: 30px 20px;
-  }
-
-  .brand {
-    font-size: 18px;
-  }
-}
-
-/* 16. 로딩 상태 */
-.auth-loading {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* 17. 성공 메시지 */
-.auth-success {
-  color: #38a169;
-  font-size: 13px;
-  font-family: "Jua", sans-serif;
-  margin-top: 4px;
-}
-
-/* 18. 추가 정보 섹션 */
-.auth-info {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
-  text-align: center;
-}
-
-.auth-info-text {
-  color: #718096;
-  font-size: 13px;
-  font-family: "Jua", sans-serif;
-  margin-bottom: 12px;
-}
-
-/* 19. 탭 스위치 (로그인/회원가입) */
-.auth-tabs {
   display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  background: #f7fafc;
-  padding: 4px;
-  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 18px;
 }
 
-.auth-tab {
-  flex: 1;
-  padding: 10px;
-  text-align: center;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  font-family: "Jua", sans-serif;
-  color: #718096;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  background: transparent;
+.icon svg {
+  fill: #1f2a44;
+  opacity: 0.8;
 }
 
-.auth-tab.active {
-  background: white;
-  color: #667eea;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* 20. 아이디 찾기 링크 */
-.auth-find-link {
-  text-align: right;
-  margin-top: -8px;
-}
-
-/* 21. 약관 동의 */
-.auth-terms {
-  background: #f7fafc;
-  padding: 16px;
-  border-radius: 10px;
-  margin-top: 8px;
-  text-align: left;
-}
-
-.auth-terms-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #4a5568;
-  font-family: "Jua", sans-serif;
-  margin-bottom: 12px;
-}
-
-.auth-terms-item {
+/* 10. 입력 필드 */
+.field {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 8px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #dfe4ff;
+  border-radius: 12px;
+  padding: 8px 12px;
+  background: #fff;
 }
 
-.auth-terms-item:last-child {
-  margin-bottom: 0;
-}
-
-.auth-terms-checkbox {
-  margin-top: 2px;
-}
-
-.auth-terms-label {
-  font-size: 13px;
-  color: #4a5568;
-  font-family: "Jua", sans-serif;
-  line-height: 1.5;
-}
-
-.auth-terms-link {
-  color: #667eea;
-  text-decoration: none;
-}
-
-.auth-terms-link:hover {
-  text-decoration: underline;
-}
-
-/* 22. 필수 표시 */
-.auth-required {
-  color: #e53e3e;
-  margin-left: 4px;
-}
-
-/* 23. 입력 그룹 행 (이름, 성 등 나란히 배치) */
-.auth-input-row {
-  display: flex;
-  gap: 12px;
-}
-
-.auth-input-row .auth-input-group {
-  flex: 1;
-}
-
-/* 24. 비밀번호 강도 표시 */
-.auth-password-strength {
-  margin-top: 8px;
-  height: 4px;
-  background: #e2e8f0;
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.auth-password-strength-bar {
-  height: 100%;
-  transition: width 0.3s, background-color 0.3s;
-}
-
-.auth-password-strength-bar.weak {
-  width: 33%;
-  background: #e53e3e;
-}
-
-.auth-password-strength-bar.medium {
-  width: 66%;
-  background: #ed8936;
-}
-
-.auth-password-strength-bar.strong {
+.input {
+  border: 0;
+  outline: 0;
   width: 100%;
-  background: #38a169;
-}
-
-/* 25. 토스트 메시지 */
-.auth-toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: white;
-  padding: 16px 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 10000;
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.auth-toast.success {
-  border-left: 4px solid #38a169;
-}
-
-.auth-toast.error {
-  border-left: 4px solid #e53e3e;
-}
-
-.auth-toast-message {
   font-size: 14px;
-  font-family: "Jua", sans-serif;
-  color: #4a5568;
-  margin: 0;
+  color: #2b2f44;
+  background: transparent;
+  font-family: "Jua", sans-serif !important;
 }
 
-/* 26. 도움말 텍스트 */
-.auth-help-text {
+.input::placeholder {
+  color: #8e95b6;
+  font-family: "Jua", sans-serif !important;
+}
+
+/* 11. 에러 메시지 */
+.fieldErr {
+  margin: -2px 2px 4px;
+  text-align: left;
+  color: #e5485f;
   font-size: 12px;
-  color: #a0aec0;
-  font-family: "Jua", sans-serif;
-  margin-top: 4px;
+  font-family: "Jua", sans-serif !important;
 }
 
-/* 27. 선택적 필드 표시 */
-.auth-optional {
-  color: #a0aec0;
-  font-size: 12px;
-  font-weight: normal;
-  margin-left: 4px;
+.errSpace {
+  height: 8px;
 }
 
-/* 28. 재사용 가능한 유틸리티 클래스 */
-.auth-text-center {
-  text-align: center;
+/* 12. 주요 버튼 */
+.primaryBtn {
+  margin-top: 8px;
+  border: 0;
+  border-radius: 12px;
+  padding: 11px 12px;
+  background: #aebaf0;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: "Jua", sans-serif !important;
+  font-size: 16px;
 }
 
-.auth-text-left {
+.primaryBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.primaryBtn:focus,
+.primaryBtn:active {
+  outline: none !important;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 13. 동의 박스 */
+.agreeBox {
+  margin-top: 2px;
   text-align: left;
 }
 
-.auth-text-right {
-  text-align: right;
+.agreeHead {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
 }
 
-.auth-mt-1 {
-  margin-top: 8px;
+.agreeTitle {
+  font-weight: 800;
+  color: #1f2a44;
+  font-size: 13px;
+  font-family: "Jua", sans-serif !important;
 }
 
-.auth-mt-2 {
-  margin-top: 16px;
+.agreeDesc {
+  color: #737aa0;
+  font-size: 12px;
+  margin-top: 4px;
+  line-height: 1.35;
+  font-family: "Jua", sans-serif !important;
 }
 
-.auth-mt-3 {
-  margin-top: 24px;
+.agreeSub {
+  margin-left: 28px;
+  margin-top: 6px;
+  display: grid;
+  gap: 6px;
 }
 
-.auth-mb-1 {
-  margin-bottom: 8px;
+.agreeLine {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: #1f2a44;
+  font-size: 13px;
+  font-family: "Jua", sans-serif !important;
 }
 
-.auth-mb-2 {
-  margin-bottom: 16px;
+/* 14. 미니 링크 */
+.miniLinks {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  color: #7c84aa;
+  font-size: 12px;
 }
 
-.auth-mb-3 {
-  margin-bottom: 24px;
+.miniLink {
+  border: 0;
+  background: transparent;
+  color: #7c84aa;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: "Jua", sans-serif !important;
 }
 
-/* 29. 접근성 개선 */
-.auth-input:focus-visible {
-  outline: 2px solid #667eea;
-  outline-offset: 2px;
+.miniLink:focus,
+.miniLink:active {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-.auth-button:focus-visible {
-  outline: 2px solid white;
-  outline-offset: 2px;
+.dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #b7bddc;
 }
 
-/* 30. 다크모드 대비 (향후 확장용) */
-@media (prefers-color-scheme: dark) {
-  .auth-card {
-    background: #1a202c;
-    color: #e2e8f0;
-  }
+/* 15. 구분선 */
+.dividerRow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 0 8px;
+}
 
-  .auth-input {
-    background: #2d3748;
-    border-color: #4a5568;
-    color: #e2e8f0;
-  }
+.hr {
+  height: 1px;
+  background: #e7e9fb;
+}
 
-  .auth-input:focus {
-    border-color: #667eea;
-  }
+.or {
+  font-size: 12px;
+  color: #1f2a44;
+  font-weight: 800;
+  font-family: "Jua", sans-serif !important;
+}
 
-  .auth-label {
-    color: #e2e8f0;
-  }
+/* 16. 소셜 로그인 */
+.socialRow {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 6px;
+}
 
-  .auth-text {
-    color: #a0aec0;
-  }
+.social {
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.social:hover,
+.social:focus,
+.social:active {
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08) !important;
+  outline: none !important;
+}
+
+.google {
+  background: #fff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+}
+
+.naver {
+  background: #19d35a;
+  color: #fff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  font-family: "Jua", sans-serif !important;
+}
+
+.kakao {
+  background: #fee500;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* 17. 하단 링크 */
+.bottomLink {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #7c84aa;
+  font-family: "Jua", sans-serif !important;
+}
+
+.bottomBtn {
+  border: 0;
+  background: transparent;
+  color: #6f76a1;
+  font-weight: 900;
+  cursor: pointer;
+  font-family: "Jua", sans-serif !important;
+}
+
+.bottomBtn:focus,
+.bottomBtn:active {
+  outline: none !important;
+  box-shadow: none !important;
 }

@@ -5,7 +5,8 @@
 .transaction-view-container {
   display: flex;
   gap: 20px;
-  height: 100%;
+  height: auto;
+  align-items: flex-start;
   /* 📍 Noto Sans KR 대신 Jua 폰트로 변경 */
   font-family: "Jua", sans-serif;
 }
@@ -80,9 +81,14 @@
 .transaction-list-card {
   background: white;
   border-radius: 20px;
-  padding: 10px 20px;
+  padding: 8px 20px 8px 20px;
   flex: 1;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  min-height: 545px;
+  max-height: 545px;
+  overflow-y: auto;
 }
 .transaction-table {
   width: 100%;
@@ -90,13 +96,13 @@
   text-align: center;
 }
 .transaction-table th {
-  padding: 12px;
+  padding: 10px;
   border-bottom: 2px solid #f0f0f0;
   color: #777;
   font-size: 14px;
 }
 .transaction-table td.td-narrow {
-  padding: 8px 5px;
+  padding: 6px 5px;
   border-bottom: 1px solid #f9f9f9;
   font-size: 14px;
 }
@@ -152,20 +158,20 @@
 .side-card {
   background: white;
   border-radius: 20px;
-  padding: 20px;
+  padding: 16px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 .card-header-title {
   text-align: center;
   font-size: 15px;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   font-weight: bold;
   color: #333;
 }
 .type-selector {
   display: flex;
   gap: 8px;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 .type-selector button {
   flex: 1;
@@ -188,7 +194,7 @@
 .input-form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 .input-form input {
   padding: 11px;
@@ -236,7 +242,8 @@
   justify-content: center;
   align-items: center;
   gap: 6px;
-  margin-top: 15px;
+  margin-top: auto;
+  margin-bottom: 0;
 }
 .page-num-btn {
   border: none;

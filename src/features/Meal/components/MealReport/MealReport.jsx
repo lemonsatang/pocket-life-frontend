@@ -605,6 +605,7 @@ const MealReport = () => {
               selected={currentDate}
               onChange={handleDatePickerChange}
               dateFormat="yyyy년 MM월"
+              formatMonthYear={(date) => `${date.getFullYear()}년 ${String(date.getMonth() + 1).padStart(2, "0")}월`}
               showMonthYearPicker={true}
               locale="ko"
               calendarClassName="meal-report-month-calendar"

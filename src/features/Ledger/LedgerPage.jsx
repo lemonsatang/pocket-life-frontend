@@ -3,10 +3,12 @@ import "./LedgerPage.css";
 import DashboardView from "./DashboardView/DashboardView";
 import TransactionView from "./TransactionView/TransactionView";
 import dataApi from "../../api/api";
+import Modal from "../../components/Modal/Modal";
 // 📍 월 선택을 위한 DatePicker 라이브러리 추가 (이미 설치되어 있는 것 활용)
 import DatePicker, { registerLocale } from "react-datepicker";
 import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
+import "../../styles/DatePicker.css";
 
 registerLocale("ko", ko);
 
@@ -15,6 +17,52 @@ const LedgerPage = () => {
   const [transactions, setTransactions] = useState([]);
   // 📍 [추가] 현재 보고 있는 기준 월 상태 (기본값: 오늘 날짜의 월)
   const [viewDate, setViewDate] = useState(new Date());
+  // 📍 달력 열림/닫힘 상태
+  const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
+
+  // [모달 상태 관리]
+  const [modalState, setModalState] = useState({
+    open: false,
+    title: "",
+    message: "",
+    type: "success",
+    onConfirm: null,
+    onCancel: null,
+    showCancel: false,
+  });
+
+  const closeModal = () => {
+    setModalState((prev) => ({ ...prev, open: false }));
+  };
+
+  const openAlert = (message, type = "warning") => {
+    setModalState({
+      open: true,
+      title: "알림",
+      message,
+      type: type,
+      onConfirm: closeModal,
+      confirmText: "확인",
+      showCancel: false,
+    });
+  };
+
+  const openConfirm = (message, onConfirm) => {
+    setModalState({
+      open: true,
+      title: "확인",
+      message,
+      type: "warning",
+      onConfirm: () => {
+        onConfirm();
+        closeModal();
+      },
+      onCancel: closeModal,
+      showCancel: true,
+      confirmText: "확인",
+      cancelText: "취소",
+    });
+  };
 
   // [1. 서버에서 거래 기록 불러오기]
   const fetchTransactions = async () => {
@@ -60,19 +108,21 @@ const LedgerPage = () => {
       setActiveTab("dashboard");
     } catch (error) {
       console.error("저장 실패:", error);
-      alert("데이터 저장에 실패했습니다.");
+      openAlert("데이터 저장에 실패했습니다.", "warning");
     }
   };
 
   // [3. 내역 삭제 함수]
   const handleDeleteTransaction = async (id) => {
-    if (!window.confirm("정말 삭제하시겠습니까?")) return;
-    try {
-      await dataApi.delete(`/api/tx/${id}`);
-      await fetchTransactions();
-    } catch (error) {
-      console.error("삭제 실패:", error);
-    }
+    openConfirm("정말 삭제하시겠습니까?", async () => {
+      try {
+        await dataApi.delete(`/api/tx/${id}`);
+        await fetchTransactions();
+      } catch (error) {
+        console.error("삭제 실패:", error);
+        openAlert("삭제에 실패했습니다.", "warning");
+      }
+    });
   };
 
   // 📍 [4. 필터링 로직] 현재 선택된 월(viewDate)에 해당하는 데이터만 추출
@@ -114,13 +164,27 @@ const LedgerPage = () => {
             <div className="date-badge-wrapper">
               <DatePicker
                 selected={viewDate}
-                onChange={(date) => setViewDate(date)}
+                onChange={(date) => {
+                  setViewDate(date);
+                  setIsMonthPickerOpen(false);
+                }}
+                open={isMonthPickerOpen}
+                onInputClick={() => setIsMonthPickerOpen(!isMonthPickerOpen)}
+                onClickOutside={() => setIsMonthPickerOpen(false)}
                 dateFormat="yyyy년 MM월"
+                formatMonthYear={(date) => `${date.getFullYear()}년 ${String(date.getMonth() + 1).padStart(2, "0")}월`}
                 showMonthYearPicker // 월/년 선택 모드 활성화
                 locale="ko"
                 customInput={
-                  <div className="date-badge" style={{ cursor: "pointer" }}>
-                    {viewDate.getFullYear()}년 {viewDate.getMonth() + 1}월 ▾
+                  <div 
+                    className="date-badge" 
+                    style={{ cursor: "pointer" }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsMonthPickerOpen(!isMonthPickerOpen);
+                    }}
+                  >
+                    {viewDate.getFullYear()}년 {String(viewDate.getMonth() + 1).padStart(2, "0")}월 ▾
                   </div>
                 }
               />
@@ -136,11 +200,23 @@ const LedgerPage = () => {
                 transactions={monthlyTransactions}
                 onAddTransaction={handleAddTransaction}
                 onDeleteTransaction={handleDeleteTransaction}
+                viewDate={viewDate}
               />
             )}
           </div>
         </main>
       </div>
+      <Modal
+        open={modalState.open}
+        title={modalState.title}
+        message={modalState.message}
+        type={modalState.type}
+        onConfirm={modalState.onConfirm}
+        onCancel={modalState.onCancel}
+        showCancel={modalState.showCancel}
+        confirmText={modalState.confirmText || "확인"}
+        cancelText={modalState.cancelText || "취소"}
+      />
     </div>
   );
 };
