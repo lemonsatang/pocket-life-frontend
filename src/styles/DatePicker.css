@@ -91,3 +91,21 @@
   color: #5e72e4;
   /* [수정 2026-01-15 09:45] 버튼 색상 변경 */
 }
+/* 10. 주 단위 범위 선택 스타일 */
+/* [추가 2026-01-19] 누가: 효민, 무엇을: 주 단위 범위 선택 시 시각적 피드백을 위한 스타일 추가, 어디서: DatePicker.css 95-105번째 줄, 어떻게: 범위 내 날짜와 범위 시작/종료 날짜에 배경색과 테두리 적용, 왜: 사용자가 선택한 주 전체가 명확하게 표시되도록 하기 위해 */
+.react-datepicker__day--in-range {
+  background-color: #edf2f7 !important;
+  color: #4a5568 !important;
+}
+
+.react-datepicker__day--in-selecting-range {
+  background-color: #edf2f7 !important;
+  color: #4a5568 !important;
+}
+
+.react-datepicker__day--range-start,
+.react-datepicker__day--range-end {
+  background-color: #5e72e4 !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+}

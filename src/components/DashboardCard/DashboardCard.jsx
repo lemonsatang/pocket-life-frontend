@@ -11,14 +11,14 @@ const DashboardCard = ({
   linkTo,
   btnText,
   isMeal,
-  isAccount, // ✅ 가계부 카드 여부
+  isAccount, // ✅ 가계부 카드 여부 (true면 수입/지출 요약 표시)
   isCart,
   isTodo,
-  income, // ✅ 백엔드에서 받아온 수입 데이터
-  expense, // ✅ 백엔드에서 받아온 지출 데이터
+  income, // ✅ 대시보드에서 /api/tx/summary로 받아온 수입
+  expense, // ✅ 대시보드에서 /api/tx/summary로 받아온 지출
   totalCalories,
 }) => {
-  // ✅ [수정] 숫자가 안 넘어올 경우를 대비한 안전 처리 및 합계 계산
+  // ✅ 숫자가 안 넘어올 경우를 대비한 안전 처리
   const safeIncome = Number(income) || 0;
   const safeExpense = Number(expense) || 0;
   const totalBalance = safeIncome - safeExpense;
@@ -27,13 +27,9 @@ const DashboardCard = ({
   const isOver = safeCalories > 2000;
 
   // [Logic] 치팅 식단 포함 여부 확인
-  const hasCheatMeal =
-    isMeal &&
-    list?.some((item) =>
-      cheatMeals.some((cheat) =>
-        (item.text || item.menuName || "").includes(cheat.name),
-      ),
-    );
+  const hasCheatMeal = isMeal && list?.some((item) => 
+    cheatMeals.some((cheat) => (item.text || item.menuName || "").includes(cheat.name))
+  );
 
   // [Logic] 치팅 데이 조건: 칼로리 2000 초과 AND 치팅 식단 포함
   const isCheatingDay = isOver && hasCheatMeal;
@@ -51,28 +47,25 @@ const DashboardCard = ({
 
       <div className="dashboard-card-content">
         {isAccount ? (
-          /* ================= 가계부 카드 영역 (수정됨) ================= */
+          /* ================= 가계부 카드 영역 ================= */
           <div className="dashboard-card-account">
-            {/* 수입 표시 줄 */}
             <div className="dashboard-card-account-row">
-              <span className="dashboard-card-account-label">이번 달 수입</span>
+              <span className="dashboard-card-account-label">수입</span>
               <span className="dashboard-card-account-income">
                 +{safeIncome.toLocaleString()}원
               </span>
             </div>
 
-            {/* 지출 표시 줄 */}
             <div className="dashboard-card-account-row">
-              <span className="dashboard-card-account-label">이번 달 지출</span>
+              <span className="dashboard-card-account-label">지출</span>
               <span className="dashboard-card-account-expense">
                 -{safeExpense.toLocaleString()}원
               </span>
             </div>
 
-            {/* 오늘의 합계(잔액) 요약 영역 */}
             <div className="dashboard-card-account-summary">
               <p className="dashboard-card-account-summary-label">
-                현재 총 잔액
+                오늘의 합계
               </p>
               <span
                 className={`dashboard-card-account-summary-value ${
@@ -86,7 +79,6 @@ const DashboardCard = ({
         ) : isTodo ? (
           <p className="dashboard-card-empty">{emptyMsg}</p>
         ) : (
-          /* 식단, 장바구니 등 기존 팀원들이 작성한 리스트 로직 유지 */
           <ul className="dashboard-card-list">
             {list?.length > 0 ? (
               list.slice(0, 5).map((item, idx) => {
@@ -104,23 +96,22 @@ const DashboardCard = ({
                           ? "✅ "
                           : "🛒 "
                         : item.isDone
-                          ? "✅ "
-                          : "• "}
+                        ? "✅ "
+                        : "• "}
                       {isMeal && item.mealType && (
-                        <strong className="dashboard-card-list-item-meal-type">
-                          [{item.mealType}]
-                        </strong>
-                      )}
-                      {item.text || item.menuName}
+                      <strong className="dashboard-card-list-item-meal-type">
+                        [{item.mealType}]
+                      </strong>
+                    )}
+                    {item.text || item.menuName}
+                  </span>
+                  {/* [Logic] 치팅 데이(2000kcal 초과 + 치팅메뉴)가 아닐 때만 칼로리 표시 */}
+                  {isMeal && item.calories !== undefined && !isCheatingDay && (
+                    <span className="dashboard-card-list-item-calories">
+                      {item.calories} kcal
                     </span>
-                    {isMeal &&
-                      item.calories !== undefined &&
-                      !isCheatingDay && (
-                        <span className="dashboard-card-list-item-calories">
-                          {item.calories} kcal
-                        </span>
-                      )}
-                  </li>
+                  )}
+                </li>
                 );
               })
             ) : (
@@ -130,20 +121,17 @@ const DashboardCard = ({
         )}
       </div>
 
-      {/* 식단 카드 전용 칼로리 요약 (기존 유지) */}
+      {/* 식단 카드일 때만 칼로리 요약 표시 */}
       {isMeal && (
         <div className="dashboard-card-calories">
-          {!isCheatingDay && (
-            <p className="dashboard-card-calories-label">오늘 총 칼로리</p>
-          )}
+          {!isCheatingDay && <p className="dashboard-card-calories-label">오늘 총 칼로리</p>}
           <span
             className={`dashboard-card-calories-value ${
               isOver ? "over" : "normal"
             }`}
           >
-            {isCheatingDay
-              ? "치팅데이!"
-              : `${safeCalories.toLocaleString()} kcal`}
+            {/* [Logic] 치팅 데이 조건 충족 시 문구 변경 */}
+            {isCheatingDay ? "치팅데이!" : `${safeCalories.toLocaleString()} kcal`}
           </span>
         </div>
       )}
@@ -152,7 +140,6 @@ const DashboardCard = ({
         <div className="dashboard-card-warning">⚠️ 구매완료 해주세요!</div>
       )}
 
-      {/* 하단 버튼 영역 */}
       <Link to={finalLink} className="dashboard-card-link">
         <button className="pixel-btn dashboard-card-button">{btnText}</button>
       </Link>

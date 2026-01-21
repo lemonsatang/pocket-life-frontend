@@ -70,25 +70,30 @@ const MealPage = ({ onLogout }) => {
 
     if (cheatMeal) {
         // [UI] 수량 선택 모달 띄우기
+        // [수정] 메뉴판 모달이 열려있을 경우 먼저 닫고, 그 다음 수량 선택 모달 열기
+        closeModal();
+        
         let quantity = 1; // 기본값
         
-        const updateModalContent = (qty) => {
-            const calculatedCalories = cheatMeal.unitCalories * qty;
-            
-            setModalState({
-                open: true,
-                title: `🍕 ${name} 수량 선택`,
-                message: ``,
-                type: 'success',
-                confirmText: "입력 완료",
+        // 모달 상태 업데이트가 완료된 후 수량 선택 모달 열기
+        setTimeout(() => {
+            const updateModalContent = (qty) => {
+                const calculatedCalories = cheatMeal.unitCalories * qty;
                 
-                // [Logic] 입력 완료 버튼 클릭 시 실제 추가
-                onConfirm: () => {
-                   const finalCalories = cheatMeal.unitCalories * quantity;
-                   // 실제 추가 로직 호출
-                   addMealItem(name, finalCalories);
-                   closeModal();
-                },
+                setModalState({
+                    open: true,
+                    title: `🍕 ${name} 수량 선택`,
+                    message: ``,
+                    type: 'success',
+                    confirmText: "입력 완료",
+                    
+                    // [Logic] 입력 완료 버튼 클릭 시 실제 추가
+                    onConfirm: () => {
+                       const finalCalories = cheatMeal.unitCalories * quantity;
+                       // 실제 추가 로직 호출
+                       addMealItem(name, finalCalories);
+                       closeModal();
+                    },
                 
                 children: (
                     <div className="quantity-modal-content" style={{textAlign: 'center', padding: '10px 0'}}>
@@ -139,9 +144,10 @@ const MealPage = ({ onLogout }) => {
                     </div>
                 )
             });
-        };
-        
-        updateModalContent(1); // 초기 실행
+            };
+            
+            updateModalContent(1); // 초기 실행
+        }, 100); // 모달 닫힌 후 수량 선택 모달 열기
         return;
     }
     
@@ -236,8 +242,8 @@ const MealPage = ({ onLogout }) => {
                             key={i} 
                             className="menu-board-item"
                             onClick={() => {
-                                handleManualAdd(m.name, m.calories); // 바로 추가
-                                closeModal();
+                                handleManualAdd(m.name, m.calories); // 수량 선택 모달로 전환
+                                // closeModal() 제거: handleManualAdd 내부에서 처리함
                             }}
                         >
                             - {m.name} ({m.calories}kcal)
