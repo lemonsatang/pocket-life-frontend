@@ -72,17 +72,22 @@ Pocket Life는
 
 ---
 
-### 3-3. 데모 GIF & 영상 (예정)
+### 3-3. 데모 GIF
 
 - **데모 GIF**  
-  - 앱의 전체 플로우(로그인 → 대시보드 → 식단 기록 → 장바구니 → 가계부 → 일정)를 10~20초 분량으로 녹화한 GIF를 사용하는 것을 추천드립니다.  
-  - 예) `./src/image/demo-flow.gif`
 
-- **시연 영상 (YouTube 등)**  
-  - 화면 흐름과 사용 시나리오를 설명하는 **1~2분 길이의 짧은 영상**을 추천드립니다.  
-  - 예) `데모 영상: https://youtu.be/your-pocket-life-demo-link`  
-
-> GIF / 영상이 준비되면 이 섹션에 실제 파일 경로나 링크만 교체해 주시면 됩니다.
+<table>
+  <tr>
+    <td align="center"><img src="./src/image/gif/Signup_Login.gif" alt="Signup & Login 데모" width="300" /></td>
+    <td align="center"><img src="./src/image/gif/Dashboard.gif"    alt="Dashboard 데모"       width="300" /></td>
+    <td align="center"><img src="./src/image/gif/Meal.gif"         alt="Meal 데모"            width="300" /></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./src/image/gif/Cart.gif"         alt="Cart 데모"            width="300" /></td>
+    <td align="center"><img src="./src/image/gif/Schedule.gif"     alt="Schedule 데모"        width="300" /></td>
+    <td align="center"><img src="./src/image/gif/Ledger.gif"       alt="Ledger 데모"          width="300" /></td>
+  </tr>
+</table>
 
 ---
 
