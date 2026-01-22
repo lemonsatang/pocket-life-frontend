@@ -78,16 +78,16 @@ Pocket Life는
 
 <table>
   <tr>
-    <td align="center"><img src="./src/image/gif/Signup_Login.gif" alt="Signup & Login 데모" width="240" /></td>
-    <td align="center"><img src="./src/image/gif/Dashboard.gif"    alt="Dashboard 데모"       width="240" /></td>
+    <td align="center"><img src="./src/image/gif/Signup_Login.gif" alt="Signup & Login 데모" width="370" /></td>
+    <td align="center"><img src="./src/image/gif/Dashboard.gif"    alt="Dashboard 데모"       width="370" /></td>
   </tr>
   <tr>
-  <td align="center"><img src="./src/image/gif/Meal.gif"         alt="Meal 데모"            width="240" /></td>
-  <td align="center"><img src="./src/image/gif/Cart.gif"         alt="Cart 데모"            width="240" /></td>
+  <td align="center"><img src="./src/image/gif/Meal.gif"         alt="Meal 데모"            width="370" /></td>
+  <td align="center"><img src="./src/image/gif/Cart.gif"         alt="Cart 데모"            width="370" /></td>
   </tr>
   <tr>
-    <td align="center"><img src="./src/image/gif/Schedule.gif"     alt="Schedule 데모"        width="240" /></td>
-    <td align="center"><img src="./src/image/gif/Ledger.gif"       alt="Ledger 데모"          width="240" /></td>
+    <td align="center"><img src="./src/image/gif/Schedule.gif"     alt="Schedule 데모"        width="370" /></td>
+    <td align="center"><img src="./src/image/gif/Ledger.gif"       alt="Ledger 데모"          width="370" /></td>
   </tr>
 </table>
 
