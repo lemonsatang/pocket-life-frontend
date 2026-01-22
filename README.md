@@ -1,6 +1,6 @@
-# Pocket Life (Frontend)
+# 🎈 Pocket Life - 당신의 일상을 가볍고 스마트하게
 
-## 1. 프로젝트 소개
+## 📢 프로젝트 소개
 
 **가계부, 식단, 일정을 한 화면에서 정리하는 올인원 라이프 플래너, Pocket Life입니다.**
 
@@ -9,44 +9,29 @@ Pocket Life는
 - 필요한 화면으로 바로 이동해 **기록·수정·삭제·분석**까지 하실 수 있는  
 프론트엔드 기반 라이프 매니지먼트 웹 애플리케이션입니다.
 
-> 이 README는 오직 **프론트엔드** 구현만 다루며, 백엔드 내용은 포함하지 않습니다.
+---
+
+## 🚀 기술 스택 (Tech Stack)
+
+프론트엔드 본연의 즐거움에 집중하여 개발했습니다.
+
+| Category | Technology |
+|----------|------------|
+| **Core** | React, Vite |
+| **Logic** | JavaScript (ES6+) |
+| **Network** | Axios |
+| **Data Viz** | Recharts, Chart.js |
+| **Data** | 공공데이터 API (Public Data API) |
+| **UI Libs** | React Datepicker |
 
 ---
 
-## 2. 기술 스택 (Frontend Only)
+## 🎥 미리보기 (Screenshots & Demo)
 
-> 아래는 프론트엔드 구현에 사용된 주요 라이브러리들입니다.  
-> **CSS 관련 내용은 별도 기술 스택으로 기재하지 않았습니다.**
-
-- **Framework / Bundler**
-  - React
-  - Vite
-
-- **Routing**
-  - React Router DOM
-
-- **HTTP 통신**
-  - Axios
-
-- **차트 및 데이터 시각화**
-  - Chart.js  
-  - Recharts  
-  - React-Chartjs-2  
-
-- **날짜 선택**
-  - React DatePicker
-
-- **기타**
-  - jwt-decode
-
----
-
-## 3. 미리보기 (Screenshots & Demo)
-
-### 3-1. 대표 대시보드
+### 📊 대표 대시보드
 
 <p align="center">
-  <img src="./src/image/DashBorad.png" alt="Pocket Life 대시보드" width="900" />
+  <img src="./src/image/gif/Dashboard.gif" alt="Pocket Life 대시보드" width="900" />
 </p>
 
 대시보드에서는 오늘의  
@@ -58,70 +43,73 @@ Pocket Life는
 
 ---
 
-### 3-2. 주요 화면 스크린샷
 
-<p align="center">
-  <img src="./src/image/DashBorad.png" alt="대시보드 화면" width="260" />
-  <img src="./src/image/LedgerMoney.png" alt="가계부 화면" width="260" />
-  <img src="./src/image/LikeCart.png" alt="장바구니 & 즐겨찾기 화면" width="260" />
-</p>
-<p align="center">
-  <img src="./src/image/MealFree.png" alt="식단 관리 & 영양 요약 화면" width="260" />
-  <img src="./src/image/ScheduleFunny.png" alt="일정 캘린더 화면" width="260" />
-</p>
-
----
-
-### 3-3. 데모 GIF
-
-- **데모 GIF**  
+### 🎬 데모 GIF
 
 <table>
   <tr>
-    <td align="center"><img src="./src/image/gif/Signup_Login.gif" alt="Signup & Login 데모" width="370" /></td>
-    <td align="center"><img src="./src/image/gif/Dashboard.gif"    alt="Dashboard 데모"       width="370" /></td>
+    <td align="center">
+      <b>🔐 회원가입 및 로그인</b><br />
+      <img src="./src/image/gif/Signup_Login.gif" alt="Signup & Login 데모" width="370" />
+    </td>
+    <td align="center">
+  <b>📊 대시보드</b><br />
+  <img src="./src/image/gif/Dashboard.gif" width="370" />
+</td>
   </tr>
   <tr>
-  <td align="center"><img src="./src/image/gif/Meal.gif"         alt="Meal 데모"            width="370" /></td>
-  <td align="center"><img src="./src/image/gif/Cart.gif"         alt="Cart 데모"            width="370" /></td>
+    <td align="center">
+      <b>🍱 식단 관리</b><br />
+      <img src="./src/image/gif/Meal.gif" alt="Meal 데모" width="370" />
+    </td>
+    <td align="center">
+      <b>🛒 장바구니</b><br />
+      <img src="./src/image/gif/Cart.gif" alt="Cart 데모" width="370" />
+    </td>
   </tr>
   <tr>
-    <td align="center"><img src="./src/image/gif/Schedule.gif"     alt="Schedule 데모"        width="370" /></td>
-    <td align="center"><img src="./src/image/gif/Ledger.gif"       alt="Ledger 데모"          width="370" /></td>
+    <td align="center">
+      <b>📅 일정 관리</b><br />
+      <img src="./src/image/gif/Schedule.gif" alt="Schedule 데모" width="370" />
+    </td>
+    <td align="center">
+      <b>💰 가계부</b><br />
+      <img src="./src/image/gif/Ledger.gif" alt="Ledger 데모" width="370" />
+    </td>
   </tr>
 </table>
 
 ---
 
-## 4. 주요 기능
+## 📌 주요 기능
 
-### 4-1. 대시보드
+### 1. 대시보드
 
 - 오늘의 일정, 식단, 장바구니, 가계부 요약을 한 화면에서 확인  
 - 각 카드에서 **상세 페이지로 바로 이동** 가능  
 - 오늘 날짜 기준으로 핵심 정보만 깔끔하게 정리
 
-### 4-2. 가계부
+### 2. 가계부
 
 - 일자별 수입/지출 내역 기록 및 수정/삭제  
 - 카테고리(예: 식비, 생활, 쇼핑 등) 별 정리  
 - 월 단위 합계, 오늘 기준 요약 정보 제공  
 - 직관적인 컬러(지출은 빨간색 등)로 빠르게 파악 가능
 
-### 4-3. 장바구니 & 즐겨찾기
+### 3. 장바구니 & 즐겨찾기
 
 - 오늘의 장바구니 목록 조회 및 추가/삭제  
 - 자주 사는 품목은 **즐겨찾기**로 관리해서 빠르게 추가  
 - 구매 완료 상태 표시로 실제 쇼핑 체크리스트처럼 사용 가능
 
-### 4-4. 식단 관리 & 영양 리포트
+### 4. 식단 관리 & 영양 리포트
 
 - 아침/점심/저녁/간식 단위로 음식과 칼로리 기록  
 - 하루 섭취 칼로리 합계 및 간단한 영양 요약 제공  
 - 추천 식단 영역에서 오늘의 추천 메뉴 제안  
 - 시각적인 차트/그래프 기반 리포트 제공
 
-### 4-5. 일정 관리 (캘린더)
+### 5. 일정 관리 (캘린더)
 
 - 월간 캘린더에서 한눈에 일정 확인  
 - 특정 날짜 선택 후 할 일 추가/수정/삭제  
@@ -129,7 +117,7 @@ Pocket Life는
 
 ---
 
-## 5. 폴더 구조 (요약)
+## 📁 폴더 구조 (요약)
 
 src
 ├─ api
@@ -152,7 +140,7 @@ src
 
 ---
 
-## 6. 화면 흐름 & 라우팅
+## 💻 화면 흐름 & 라우팅
 
 > 실제 라우팅 구조는 `App.jsx` / `main.jsx` 에 정의되어 있으며, 아래는 대략적인 흐름입니다.
 
@@ -169,32 +157,32 @@ src
 
 ---
 
-## 7. 설치 및 실행 방법
+## 🔗 설치 및 실행 방법
 
-### 7-1. 사전 준비
+### 1. 사전 준비
 
 - Node.js (권장: LTS 버전) 설치
 
-### 7-2. 의존성 설치
+### 2. 의존성 설치
 
-npm install### 7-3. 개발 서버 실행
+npm install### 3. 개발 서버 실행
 
 npm run dev- 기본적으로 `http://localhost:5173` (또는 터미널에 표시되는 주소)에서 확인하실 수 있습니다.
 
-### 7-4. 프로덕션 빌드
+### 4. 프로덕션 빌드
 
 npm run build
 npm run preview---
 
-## 8. 프로젝트 목표 & 향후 개선
+## 🔔 프로젝트 목표 & 향후 개선
 
-### 8-1. 목표
+### 1. 목표
 
 - 일상에서 자주 사용하는 **가계부, 식단, 장바구니, 일정 관리**를 하나의 앱으로 통합하는 것을 목표로 합니다.  
 - 데이터를 시각적으로 표현해 사용자가 **오늘의 상태를 한 번에 이해**할 수 있도록 지원합니다.  
 - PC 환경에서 사용하기 편한 **심플하고 부드러운 인터페이스**를 제공합니다.
 
-### 8-2. 향후 개선 아이디어
+### 2. 향후 개선 아이디어
 
 - 반응형 레이아웃 확장(태블릿/모바일 대응)  
 - 그래프/차트 종류 확장 및 필터링 기능 강화  
