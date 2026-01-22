@@ -29,7 +29,9 @@
 현재 상태를 직관적으로 파악할 수 있는 메인 대시보드입니다. 
 한눈에 모든정보의 요약내용을 파악 및 관리할 수 있습니다.
 
-<video src="./src/image/gif/Dashboard2.mp4" autoplay loop muted width="100%"></video>
+<a href="https://raw.githubusercontent.com/lemonsatang/pocket-life-frontend/main/src/image/gif/Dashboard2.mp4">
+  <img src="./src/image/DashBorad.png" width="100%" alt="대시보드 미리보기" />
+</a>
 
 ### 2. 똑똑한 가계부 관리 (Ledger)
 수입과 지출을 캘린더와 리스트로 간편하게 관리하세요. 통계 그래프가 당신의 소비 패턴을 분석해 드립니다.
