@@ -161,9 +161,7 @@ const TransactionView = ({
           <span role="img" aria-label="calendar" className="calendar-icon">
             📅
           </span>
-          <span className="date-text">
-            {formatDateWithDay(formData.date)}
-          </span>
+          <span className="date-text">{formatDateWithDay(formData.date)}</span>
         </div>
         <button
           type="button"
@@ -426,7 +424,7 @@ const TransactionView = ({
             </button>
           </div>
           <form className="input-form" onSubmit={handleSubmit}>
-            {/* 📍 수정됨: 금액 입력 필드 - 150자리 제한 */}
+            {/* 📍 수정됨: 금액 입력 필드 - 10자리 제한 */}
             <input
               type="number"
               name="amount"
@@ -434,8 +432,8 @@ const TransactionView = ({
               value={formData.amount}
               onChange={handleInputChange}
               onInput={(e) => {
-                if (e.target.value.length > 7)
-                  e.target.value = e.target.value.slice(0, 150);
+                if (e.target.value.length > 10)
+                  e.target.value = e.target.value.slice(0, 10);
               }}
             />
             {/* 📍 수정됨: 항목 입력 필드 - 20자 제한 */}
