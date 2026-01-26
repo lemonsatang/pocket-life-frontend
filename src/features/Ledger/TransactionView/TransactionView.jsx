@@ -400,6 +400,7 @@ const TransactionView = ({
             <tbody>
               {currentItems.map((t) => (
                 <tr key={t.id}>
+                  {/* 📍 CSS에서 vertical-align: top 처리를 위해 클래스 유지 */}
                   <td className="td-narrow">{t.date}</td>
                   <td className="td-narrow text-bold">{t.item}</td>
                   <td className="td-narrow">
@@ -484,7 +485,7 @@ const TransactionView = ({
             </button>
           </div>
           <form className="input-form" onSubmit={handleSubmit}>
-            {/* 📍 수정됨: 금액 입력 필드 - 7자리 제한 */}
+            {/* 📍 수정됨: 금액 입력 필드 - 150자리 제한 */}
             <input
               type="number"
               name="amount"
@@ -493,17 +494,17 @@ const TransactionView = ({
               onChange={handleInputChange}
               onInput={(e) => {
                 if (e.target.value.length > 7)
-                  e.target.value = e.target.value.slice(0, 7);
+                  e.target.value = e.target.value.slice(0, 150);
               }}
             />
-            {/* 📍 수정됨: 항목 입력 필드 - 7자 제한 */}
+            {/* 📍 수정됨: 항목 입력 필드 - 10자 제한 */}
             <input
               type="text"
               name="item"
               placeholder="항목 (예: 이자, 편의점)"
               value={formData.item}
               onChange={handleInputChange}
-              maxLength={7}
+              maxLength={10}
             />
             {/* 📍 수정됨: 카테고리 입력 필드 - 7자 제한 */}
             <input
@@ -544,14 +545,14 @@ const TransactionView = ({
                 </div>
               )}
             />
-            {/* 📍 수정됨: 메모 입력 필드 - 7자 제한 */}
+            {/* 📍 수정됨: 메모 입력 필드 - 10자 제한 */}
             <input
               type="text"
               name="memo"
               placeholder="메모"
               value={formData.memo}
               onChange={handleInputChange}
-              maxLength={7}
+              maxLength={10}
             />
             <button type="submit" className="submit-save-btn">
               {editingId ? "수정하기" : "저장하기"}
