@@ -56,7 +56,7 @@ const TransactionView = ({
     type: "지출", // 기본은 '지출' 버튼 활성화
     memo: "",
   });
-  
+
   // 📍 달력 열림/닫힘 상태
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
@@ -82,28 +82,31 @@ const TransactionView = ({
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isSortDropdownOpen && !event.target.closest('.custom-dropdown-wrapper')) {
+      if (
+        isSortDropdownOpen &&
+        !event.target.closest(".custom-dropdown-wrapper")
+      ) {
         setIsSortDropdownOpen(false);
       }
     };
 
     if (isSortDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isSortDropdownOpen]);
 
   // 날짜 포맷팅 함수: "2026년 01월 21일 수요일" 형식으로 변환
   const formatDateWithDay = (date) => {
     if (!date) return "날짜 선택";
-    
+
     try {
       const dateObj = date instanceof Date ? date : new Date(date);
       if (isNaN(dateObj.getTime())) return "날짜 선택";
-      
+
       const year = dateObj.getFullYear();
       const month = String(dateObj.getMonth() + 1).padStart(2, "0");
       const day = String(dateObj.getDate()).padStart(2, "0");
@@ -117,7 +120,7 @@ const TransactionView = ({
         "토요일",
       ];
       const dayName = dayNames[dateObj.getDay()];
-      
+
       return `${year}년 ${month}월 ${day}일 ${dayName}`;
     } catch (e) {
       return "날짜 선택";
@@ -137,7 +140,7 @@ const TransactionView = ({
       <div
         ref={ref}
         onClick={(e) => {
-          if (e.target.tagName !== 'BUTTON') {
+          if (e.target.tagName !== "BUTTON") {
             setIsDatePickerOpen(!isDatePickerOpen);
             onClick(e);
           }
@@ -198,8 +201,8 @@ const TransactionView = ({
           <span role="img" aria-label="calendar" style={{ flexShrink: 0 }}>
             📅
           </span>
-          <span 
-            style={{ 
+          <span
+            style={{
               whiteSpace: "nowrap",
               display: "inline-block",
               width: "145px",
@@ -264,9 +267,10 @@ const TransactionView = ({
 
     try {
       // 날짜를 YYYY-MM-DD 형식으로 변환
-      const dateStr = formData.date instanceof Date 
-        ? formData.date.toISOString().split("T")[0] 
-        : formData.date;
+      const dateStr =
+        formData.date instanceof Date
+          ? formData.date.toISOString().split("T")[0]
+          : formData.date;
 
       if (editingId) {
         // --- 📍 수정 모드일 때 (PUT 요청) ---
@@ -451,7 +455,7 @@ const TransactionView = ({
             <button
               className="page-nav-btn"
               disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
             >
               &gt;
             </button>
@@ -480,26 +484,35 @@ const TransactionView = ({
             </button>
           </div>
           <form className="input-form" onSubmit={handleSubmit}>
+            {/* 📍 수정됨: 금액 입력 필드 - 7자리 제한 */}
             <input
               type="number"
               name="amount"
               placeholder="금액"
               value={formData.amount}
               onChange={handleInputChange}
+              onInput={(e) => {
+                if (e.target.value.length > 7)
+                  e.target.value = e.target.value.slice(0, 7);
+              }}
             />
+            {/* 📍 수정됨: 항목 입력 필드 - 7자 제한 */}
             <input
               type="text"
               name="item"
               placeholder="항목 (예: 이자, 편의점)"
               value={formData.item}
               onChange={handleInputChange}
+              maxLength={7}
             />
+            {/* 📍 수정됨: 카테고리 입력 필드 - 7자 제한 */}
             <input
               type="text"
               name="category"
               placeholder="카테고리"
               value={formData.category}
               onChange={handleInputChange}
+              maxLength={7}
             />
             <DatePicker
               selected={formData.date}
@@ -520,19 +533,25 @@ const TransactionView = ({
                 prevMonthButtonDisabled,
                 nextMonthButtonDisabled,
               }) => (
-                <div className="react-datepicker__header" style={{ position: "relative", textAlign: "center" }}>
+                <div
+                  className="react-datepicker__header"
+                  style={{ position: "relative", textAlign: "center" }}
+                >
                   <h2 className="react-datepicker__current-month">
-                    {date.getFullYear()}년 {String(date.getMonth() + 1).padStart(2, "0")}월
+                    {date.getFullYear()}년{" "}
+                    {String(date.getMonth() + 1).padStart(2, "0")}월
                   </h2>
                 </div>
               )}
             />
+            {/* 📍 수정됨: 메모 입력 필드 - 7자 제한 */}
             <input
               type="text"
               name="memo"
               placeholder="메모"
               value={formData.memo}
               onChange={handleInputChange}
+              maxLength={7}
             />
             <button type="submit" className="submit-save-btn">
               {editingId ? "수정하기" : "저장하기"}
