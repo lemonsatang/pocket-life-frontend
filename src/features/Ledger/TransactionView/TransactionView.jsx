@@ -266,11 +266,11 @@ const TransactionView = ({
     }
 
     try {
-      // 날짜를 YYYY-MM-DD 형식으로 변환
-      const dateStr =
-        formData.date instanceof Date
-          ? formData.date.toISOString().split("T")[0]
-          : formData.date;
+      // 📍 수정됨: UTC 오차 해결을 위해 한국 시간 기준 YYYY-MM-DD 추출
+      const offset = formData.date.getTimezoneOffset() * 60000;
+      const dateStr = new Date(formData.date.getTime() - offset)
+        .toISOString()
+        .split("T")[0];
 
       if (editingId) {
         // --- 📍 수정 모드일 때 (PUT 요청) ---
