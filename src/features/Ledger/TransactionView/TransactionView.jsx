@@ -139,97 +139,38 @@ const TransactionView = ({
     return (
       <div
         ref={ref}
+        className="custom-date-input-wrapper"
         onClick={(e) => {
           if (e.target.tagName !== "BUTTON") {
             setIsDatePickerOpen(!isDatePickerOpen);
             onClick(e);
           }
         }}
-        style={{
-          cursor: "pointer",
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "4px",
-          padding: "10px 8px",
-          border: "1px solid #e2e8f0",
-          borderRadius: "10px",
-          background: "#fff",
-          fontSize: "14px",
-          color: "#2d3748",
-          lineHeight: 1.2,
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-        }}
       >
         <button
           type="button"
+          className="date-nav-button"
           onClick={(e) => {
             e.stopPropagation();
             handleDateChange(-1);
           }}
-          style={{
-            background: "none",
-            border: "none",
-            fontSize: "16px",
-            color: "#6f76a1",
-            cursor: "pointer",
-            padding: "2px 6px",
-            outline: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
         >
           ‹
         </button>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            cursor: "pointer",
-            flex: 1,
-            justifyContent: "center",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            minWidth: 0,
-          }}
-        >
-          <span role="img" aria-label="calendar" style={{ flexShrink: 0 }}>
+        <div className="date-display-wrapper">
+          <span role="img" aria-label="calendar" className="calendar-icon">
             📅
           </span>
-          <span
-            style={{
-              whiteSpace: "nowrap",
-              display: "inline-block",
-              width: "145px",
-              textAlign: "center",
-            }}
-          >
+          <span className="date-text">
             {formatDateWithDay(formData.date)}
           </span>
         </div>
         <button
           type="button"
+          className="date-nav-button"
           onClick={(e) => {
             e.stopPropagation();
             handleDateChange(1);
-          }}
-          style={{
-            background: "none",
-            border: "none",
-            fontSize: "16px",
-            color: "#6f76a1",
-            cursor: "pointer",
-            padding: "2px 6px",
-            outline: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
           }}
         >
           ›
@@ -534,10 +475,7 @@ const TransactionView = ({
                 prevMonthButtonDisabled,
                 nextMonthButtonDisabled,
               }) => (
-                <div
-                  className="react-datepicker__header"
-                  style={{ position: "relative", textAlign: "center" }}
-                >
+                <div className="react-datepicker__header datepicker-custom-header">
                   <h2 className="react-datepicker__current-month">
                     {date.getFullYear()}년{" "}
                     {String(date.getMonth() + 1).padStart(2, "0")}월
@@ -560,8 +498,7 @@ const TransactionView = ({
             {editingId && (
               <button
                 type="button"
-                className="submit-save-btn"
-                style={{ backgroundColor: "#bbb", marginTop: "5px" }}
+                className="submit-save-btn cancel-btn"
                 onClick={() => {
                   setEditingId(null);
                   setFormData({
