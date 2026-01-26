@@ -18,9 +18,9 @@ Pocket Life는
 
 | 분류 | 기술 |
 |------|---------|
-| **핵심** | React, Vite |
+| **프레임워크** | React, Vite |
 | **언어** | JavaScript (ES6+) |
-| **통신** | Axios |
+| **네트워크** | Axios |
 | **차트** | Recharts, Chart.js |
 | **UI** | React Datepicker |
 
