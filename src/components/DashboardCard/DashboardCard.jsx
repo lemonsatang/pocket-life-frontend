@@ -27,9 +27,13 @@ const DashboardCard = ({
   const isOver = safeCalories > 2000;
 
   // [Logic] 치팅 식단 포함 여부 확인
-  const hasCheatMeal = isMeal && list?.some((item) => 
-    cheatMeals.some((cheat) => (item.text || item.menuName || "").includes(cheat.name))
-  );
+  const hasCheatMeal =
+    isMeal &&
+    list?.some((item) =>
+      cheatMeals.some((cheat) =>
+        (item.text || item.menuName || "").includes(cheat.name),
+      ),
+    );
 
   // [Logic] 치팅 데이 조건: 칼로리 2000 초과 AND 치팅 식단 포함
   const isCheatingDay = isOver && hasCheatMeal;
@@ -96,22 +100,24 @@ const DashboardCard = ({
                           ? "✅ "
                           : "🛒 "
                         : item.isDone
-                        ? "✅ "
-                        : "• "}
+                          ? "✅ "
+                          : "• "}
                       {isMeal && item.mealType && (
-                      <strong className="dashboard-card-list-item-meal-type">
-                        [{item.mealType}]
-                      </strong>
-                    )}
-                    {item.text || item.menuName}
-                  </span>
-                  {/* [Logic] 치팅 데이(2000kcal 초과 + 치팅메뉴)가 아닐 때만 칼로리 표시 */}
-                  {isMeal && item.calories !== undefined && !isCheatingDay && (
-                    <span className="dashboard-card-list-item-calories">
-                      {item.calories} kcal
+                        <strong className="dashboard-card-list-item-meal-type">
+                          [{item.mealType}]
+                        </strong>
+                      )}
+                      {item.text || item.menuName}
                     </span>
-                  )}
-                </li>
+                    {/* [Logic] 치팅 데이(2000kcal 초과 + 치팅메뉴)가 아닐 때만 칼로리 표시 */}
+                    {isMeal &&
+                      item.calories !== undefined &&
+                      !isCheatingDay && (
+                        <span className="dashboard-card-list-item-calories">
+                          {item.calories} kcal
+                        </span>
+                      )}
+                  </li>
                 );
               })
             ) : (
@@ -124,14 +130,18 @@ const DashboardCard = ({
       {/* 식단 카드일 때만 칼로리 요약 표시 */}
       {isMeal && (
         <div className="dashboard-card-calories">
-          {!isCheatingDay && <p className="dashboard-card-calories-label">오늘 총 칼로리</p>}
+          {!isCheatingDay && (
+            <p className="dashboard-card-calories-label">오늘 총 칼로리</p>
+          )}
           <span
             className={`dashboard-card-calories-value ${
               isOver ? "over" : "normal"
             }`}
           >
             {/* [Logic] 치팅 데이 조건 충족 시 문구 변경 */}
-            {isCheatingDay ? "치팅데이!" : `${safeCalories.toLocaleString()} kcal`}
+            {isCheatingDay
+              ? "치팅데이!"
+              : `${safeCalories.toLocaleString()} kcal`}
           </span>
         </div>
       )}
