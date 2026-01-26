@@ -16,7 +16,7 @@ import OAuth2RedirectHandler from "./api/OAuth2RedirectHandler";
 import "./styles/Common.css";
 import "./styles/DatePicker.css";
 
-import { MealProvider } from "./features/Meal/context/MealContext.jsx"; // [New]
+import { MealProvider } from "./context/MealContext.jsx"; // [New]
 
 // [Logic] 메인 App 컴포넌트
 export default function App() {

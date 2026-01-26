@@ -1,6 +1,6 @@
 // [Layout] 식단 상세 리포트 페이지 - 식단관리 차트 및 주/월 단위 통계
 import React, { useState, useEffect, useMemo } from "react";
-import { useMealContext } from "../../context/MealContext.jsx";
+import { useMealContext } from "../../../../context/MealContext.jsx";
 import dataApi from "../../../../api/api";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";

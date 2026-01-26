@@ -1,6 +1,6 @@
 // [Layout] 식단 관리 페이지 - 식사 기록 및 통계
 import React, { useState, useEffect } from "react";
-import { useMealContext } from "./context/MealContext.jsx"; // [New] import
+import { useMealContext } from "../../context/MealContext.jsx"; // [New] import
 import DatePicker from "react-datepicker";
 import { useMealData } from "./hooks/useMealData";
 import MealStats from "./components/MealStats/MealStats";
@@ -11,7 +11,7 @@ import Header from "../../components/Layout/Header";
 import Modal from "../../components/Modal/Modal";
 import dataApi from "../../api/api"; // [추가 2026-01-XX] 누가: 프론트엔드 개발자, 무엇을: API 호출을 위한 import 추가, 어디서: MealPage.jsx 10번째 줄, 어떻게: dataApi import 추가, 왜: 목표 칼로리를 API에서 가져오기 위해
 import "./MealPage.css";
-import { lightMeals, heartyMeals, cheatMeals } from "./data/recommendedMeals";
+import { lightMeals, heartyMeals, cheatMeals } from "../../data/Mealmenu";
 
 const MealPage = ({ onLogout }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
