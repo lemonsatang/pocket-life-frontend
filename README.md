@@ -2,6 +2,8 @@
 
 ## 📢 프로젝트 소개
 
+### 👨‍👧‍👧Team (1조): 권효민,장민선,정해련
+
 **가계부, 식단, 일정을 한 화면에서 정리하는 올인원 라이프 플래너, Pocket Life입니다.**
 
 Pocket Life는  
@@ -14,14 +16,13 @@ Pocket Life는
 ## 🚀 기술 스택 (Tech Stack)
 
 
-| Category | Technology |
-|----------|------------|
-| **Core** | React, Vite |
-| **Logic** | JavaScript (ES6+) |
-| **Network** | Axios |
-| **Data Viz** | Recharts, Chart.js |
-| **Data** | 공공데이터 API (Public Data API) |
-| **UI Libs** | React Datepicker |
+| 분류 | 기술 |
+|------|---------|
+| **핵심** | React, Vite |
+| **언어** | JavaScript (ES6+) |
+| **통신** | Axios |
+| **차트** | Recharts, Chart.js |
+| **UI** | React Datepicker |
 
 ---
 
@@ -30,7 +31,7 @@ Pocket Life는
 ### 📊 대표 대시보드
 
 <p align="center">
-  <img src="./src/image/gif/Dashboard.gif" alt="Pocket Life 대시보드" width="900" />
+  <img src="./src/assets/image/gif/Dashboard.gif" alt="Pocket Life 대시보드" width="900" />
 </p>
 
 #### 대시보드에서는 아래의 기록정보 한 화면에서 확인하실 수 있습니다.
@@ -48,31 +49,31 @@ Pocket Life는
   <tr>
     <td align="center">
       <b>🔐 회원가입 및 로그인</b><br />
-      <img src="./src/image/gif/Signup_Login.gif" alt="Signup & Login 데모" width="370" />
+      <img src="./src/assets/image/gif/Signup_Login.gif" alt="Signup & Login 데모" width="370" />
     </td>
     <td align="center">
   <b>📊 대시보드</b><br />
-  <img src="./src/image/gif/Dashboard.gif" width="370" />
+  <img src="./src/assets/image/gif/Dashboard.gif" width="370" />
 </td>
   </tr>
   <tr>
     <td align="center">
       <b>🍱 식단 관리</b><br />
-      <img src="./src/image/gif/Meal.gif" alt="Meal 데모" width="370" />
+      <img src="./src/assets/image/gif/Meal.gif" alt="Meal 데모" width="370" />
     </td>
     <td align="center">
       <b>🛒 장바구니</b><br />
-      <img src="./src/image/gif/Cart.gif" alt="Cart 데모" width="370" />
+      <img src="./src/assets/image/gif/Cart.gif" alt="Cart 데모" width="370" />
     </td>
   </tr>
   <tr>
     <td align="center">
       <b>📅 일정 관리</b><br />
-      <img src="./src/image/gif/Schedule.gif" alt="Schedule 데모" width="370" />
+      <img src="./src/assets/image/gif/Schedule.gif" alt="Schedule 데모" width="370" />
     </td>
     <td align="center">
       <b>💰 가계부</b><br />
-      <img src="./src/image/gif/Ledger.gif" alt="Ledger 데모" width="370" />
+      <img src="./src/assets/image/gif/Ledger.gif" alt="Ledger 데모" width="370" />
     </td>
   </tr>
 </table>
@@ -176,7 +177,6 @@ src
 
 ## 🛫 향후 개선
 
-- 반응형 레이아웃 확장(태블릿/모바일 대응)  
 - 그래프/차트 종류 확장 및 필터링 기능 강화  
 - 사용자 맞춤 추천(예: 소비 패턴, 식단 패턴 기반) 로직 고도화  
 - 접근성(키보드 네비게이션, 스크린 리더 지원 등) 개선
