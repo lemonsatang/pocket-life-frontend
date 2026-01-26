@@ -497,14 +497,14 @@ const TransactionView = ({
                   e.target.value = e.target.value.slice(0, 150);
               }}
             />
-            {/* 📍 수정됨: 항목 입력 필드 - 10자 제한 */}
+            {/* 📍 수정됨: 항목 입력 필드 - 20자 제한 */}
             <input
               type="text"
               name="item"
               placeholder="항목 (예: 이자, 편의점)"
               value={formData.item}
               onChange={handleInputChange}
-              maxLength={10}
+              maxLength={20}
             />
             {/* 📍 수정됨: 카테고리 입력 필드 - 7자 제한 */}
             <input
@@ -545,14 +545,14 @@ const TransactionView = ({
                 </div>
               )}
             />
-            {/* 📍 수정됨: 메모 입력 필드 - 10자 제한 */}
+            {/* 📍 수정됨: 메모 입력 필드 - 20자 제한 */}
             <input
               type="text"
               name="memo"
               placeholder="메모"
               value={formData.memo}
               onChange={handleInputChange}
-              maxLength={10}
+              maxLength={20}
             />
             <button type="submit" className="submit-save-btn">
               {editingId ? "수정하기" : "저장하기"}
