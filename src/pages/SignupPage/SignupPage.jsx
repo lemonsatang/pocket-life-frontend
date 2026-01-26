@@ -174,8 +174,8 @@ export default function SignupPage({ onGoLogin }) {
       email: !f.email
         ? "필수 입력"
         : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)
-        ? "이메일 형식"
-        : "",
+          ? "이메일 형식"
+          : "",
       name: !f.name ? "필수 입력" : "",
       phone:
         f.phone && !/^\d{3}-\d{4}-\d{4}$/.test(f.phone)
@@ -184,7 +184,7 @@ export default function SignupPage({ onGoLogin }) {
       birth:
         f.birth && !/^\d{6}$/.test(f.birth) ? "생년월일 6자리 (YYMMDD)" : "",
     }),
-    [f]
+    [f],
   );
 
   // [Layout] 인라인 에러 메시지 컴포넌트
@@ -248,6 +248,7 @@ export default function SignupPage({ onGoLogin }) {
           value={f.id}
           onChange={on}
           onBlur={idChk}
+          maxLength={20}
         />
         {idMsg.text && (
           <div
@@ -265,6 +266,7 @@ export default function SignupPage({ onGoLogin }) {
           type={showPw ? "text" : "password"}
           value={f.pw}
           onChange={on}
+          maxLength={50}
           suffix={
             <button
               type="button"
@@ -284,6 +286,7 @@ export default function SignupPage({ onGoLogin }) {
           type={showPw ? "text" : "password"}
           value={f.pw2}
           onChange={on}
+          maxLength={50}
         />
         <InlineErr msg={err.pw2} />
 
@@ -293,6 +296,7 @@ export default function SignupPage({ onGoLogin }) {
           name="email"
           value={f.email}
           onChange={on}
+          maxLength={40}
         />
         <InlineErr msg={err.email} />
 
@@ -302,6 +306,7 @@ export default function SignupPage({ onGoLogin }) {
           name="name"
           value={f.name}
           onChange={on}
+          maxLength={5}
         />
         <InlineErr msg={err.name} />
 
@@ -392,6 +397,7 @@ function Field({
   onChange,
   onBlur,
   suffix,
+  maxLength,
 }) {
   return (
     <div className="field">
@@ -404,6 +410,7 @@ function Field({
         onChange={onChange}
         onBlur={onBlur}
         placeholder={placeholder}
+        maxLength={maxLength}
       />
       {suffix && suffix}
     </div>
@@ -420,34 +427,34 @@ function getIcon(k) {
   );
   if (k === "user")
     return S(
-      "M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"
+      "M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z",
     );
   if (k === "lock")
     return S(
-      "M17 10h-1V8a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4Z"
+      "M17 10h-1V8a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4Z",
     );
   if (k === "check") return S("M9 12.5 6.5 10 5 11.5 9 15.5 19 5.5 17.5 4Z");
   if (k === "mail")
     return S(
-      "M20 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2Zm0 3-8 5L4 9"
+      "M20 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2Zm0 3-8 5L4 9",
     );
   if (k === "person")
     return S("M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-7.5 9a7.5 7.5 0 0 1 15 0Z");
   if (k === "phone")
     return S(
-      "M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.07 21 3 13.93 3 5a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.59a1 1 0 0 1-.25 1.03l-2.2 2.17Z"
+      "M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.07 21 3 13.93 3 5a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.59a1 1 0 0 1-.25 1.03l-2.2 2.17Z",
     );
   if (k === "cal")
     return S(
-      "M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2Zm14 8H3V6h18Z"
+      "M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2Zm14 8H3V6h18Z",
     );
   if (k === "eye")
     return S(
-      "M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+      "M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z",
     );
   if (k === "eyeOff")
     return S(
-      "M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-4.01.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
+      "M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-4.01.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z",
     );
 
   return null;

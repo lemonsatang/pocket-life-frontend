@@ -25,6 +25,18 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
     onCancel: null,
   });
 
+  // 아이디 유효성 검사
+  const idValid = (e) => {
+    let text = e.target.value;
+
+    text = text.replace(/[^a-zA-Z0-9]/g, "");
+    if (text.length > 0 && /^[0-9]/.test(text)) {
+      text = text.substring(1);
+    }
+
+    setId(text);
+  };
+
   // [Logic] 모달 닫기
   const close = () => setM((s) => ({ ...s, open: false }));
 
@@ -37,7 +49,6 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
       showCancel: false,
       confirmText: "확인",
       cancelText: "취소",
-      // [수정 2026-01-15 09:40] 인자로 받은 type 적용
       type: type,
       onConfirm: () => {
         close();
@@ -61,7 +72,6 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
         "http://localhost:8080/login",
         formData,
       );
-      console.log(response);
 
       // 토큰 추출
       const token = response.headers["authorization"];
@@ -74,7 +84,7 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
         // 방법: 일반 로그인 성공 시 기존의 소셜 토큰(mock_token)을 명시적으로 삭제.
         sessionStorage.removeItem("mock_token");
 
-        // [수정 2026-01-15 09:40] 로그인 성공 -> success (초록)
+        // 로그인 성공
         openOk(
           "로그인 성공",
           () => {
@@ -87,12 +97,11 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
       }
     } catch (e) {
       console.error("로그인 에러: ", e);
-      // [수정 2026-01-15 09:40] 로그인 실패 -> warning (빨강, 기본값)
       openOk("로그인 정보를 확인해주세요.");
     }
   };
 
-  // [Logic] 소셜 로그인 처리
+  // 소셜 로그인 처리
   const handleSocialLogin = (provider) => {
     sessionStorage.removeItem("token");
 
@@ -116,8 +125,9 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
           <input
             className="input login-input"
             value={id}
-            onChange={(e) => setId(e.target.value)}
+            onChange={idValid}
             placeholder="아이디"
+            maxLength={20}
           />
         </div>
 
@@ -133,6 +143,7 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
             value={pw}
             onChange={(e) => setPw(e.target.value)}
             placeholder="비밀번호"
+            maxLength={50}
           />
           <button
             type="button"
@@ -209,7 +220,6 @@ export default function LoginPage({ onGoSignup, onLoginSuccess }) {
         showCancel={m.showCancel}
         confirmText={m.confirmText}
         cancelText={m.cancelText}
-        // [수정 2026-01-15 09:40] type 전달
         type={m.type}
         onConfirm={m.onConfirm}
         onCancel={m.onCancel}
