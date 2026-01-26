@@ -7,11 +7,13 @@
   gap: 20px;
   height: auto;
   align-items: flex-start;
+  justify-content: flex-start;
   font-family: "Jua", sans-serif;
   /* 📍 전체 컨테이너를 10% 정도 넓혀 리스트 공간 확보 */
-  width: 95%;
+  width: 100%;
   max-width: 1300px;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0 20px;
 }
 
 .left-transaction-panel {
@@ -24,11 +26,13 @@
 
 .right-input-panel {
   /* 📍 사이드바는 원래의 적정 너비로 복구 */
-  flex: 1;
+  flex: 0.85;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  min-width: 320px;
+  min-width: 280px;
+  max-width: 300px;
+  margin-left: auto;
 }
 
 /* [2. 상단 컨트롤 바 스타일 - 원상복구] */
@@ -98,9 +102,9 @@
   display: flex;
   flex-direction: column;
 
-  /* 📍 요청하신 세로 사이즈 유지 및 드래그바(스크롤) 제거 */
-  min-height: 545px;
-  max-height: 545px;
+  /* 📍 2026-01-26 15:15: 높이 연장이 다른 영역에 영향을 주어 다시 545px로 원복함. */
+  min-height: 573px;
+  max-height: 573px;
   overflow: hidden; /* 📍 불필요하게 생겼던 드래그바 삭제 */
 }
 
@@ -110,29 +114,33 @@
   text-align: center;
 }
 .transaction-table th {
-  padding: 12px 10px;
+  padding: 10px 10px;
   border-bottom: 2px solid #f0f0f0;
   color: #777;
   font-size: 14px;
 }
 .transaction-table td.td-narrow {
-  padding: 15px 5px;
+  padding: 8px 5px;
   border-bottom: 1px solid #f9f9f9;
   font-size: 14px;
-  vertical-align: top;
+  vertical-align: middle;
   word-break: break-all;
+  white-space: nowrap;
 }
 
-/* [4. 알약 버튼 스타일 - 원상복구] */
+/* [4. 라운드 처리된 네모 버튼 스타일] */
 .action-button-group {
   display: flex;
+  flex-direction: row;
   justify-content: center;
+  align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 .pill-btn {
   border: none;
-  padding: 5px 12px;
-  border-radius: 20px;
+  padding: 6px 14px;
+  border-radius: 8px;
   font-size: 11px;
   font-weight: bold;
   color: white;
@@ -170,7 +178,7 @@
 .side-card {
   background: white;
   border-radius: 20px;
-  padding: 20px;
+  padding: 25px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   width: 100%;
   box-sizing: border-box;
@@ -181,6 +189,11 @@
   margin-bottom: 15px;
   font-weight: bold;
   color: #333;
+}
+.input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px; /* 입력란 간격 조정 */
 }
 .input-form input {
   padding: 12px;
@@ -218,11 +231,13 @@
 }
 .pagination-container {
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   gap: 8px;
-  margin-top: auto;
-  padding-top: 10px;
+  margin-top: 35px;
+  padding-top: 5px;
+  visibility: visible;
 }
 .page-num-btn {
   border: none;
@@ -239,4 +254,70 @@
   background-color: #b2b2ff;
   color: white;
   font-weight: bold;
+}
+
+/* [8. DatePicker 커스텀 스타일] */
+.custom-date-input-wrapper {
+  cursor: pointer;
+  width: 101%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+  color: #2d3748;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.date-nav-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #6f76a1;
+  cursor: pointer;
+  padding: 2px 6px;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.date-display-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  flex: 1;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.calendar-icon {
+  flex-shrink: 0;
+}
+
+.date-text {
+  white-space: nowrap;
+  display: inline-block;
+  width: 145px;
+  text-align: center;
+}
+
+.datepicker-custom-header {
+  position: relative;
+  text-align: center;
+}
+
+.cancel-btn {
+  background-color: #bbb !important;
+  margin-top: 5px;
 }

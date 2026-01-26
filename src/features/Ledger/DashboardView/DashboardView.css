@@ -90,6 +90,8 @@
   display: flex;
   flex-direction: column;
   align-items: center; /* 가로 중앙 정렬 */
+  overflow-y: auto; /* 스크롤 가능하도록 */
+  max-height: 100%; /* 부모 높이를 넘지 않도록 */
 }
 
 /* 📍 카드 내부 상단 중앙 제목 스타일 */
@@ -117,6 +119,7 @@
   font-size: 14px;
   text-align: center;
   border-bottom: 1px solid #f9f9f9;
+  word-break: break-word; /* 긴 텍스트 줄바꿈 */
 }
 
 /* [6. 뱃지 및 컬러] */
