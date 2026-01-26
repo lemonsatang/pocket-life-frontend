@@ -9,7 +9,7 @@ import dataApi from "../../api/api";
 registerLocale("ko", ko);
 
 const Home = () => {
-  /* [1. 상태 관리 - 기존 유지] */
+  /* [1. 상태 관리] */
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dashboardData, setDashboardData] = useState({
     meals: [],
@@ -19,7 +19,7 @@ const Home = () => {
     expense: 0,
   });
 
-  /* [2. 날짜 변환 로직 - 기존 유지] */
+  /* [2. 날짜 변환 로직] */
   const getDateStr = (dateObj) => {
     const year = dateObj.getFullYear();
     const month = String(dateObj.getMonth() + 1).padStart(2, "0");
@@ -33,10 +33,9 @@ const Home = () => {
     </span>
   ));
 
-  /* [3. 데이터 로딩 및 정확한 금액 계산] */
+  /* [3. 데이터 로딩 및 날짜별 필터링 수정] */
   useEffect(() => {
-    const dateStr = getDateStr(currentDate);
-    const currentYearMonth = dateStr.substring(0, 7); // "2026-01"
+    const dateStr = getDateStr(currentDate); // 예: "2026-01-26"
 
     Promise.all([
       dataApi
@@ -51,26 +50,22 @@ const Home = () => {
         .get(`/api/todo/getList?date=${dateStr}`)
         .then((res) => res.data)
         .catch(() => []),
-      /* 📍 [수정] 가계부 API 주소를 /api/tx/latest에서 /api/tx로 변경 */
       dataApi
         .get(`/api/tx`)
         .then((res) => res.data)
         .catch(() => []),
     ])
       .then(([meals, cartData, todos, txs]) => {
-        /* 📍 [가계부 필드 매칭 및 합산] */
         let incomeSum = 0;
         let expenseSum = 0;
 
         if (Array.isArray(txs)) {
           txs.forEach((t) => {
-            // 가계부 페이지 로직 반영: 날짜는 t.txDate에 들어있음
             const txDate = t.txDate || "";
 
-            // 현재 선택된 달(currentYearMonth)과 일치하는지 확인
-            if (txDate.startsWith(currentYearMonth)) {
+            // 📍 [수정] '월' 단위 비교가 아닌, 선택된 '날짜(dateStr)'와 정확히 일치하는 데이터만 합산
+            if (txDate === dateStr) {
               const amount = Number(t.amount) || 0;
-              // 가계부 페이지 로직 반영: t.type === "INCOME" 이면 수입
               if (t.type === "INCOME") {
                 incomeSum += amount;
               } else {
@@ -80,7 +75,7 @@ const Home = () => {
           });
         }
 
-        /* --- 기존 기능(식단/장바구니 등) 로직 보존 --- */
+        /* --- 기존 기능 보존 --- */
         const todayCartItems = (cartData || []).filter(
           (item) => item.shoppingDate === dateStr,
         );
@@ -100,7 +95,7 @@ const Home = () => {
       .catch((err) => console.error("데이터 로딩 실패", err));
   }, [currentDate]);
 
-  /* [4. 요약 계산 - 기존 유지] */
+  /* [4. 요약 계산] */
   const totalCalories = dashboardData.meals.reduce(
     (sum, m) => sum + (Number(m.calories) || 0),
     0,
@@ -138,66 +133,51 @@ const Home = () => {
               prevMonthButtonDisabled,
               nextMonthButtonDisabled,
             }) => (
-              <div className="react-datepicker__header" style={{ position: "relative", textAlign: "center", output: "visible" }}>
+              <div
+                className="react-datepicker__header"
+                style={{ position: "relative", textAlign: "center" }}
+              >
                 <button
                   type="button"
                   onClick={decreaseMonth}
                   disabled={prevMonthButtonDisabled}
                   className="date-nav-btn"
-                  aria-label="이전 달"
                   style={{
                     position: "absolute",
                     left: "10px",
                     top: "50%",
                     transform: "translateY(-50%)",
-                    zIndex: 10,
-                    width: "32px",
-                    height: "32px",
                     background: "none",
                     border: "none",
-                    cursor: prevMonthButtonDisabled ? "not-allowed" : "pointer",
-                    padding: 0,
-                    outline: "none",
-                    color: prevMonthButtonDisabled ? "#cbd5e0" : "#5e72e4",
                     fontSize: "1.5rem",
-                    fontWeight: "bold",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    lineHeight: 1,
+                    color: "#5e72e4",
+                    cursor: "pointer",
                   }}
                 >
                   ◀
                 </button>
-                <h2 className="react-datepicker__current-month" style={{ margin: 0 }}>
-                  {date.getFullYear()}년 {String(date.getMonth() + 1).padStart(2, "0")}월
+                <h2
+                  className="react-datepicker__current-month"
+                  style={{ margin: 0 }}
+                >
+                  {date.getFullYear()}년{" "}
+                  {String(date.getMonth() + 1).padStart(2, "0")}월
                 </h2>
                 <button
                   type="button"
                   onClick={increaseMonth}
                   disabled={nextMonthButtonDisabled}
                   className="date-nav-btn"
-                  aria-label="다음 달"
                   style={{
                     position: "absolute",
                     right: "10px",
                     top: "50%",
                     transform: "translateY(-50%)",
-                    zIndex: 10,
-                    width: "32px",
-                    height: "32px",
                     background: "none",
                     border: "none",
-                    cursor: nextMonthButtonDisabled ? "not-allowed" : "pointer",
-                    padding: 0,
-                    outline: "none",
-                    color: nextMonthButtonDisabled ? "#cbd5e0" : "#5e72e4",
                     fontSize: "1.5rem",
-                    fontWeight: "bold",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    lineHeight: 1,
+                    color: "#5e72e4",
+                    cursor: "pointer",
                   }}
                 >
                   ▶
